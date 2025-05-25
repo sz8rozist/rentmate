@@ -1,0 +1,82 @@
+{
+  "project_info": {
+    "project_number": "338621184939",
+    "project_id": "rentmate-bcc88",
+    "storage_bucket": "rentmate-bcc88.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:338621184939:android:350a3345cf0fde85b130ee",
+        "android_client_info": {
+          "package_name": "com.example.rentmate"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "338621184939-5rkfa7aovpmlr90u4jli7oague825j5t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBpNHv_k1iAuJmmEi-9RqEzhhMpwmEJU_Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "338621184939-5rkfa7aovpmlr90u4jli7oague825j5t.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "338621184939-9rra475154l821gk75tbh4s905vpstns.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.rentmate"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:338621184939:android:04fe0f5095071ce1b130ee",
+        "android_client_info": {
+          "package_name": "com.exmaple.rentmate"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "338621184939-5rkfa7aovpmlr90u4jli7oague825j5t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBpNHv_k1iAuJmmEi-9RqEzhhMpwmEJU_Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "338621184939-5rkfa7aovpmlr90u4jli7oague825j5t.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "338621184939-9rra475154l821gk75tbh4s905vpstns.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.rentmate"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
