@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rentmate/theme/theme.dart';
+import 'package:rentmate/views/splash_screen.dart';
 import 'package:rentmate/views/welcome_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -19,7 +20,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'RentMate',
       theme: lightMode,
-      home: const WelcomeScreen(),
+      home: const SplashScreen(),
     );
   }
 }

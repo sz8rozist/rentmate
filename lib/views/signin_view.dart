@@ -44,7 +44,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
-                        'Welcome back',
+                        'Üdv újra',
                         style: TextStyle(
                           fontSize: 30.0,
                           fontWeight: FontWeight.w900,
@@ -57,13 +57,13 @@ class _SignInScreenState extends State<SignInScreen> {
                       TextFormField(
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter Email';
+                            return 'Email cím megadása kötelező.';
                           }
                           return null;
                         },
                         decoration: InputDecoration(
                           label: const Text('Email'),
-                          hintText: 'Enter Email',
+                          hintText: 'Írja be az email címét',
                           hintStyle: const TextStyle(
                             color: Colors.black26,
                           ),
@@ -89,13 +89,13 @@ class _SignInScreenState extends State<SignInScreen> {
                         obscuringCharacter: '*',
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter Password';
+                            return 'Jelszó megadása kötelező.';
                           }
                           return null;
                         },
                         decoration: InputDecoration(
                           label: const Text('Password'),
-                          hintText: 'Enter Password',
+                          hintText: 'Írja be a jelszavát',
                           hintStyle: const TextStyle(
                             color: Colors.black26,
                           ),
@@ -131,7 +131,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                 activeColor: lightColorScheme.primary,
                               ),
                               const Text(
-                                'Remember me',
+                                'Emlékezz rám',
                                 style: TextStyle(
                                   color: Colors.black45,
                                 ),
@@ -140,7 +140,7 @@ class _SignInScreenState extends State<SignInScreen> {
                           ),
                           GestureDetector(
                             child: Text(
-                              'Forget password?',
+                              'Elfelejtett jelszó?',
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: lightColorScheme.primary,
@@ -171,7 +171,7 @@ class _SignInScreenState extends State<SignInScreen> {
                               );
                             }
                           },
-                          child: const Text('Sign up'),
+                          child: const Text('Bejelentkezés'),
                         ),
                       ),
                       const SizedBox(
@@ -192,7 +192,7 @@ class _SignInScreenState extends State<SignInScreen> {
                               horizontal: 10,
                             ),
                             child: Text(
-                              'Sign up with',
+                              'Jelentkezz be',
                               style: TextStyle(
                                 color: Colors.black45,
                               ),
@@ -226,7 +226,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const Text(
-                            'Don\'t have an account? ',
+                            'Nincs még fiókod? ',
                             style: TextStyle(
                               color: Colors.black45,
                             ),
@@ -241,7 +241,7 @@ class _SignInScreenState extends State<SignInScreen> {
                               );
                             },
                             child: Text(
-                              'Sign up',
+                              'Regisztrálj',
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: lightColorScheme.primary,

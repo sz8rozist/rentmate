@@ -26,7 +26,7 @@ class WelcomeScreen extends StatelessWidget {
                   text: const TextSpan(
                     children: [
                       TextSpan(
-                        text: 'Welcome Back!\n',
+                        text: 'Üdv Újra!\n',
                         style: TextStyle(
                           fontSize: 45.0,
                           fontWeight: FontWeight.w600,
@@ -50,7 +50,7 @@ class WelcomeScreen extends StatelessWidget {
             children: [
               Expanded(
                 child: WelcomeButton(
-                  buttonText: 'Sign in',
+                  buttonText: 'Bejelentkezés',
                   onTap: const SignInScreen(),
                   color: Colors.transparent,
                   textColor: Colors.white,
@@ -58,7 +58,7 @@ class WelcomeScreen extends StatelessWidget {
               ),
               Expanded(
                 child: WelcomeButton(
-                  buttonText: 'Sign up',
+                  buttonText: 'Regisztráció',
                   onTap: const SignUpScreen(),
                   color: Colors.white,
                   textColor: lightColorScheme.primary,

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:rentmate/views/signin_view.dart';
-import 'package:icons_plus/icons_plus.dart';
 import '../theme/theme.dart';
 import '../widgets/custom_scaffold.dart';
 
@@ -46,7 +45,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     children: [
                       // get started text
                       Text(
-                        'Get Started',
+                        'Kezdjük',
                         style: TextStyle(
                           fontSize: 30.0,
                           fontWeight: FontWeight.w900,
@@ -60,13 +59,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       TextFormField(
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter Full name';
+                            return 'Teljes név megadása kötelező.';
                           }
                           return null;
                         },
                         decoration: InputDecoration(
-                          label: const Text('Full Name'),
-                          hintText: 'Enter Full Name',
+                          label: const Text('Teljes név'),
+                          hintText: 'Írja be a teljes nevét',
                           hintStyle: const TextStyle(
                             color: Colors.black26,
                           ),
@@ -91,13 +90,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       TextFormField(
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter Email';
+                            return 'Email cím megadása kötelező.';
                           }
                           return null;
                         },
                         decoration: InputDecoration(
                           label: const Text('Email'),
-                          hintText: 'Enter Email',
+                          hintText: 'Írja be az email címét',
                           hintStyle: const TextStyle(
                             color: Colors.black26,
                           ),
@@ -124,13 +123,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         obscuringCharacter: '*',
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter Password';
+                            return 'Jelszó megadása kötelező.';
                           }
                           return null;
                         },
                         decoration: InputDecoration(
-                          label: const Text('Password'),
-                          hintText: 'Enter Password',
+                          label: const Text('Jelszó'),
+                          hintText: 'Írja be a jelszavát',
                           hintStyle: const TextStyle(
                             color: Colors.black26,
                           ),
@@ -163,17 +162,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             },
                             activeColor: lightColorScheme.primary,
                           ),
-                          const Text(
-                            'I agree to the processing of ',
-                            style: TextStyle(
-                              color: Colors.black45,
+                          Flexible(
+                            child: Text(
+                              'I agree to the processing of ',
+                              style: TextStyle(
+                                color: Colors.black45,
+                              ),
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          Text(
-                            'Personal data',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: lightColorScheme.primary,
+                          Flexible(
+                            child: Text(
+                              'Személyes adatok',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: lightColorScheme.primary,
+                              ),
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],
@@ -201,7 +206,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               );
                             }
                           },
-                          child: const Text('Sign up'),
+                          child: const Text('Regisztráció'),
                         ),
                       ),
                       const SizedBox(
@@ -223,7 +228,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               horizontal: 10,
                             ),
                             child: Text(
-                              'Sign up with',
+                              'Regisztrálj',
                               style: TextStyle(
                                 color: Colors.black45,
                               ),
@@ -258,7 +263,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const Text(
-                            'Already have an account? ',
+                            'Van már fiókod? ',
                             style: TextStyle(
                               color: Colors.black45,
                             ),
@@ -273,7 +278,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               );
                             },
                             child: Text(
-                              'Sign in',
+                              'Jelentkezz be',
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: lightColorScheme.primary,
