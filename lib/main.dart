@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:rentmate/routing/app_router.dart';
 import 'package:rentmate/theme/theme.dart';
-import 'package:rentmate/views/splash_screen.dart';
-import 'package:rentmate/views/welcome_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {
@@ -16,11 +15,11 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       title: 'RentMate',
       theme: lightMode,
-      home: const SplashScreen(),
+      routerConfig: goRouter,
     );
   }
 }

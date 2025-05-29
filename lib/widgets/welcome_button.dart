@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class WelcomeButton extends StatelessWidget {
   const WelcomeButton({
     super.key,
     required this.buttonText,
-    required this.onTap,
+    required this.routeName,
     this.color,
     this.textColor,
   });
 
   final String buttonText;
-  final Widget onTap;
+  final String routeName;
   final Color? color;
   final Color? textColor;
 
@@ -28,10 +29,7 @@ class WelcomeButton extends StatelessWidget {
           ),
         ),
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => onTap),
-          );
+          context.pushNamed(routeName);
         },
         child: Text(
           buttonText,

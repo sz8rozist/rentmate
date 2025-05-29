@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:rentmate/views/signin_view.dart';
-import 'package:rentmate/views/signup_view.dart';
+import 'package:rentmate/routing/app_router.dart';
 import '../theme/theme.dart';
 import '../widgets/custom_scaffold.dart';
 import '../widgets/welcome_button.dart';
@@ -51,7 +50,7 @@ class WelcomeScreen extends StatelessWidget {
               Expanded(
                 child: WelcomeButton(
                   buttonText: 'Bejelentkezés',
-                  onTap: const SignInScreen(),
+                  routeName: AppRoute.signin.name,
                   color: Colors.transparent,
                   textColor: Colors.white,
                 ),
@@ -59,7 +58,7 @@ class WelcomeScreen extends StatelessWidget {
               Expanded(
                 child: WelcomeButton(
                   buttonText: 'Regisztráció',
-                  onTap: const SignUpScreen(),
+                  routeName: AppRoute.signup.name,
                   color: Colors.white,
                   textColor: lightColorScheme.primary,
                 ),

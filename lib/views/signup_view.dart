@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:icons_plus/icons_plus.dart';
+import 'package:rentmate/routing/app_router.dart';
 import 'package:rentmate/views/signin_view.dart';
 import '../theme/theme.dart';
 import '../widgets/custom_scaffold.dart';
@@ -270,12 +272,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                           GestureDetector(
                             onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (e) => const SignInScreen(),
-                                ),
-                              );
+                              context.goNamed(AppRoute.signin.name);
                             },
                             child: Text(
                               'Jelentkezz be',

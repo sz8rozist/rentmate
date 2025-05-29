@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:icons_plus/icons_plus.dart';
-import 'package:rentmate/views/signup_view.dart';
+import 'package:rentmate/routing/app_router.dart';
 
 import '../theme/theme.dart';
 import '../widgets/custom_scaffold.dart';
@@ -233,12 +234,7 @@ class _SignInScreenState extends State<SignInScreen> {
                           ),
                           GestureDetector(
                             onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (e) => const SignUpScreen(),
-                                ),
-                              );
+                              context.goNamed(AppRoute.signup.name);
                             },
                             child: Text(
                               'Regisztrálj',
