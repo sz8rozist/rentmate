@@ -24,26 +24,43 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+
     return Scaffold(
       backgroundColor: lightColorScheme.primary,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset('assets/images/logo_white.png'),
-            const SizedBox(height: 30,),
-            if(defaultTargetPlatform == TargetPlatform.iOS)
-              const CupertinoActivityIndicator(
-                color: Colors.white,
-                radius: 20,
-              )
-            else
-              const CircularProgressIndicator(
-                color: Colors.white,
-              )
-          ],
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: size.height * 0.8,
+              maxWidth: size.width * 0.8,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Flexible(
+                  child: Image.asset(
+                    'assets/images/logo_white.png',
+                    fit: BoxFit.contain,
+                  ),
+                ),
+                const SizedBox(height: 30),
+                if (defaultTargetPlatform == TargetPlatform.iOS)
+                  const CupertinoActivityIndicator(
+                    color: Colors.white,
+                    radius: 20,
+                  )
+                else
+                  const CircularProgressIndicator(
+                    color: Colors.white,
+                  ),
+              ],
+            ),
+          ),
         ),
       ),
     );
   }
+
 }

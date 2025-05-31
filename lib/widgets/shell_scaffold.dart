@@ -29,7 +29,6 @@ class ShellScaffold extends ConsumerWidget {
     final title = _getTitle(index);
 
     return Scaffold(
-      backgroundColor: Colors.grey[200],
       extendBody: true,
       body: Column(
         children: [

@@ -41,5 +41,13 @@ class AuthService {
     return UserModel.fromJson(response);
   }
 
+  Future<void> signOut() async {
+    try {
+      await _client.auth.signOut();
+    } catch (e) {
+      throw Exception('Kijelentkezés sikertelen: $e');
+    }
+  }
+
   User? get currentUser => _client.auth.currentUser;
 }

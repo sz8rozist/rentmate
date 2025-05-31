@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/user_model.dart';
 import '../services/auth_service.dart';
 
@@ -9,6 +10,13 @@ final authViewModelProvider =
     StateNotifierProvider<AuthViewModel, AsyncValue<UserModel?>>(
       (ref) => AuthViewModel(ref),
     );
+
+final currentUserProvider = StreamProvider<User?>((ref) {
+  return Supabase.instance.client.auth.onAuthStateChange.map((event) {
+    return event.session?.user;
+  });
+});
+
 
 class AuthViewModel extends StateNotifier<AsyncValue<UserModel?>> {
   final Ref ref;
@@ -43,5 +51,10 @@ class AuthViewModel extends StateNotifier<AsyncValue<UserModel?>> {
     } catch (e, st) {
       state = AsyncError(e, st);
     }
+  }
+
+  Future<void> signOut() async {
+    final authService = ref.read(authServiceProvider);
+    await authService.signOut();
   }
 }
