@@ -1,45 +1,47 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/user_model.dart';
-import '../repositories/auth_repository.dart';
 import '../services/auth_service.dart';
 
 // Provider beállítás
 final authServiceProvider = Provider((ref) => AuthService());
-final authRepositoryProvider = Provider((ref) => AuthRepository(ref.read(authServiceProvider)));
 
-final authViewModelProvider = StateNotifierProvider<AuthViewModel, AsyncValue<UserModel?>>(
+final authViewModelProvider =
+    StateNotifierProvider<AuthViewModel, AsyncValue<UserModel?>>(
       (ref) => AuthViewModel(ref),
-);
+    );
 
 class AuthViewModel extends StateNotifier<AsyncValue<UserModel?>> {
   final Ref ref;
 
   AuthViewModel(this.ref) : super(const AsyncValue.data(null));
 
-  Future<void> signUp(String email, String password) async {
-    state = const AsyncValue.loading();
+  Future<void> register({
+    required String email,
+    required String password,
+    required String name,
+  }) async {
+    state = const AsyncLoading();
     try {
-      final user =
-      await ref.read(authRepositoryProvider).signUp(email, password);
-      state = AsyncValue.data(user);
+      final authService = ref.read(authServiceProvider);
+      await authService.registerUser(
+        email: email,
+        password: password,
+        name: name,
+      );
+      state = const AsyncData(null); // Vagy beállíthatod az aktuális usert is
     } catch (e, st) {
-      state = AsyncValue.error(e, st);
+      state = AsyncError(e, st);
     }
   }
 
-  Future<void> login(String email, String password) async {
-    state = const AsyncValue.loading();
+  Future<void> signIn({required String email, required String password}) async {
+    state = const AsyncLoading();
     try {
-      final user =
-      await ref.read(authRepositoryProvider).login(email, password);
-      state = AsyncValue.data(user);
+      final authService = ref.read(authServiceProvider);
+      final user = await authService.signIn(email: email, password: password);
+      state = AsyncData(user);
     } catch (e, st) {
-      state = AsyncValue.error(e, st);
+      state = AsyncError(e, st);
     }
-  }
-
-  Future<void> logout() async {
-    ref.read(authRepositoryProvider).logout();
-    state = const AsyncValue.data(null);
   }
 }

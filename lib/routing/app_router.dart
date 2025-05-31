@@ -56,6 +56,10 @@ final goRouter = GoRouter(
           path: '/search',
           builder: (context, state) => const Center(child: Text('Search Page')),
         ),
+        GoRoute(
+          path: '/profil',
+          builder: (context, state) => const Center(child: Text('Profil page')),
+        ),
       ],
     ),
   ],

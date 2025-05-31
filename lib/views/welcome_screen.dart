@@ -12,14 +12,23 @@ class WelcomeScreen extends StatelessWidget {
     return CustomScaffold(
       child: Column(
         children: [
-          Flexible(
+          Expanded(
             flex: 8,
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                vertical: 0,
-                horizontal: 40.0,
-              ),
-              child: Center(
+            child: Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 40.0, vertical: 20.0),
+                margin: const EdgeInsets.symmetric(horizontal: 20.0),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.5),
+                  borderRadius: BorderRadius.circular(10.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.3),
+                      blurRadius: 8.0,
+                      offset: const Offset(2, 2),
+                    ),
+                  ],
+                ),
                 child: RichText(
                   textAlign: TextAlign.center,
                   text: const TextSpan(
@@ -29,14 +38,14 @@ class WelcomeScreen extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 45.0,
                           fontWeight: FontWeight.w600,
+                          color: Colors.white,
                         ),
                       ),
                       TextSpan(
-                        text:
-                            '\nEnter personal details to your employee account',
+                        text: '\nEnter personal details to your employee account',
                         style: TextStyle(
                           fontSize: 20,
-                          // height: 0,
+                          color: Colors.white,
                         ),
                       ),
                     ],
@@ -45,6 +54,7 @@ class WelcomeScreen extends StatelessWidget {
               ),
             ),
           ),
+
           Row(
             children: [
               Expanded(

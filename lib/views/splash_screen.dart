@@ -30,7 +30,7 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset('assets/images/logo.png'),
+            Image.asset('assets/images/logo_white.png'),
             const SizedBox(height: 30,),
             if(defaultTargetPlatform == TargetPlatform.iOS)
               const CupertinoActivityIndicator(
