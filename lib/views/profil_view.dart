@@ -67,7 +67,7 @@ class ProfilView extends ConsumerWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
                   child: Row(
                     children: [
-                      Icon(item.icon, size: 28, color: lightColorScheme.secondary),
+                      Icon(item.icon, size: 20, color: lightColorScheme.secondary),
                       const SizedBox(width: 16),
                       Text(
                         item.title,

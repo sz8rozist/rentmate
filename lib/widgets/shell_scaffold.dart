@@ -86,19 +86,8 @@ class ShellScaffold extends ConsumerWidget {
       ),
 
       // Curved Bottom Navigation Bar with animation
-      bottomNavigationBar: CurvedNavigationBar(
-        index: index,
-        height: 60,
-        backgroundColor: Colors.transparent,
-        color: lightColorScheme.primary, // háttérszín
-        buttonBackgroundColor: Colors.white, // középső gomb háttér
-        animationCurve: Curves.easeInOutBack,
-        animationDuration: const Duration(milliseconds: 400),
-        items: [
-          _navItem(icon: FontAwesome.house, selected: index == 0),
-          _navItem(icon: Icons.search, selected: index == 1),
-          _navItem(icon: FontAwesome.user, selected: index == 2),
-        ],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: index,
         onTap: (i) {
           ref.read(bottomNavIndexProvider.notifier).state = i;
           switch (i) {
@@ -113,19 +102,11 @@ class ShellScaffold extends ConsumerWidget {
               break;
           }
         },
-      ),
-    );
-  }
-
-  Widget _navItem({required IconData icon, required bool selected}) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-      padding: const EdgeInsets.all(4),
-      child: Icon(
-        icon,
-        size: selected ? 30 : 24,
-        color: selected ? lightColorScheme.secondary : Colors.white,
+        items: [
+          BottomNavigationBarItem(icon: Icon(FontAwesome.house), label: 'Kezdőlap'),
+          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Keresés'),
+          BottomNavigationBarItem(icon: Icon(FontAwesome.user), label: 'Profil'),
+        ],
       ),
     );
   }
