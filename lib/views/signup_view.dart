@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:rentmate/routing/app_router.dart';
+import '../models/user_role.dart';
 import '../theme/theme.dart';
 import '../viewmodels/auth_viewmodel.dart';
 import '../widgets/custom_scaffold.dart';
@@ -35,12 +36,20 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
   Future<void> _submitForm() async {
     if (_formSignupKey.currentState!.validate() && agreePersonalData) {
+      final role = ref.read(roleProvider);
+      if (role == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Kérlek válassz szerepkört.')),
+        );
+        return;
+      }
       final authViewModel = ref.read(authViewModelProvider.notifier);
 
       await authViewModel.register(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
         name: _nameController.text.trim(),
+        role: role
       );
 
       final state = ref.read(authViewModelProvider);
@@ -71,214 +80,241 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(authViewModelProvider);
-
+    final selectedRole = ref.watch(roleProvider);
     return LoadingOverlay(
-        isLoading: state is AsyncLoading,
-        child:
-        CustomScaffold(
-          child: Column(
-            children: [
-              const Expanded(flex: 1, child: SizedBox(height: 10)),
-              Expanded(
-                flex: 7,
-                child: Container(
-                  padding: const EdgeInsets.fromLTRB(25.0, 50.0, 25.0, 20.0),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(40.0),
-                    ),
+      isLoading: state is AsyncLoading,
+      child: CustomScaffold(
+        child: Column(
+          children: [
+            const Expanded(flex: 1, child: SizedBox(height: 10)),
+            Expanded(
+              flex: 7,
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(25.0, 50.0, 25.0, 20.0),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(40.0),
                   ),
-                  child: SingleChildScrollView(
-                    child: Form(
-                      key: _formSignupKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Kezdjük',
-                            style: TextStyle(
-                              fontSize: 30.0,
-                              fontWeight: FontWeight.w900,
-                              color: lightColorScheme.primary,
+                ),
+                child: SingleChildScrollView(
+                  child: Form(
+                    key: _formSignupKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Kezdjük',
+                          style: TextStyle(
+                            fontSize: 30.0,
+                            fontWeight: FontWeight.w900,
+                            color: lightColorScheme.primary,
+                          ),
+                        ),
+                        const SizedBox(height: 40.0),
+                        // Teljes név
+                        TextFormField(
+                          controller: _nameController,
+                          validator:
+                              RequiredValidator(
+                                errorText: 'Teljes név megadása kötelező.',
+                              ).call,
+                          decoration: InputDecoration(
+                            label: const Text('Teljes név'),
+                            hintText: 'Írja be a teljes nevét',
+                            hintStyle: const TextStyle(color: Colors.black26),
+                            border: OutlineInputBorder(
+                              borderSide: const BorderSide(
+                                color: Colors.black12,
+                              ),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: const BorderSide(
+                                color: Colors.black12,
+                              ),
+                              borderRadius: BorderRadius.circular(10),
                             ),
                           ),
-                          const SizedBox(height: 40.0),
-                          // Teljes név
-                          TextFormField(
-                            controller: _nameController,
-                            validator:
+                        ),
+                        const SizedBox(height: 25.0),
+                        // Email
+                        TextFormField(
+                          controller: _emailController,
+                          validator:
+                              MultiValidator([
                                 RequiredValidator(
-                                  errorText: 'Teljes név megadása kötelező.',
-                                ).call,
-                            decoration: InputDecoration(
-                              label: const Text('Teljes név'),
-                              hintText: 'Írja be a teljes nevét',
-                              hintStyle: const TextStyle(color: Colors.black26),
-                              border: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  color: Colors.black12,
+                                  errorText: 'Email cím megadása kötelező.',
                                 ),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  color: Colors.black12,
+                                EmailValidator(
+                                  errorText: 'Érvényes email címet adjon meg.',
                                 ),
-                                borderRadius: BorderRadius.circular(10),
+                              ]).call,
+                          decoration: InputDecoration(
+                            label: const Text('Email'),
+                            hintText: 'Írja be az email címét',
+                            hintStyle: const TextStyle(color: Colors.black26),
+                            border: OutlineInputBorder(
+                              borderSide: const BorderSide(
+                                color: Colors.black12,
                               ),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: const BorderSide(
+                                color: Colors.black12,
+                              ),
+                              borderRadius: BorderRadius.circular(10),
                             ),
                           ),
-                          const SizedBox(height: 25.0),
-                          // Email
-                          TextFormField(
-                            controller: _emailController,
-                            validator:
-                                MultiValidator([
-                                  RequiredValidator(
-                                    errorText: 'Email cím megadása kötelező.',
-                                  ),
-                                  EmailValidator(
-                                    errorText:
-                                        'Érvényes email címet adjon meg.',
-                                  ),
-                                ]).call,
-                            decoration: InputDecoration(
-                              label: const Text('Email'),
-                              hintText: 'Írja be az email címét',
-                              hintStyle: const TextStyle(color: Colors.black26),
-                              border: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  color: Colors.black12,
+                        ),
+                        const SizedBox(height: 25.0),
+                        // Jelszó
+                        TextFormField(
+                          controller: _passwordController,
+                          obscureText: true,
+                          obscuringCharacter: '*',
+                          validator:
+                              MultiValidator([
+                                RequiredValidator(
+                                  errorText: 'Jelszó megadása kötelező.',
                                 ),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  color: Colors.black12,
+                                MinLengthValidator(
+                                  6,
+                                  errorText:
+                                      'A jelszónak legalább 6 karakter hosszúnak kell lennie.',
                                 ),
-                                borderRadius: BorderRadius.circular(10),
+                              ]).call,
+                          decoration: InputDecoration(
+                            label: const Text('Jelszó'),
+                            hintText: 'Írja be a jelszavát',
+                            hintStyle: const TextStyle(color: Colors.black26),
+                            border: OutlineInputBorder(
+                              borderSide: const BorderSide(
+                                color: Colors.black12,
                               ),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: const BorderSide(
+                                color: Colors.black12,
+                              ),
+                              borderRadius: BorderRadius.circular(10),
                             ),
                           ),
-                          const SizedBox(height: 25.0),
-                          // Jelszó
-                          TextFormField(
-                            controller: _passwordController,
-                            obscureText: true,
-                            obscuringCharacter: '*',
-                            validator:
-                                MultiValidator([
-                                  RequiredValidator(
-                                    errorText: 'Jelszó megadása kötelező.',
-                                  ),
-                                  MinLengthValidator(
-                                    6,
-                                    errorText:
-                                        'A jelszónak legalább 6 karakter hosszúnak kell lennie.',
-                                  ),
-                                ]).call,
-                            decoration: InputDecoration(
-                              label: const Text('Jelszó'),
-                              hintText: 'Írja be a jelszavát',
-                              hintStyle: const TextStyle(color: Colors.black26),
-                              border: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  color: Colors.black12,
+                        ),
+                        const SizedBox(height: 25.0),
+                        const SizedBox(height: 16),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Radio<UserRole>(
+                                  value: UserRole.landlord,
+                                  groupValue: selectedRole,
+                                  onChanged: (value) {
+                                    ref.read(roleProvider.notifier).state =
+                                        value;
+                                  },
                                 ),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  color: Colors.black12,
+                                Text(UserRole.landlord.label),
+                                const SizedBox(width: 20),
+                                Radio<UserRole>(
+                                  value: UserRole.tenant,
+                                  groupValue: selectedRole,
+                                  onChanged: (value) {
+                                    ref.read(roleProvider.notifier).state =
+                                        value;
+                                  },
                                 ),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
+                                Text(UserRole.tenant.label),
+                              ],
                             ),
-                          ),
-                          const SizedBox(height: 25.0),
-                          // Checkbox
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Checkbox(
-                                value: agreePersonalData,
-                                onChanged: (bool? value) {
-                                  setState(
-                                    () => agreePersonalData = value ?? false,
-                                  );
-                                },
-                                activeColor: lightColorScheme.primary,
-                              ),
-                              Flexible(
-                                child: RichText(
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  text: TextSpan(
-                                    children: [
-                                      const TextSpan(
-                                        text: 'Elfogadom a ',
-                                        style: TextStyle(color: Colors.black45),
+                          ],
+                        ),
+                        // Checkbox
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Checkbox(
+                              value: agreePersonalData,
+                              onChanged: (bool? value) {
+                                setState(
+                                  () => agreePersonalData = value ?? false,
+                                );
+                              },
+                              activeColor: lightColorScheme.primary,
+                            ),
+                            Flexible(
+                              child: RichText(
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                text: TextSpan(
+                                  children: [
+                                    const TextSpan(
+                                      text: 'Elfogadom a ',
+                                      style: TextStyle(color: Colors.black45),
+                                    ),
+                                    TextSpan(
+                                      text: 'személyes adatok kezelését',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: lightColorScheme.primary,
                                       ),
-                                      TextSpan(
-                                        text: 'személyes adatok kezelését',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: lightColorScheme.primary,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ],
-                          ),
-                          const SizedBox(height: 25.0),
-                          // Gomb
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed:
-                                  state is AsyncLoading ? null : _submitForm,
-                              child: const Text('Regisztráció'),
                             ),
+                          ],
+                        ),
+                        const SizedBox(height: 25.0),
+                        // Gomb
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed:
+                                state is AsyncLoading ? null : _submitForm,
+                            child: const Text('Regisztráció'),
                           ),
-                          const SizedBox(height: 30.0),
-                          _dividerRow('Regisztrálj'),
-                          const SizedBox(height: 30.0),
-                          _socialRow(),
-                          const SizedBox(height: 25.0),
-                          // Már van fiókod?
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Text(
-                                'Van már fiókod? ',
-                                style: TextStyle(color: Colors.black45),
-                              ),
-                              GestureDetector(
-                                onTap:
-                                    () => context.goNamed(AppRoute.signin.name),
-                                child: Text(
-                                  'Jelentkezz be',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: lightColorScheme.primary,
-                                  ),
+                        ),
+                        const SizedBox(height: 30.0),
+                        _dividerRow('Regisztrálj'),
+                        const SizedBox(height: 30.0),
+                        _socialRow(),
+                        const SizedBox(height: 25.0),
+                        // Már van fiókod?
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text(
+                              'Van már fiókod? ',
+                              style: TextStyle(color: Colors.black45),
+                            ),
+                            GestureDetector(
+                              onTap:
+                                  () => context.goNamed(AppRoute.signin.name),
+                              child: Text(
+                                'Jelentkezz be',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: lightColorScheme.primary,
                                 ),
                               ),
-                            ],
-                          ),
-                          const SizedBox(height: 20.0),
-                        ],
-                      ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20.0),
+                      ],
                     ),
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
+      ),
     );
   }
 

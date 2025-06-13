@@ -5,7 +5,6 @@ import 'package:icons_plus/icons_plus.dart';
 import 'package:rentmate/routing/app_router.dart';
 import 'package:rentmate/theme/theme.dart';
 
-// Importáld az AuthService providert
 import '../viewmodels/auth_viewmodel.dart';
 
 class ProfilView extends ConsumerWidget {
@@ -36,7 +35,7 @@ class ProfilView extends ConsumerWidget {
         onTap: () async {
           try {
             await authService.signOut();
-            context.goNamed(AppRoute.signin.name);
+            context.goNamed(AppRoute.welcome.name);
           } catch (e) {
             // Hibakezelés: pl. SnackBar
             ScaffoldMessenger.of(context).showSnackBar(
@@ -47,8 +46,7 @@ class ProfilView extends ConsumerWidget {
       ),
     ];
 
-    return Scaffold(
-      body: Padding(
+    return  Padding(
         padding: const EdgeInsets.all(16),
         child: ListView.builder(
           itemCount: items.length,
@@ -82,8 +80,7 @@ class ProfilView extends ConsumerWidget {
             );
           },
         ),
-      ),
-    );
+      );
 
   }
 }

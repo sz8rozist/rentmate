@@ -9,9 +9,21 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f7c025f7-f5d1-49bb-9496-3d397e9e2c84" name="Changes" comment="bejelentkezés javítás, kijelentkezés, profil oldal">
+    <list default="true" id="f7c025f7-f5d1-49bb-9496-3d397e9e2c84" name="Changes" comment="javítások">
+      <change afterPath="$PROJECT_DIR$/lib/models/flat_model.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/models/user_role.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/views/lakasaim_view.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.flutter-plugins-dependencies" beforeDir="false" afterPath="$PROJECT_DIR$/.flutter-plugins-dependencies" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/models/user_model.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/models/user_model.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/routing/app_router.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/routing/app_router.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/routing/router_notifier.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/routing/router_notifier.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/services/auth_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/services/auth_service.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/viewmodels/auth_viewmodel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/viewmodels/auth_viewmodel.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/views/profil_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/profil_view.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/views/signin_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/signin_view.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/views/signup_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/signup_view.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/widgets/shell_scaffold.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/widgets/shell_scaffold.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -179,7 +191,15 @@
       <option name="project" value="LOCAL" />
       <updated>1748715981760</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="javítások">
+      <option name="closed" value="true" />
+      <created>1748776948470</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1748776948470</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -205,6 +225,7 @@
     <MESSAGE value="Home page" />
     <MESSAGE value="curved navigation bar" />
     <MESSAGE value="bejelentkezés javítás, kijelentkezés, profil oldal" />
-    <option name="LAST_COMMIT_MESSAGE" value="bejelentkezés javítás, kijelentkezés, profil oldal" />
+    <MESSAGE value="javítások" />
+    <option name="LAST_COMMIT_MESSAGE" value="javítások" />
   </component>
 </project>

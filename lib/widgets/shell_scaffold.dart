@@ -1,21 +1,28 @@
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:icons_plus/icons_plus.dart';
-import 'package:rentmate/theme/theme.dart';
+import 'package:rentmate/models/user_model.dart';
+import '../models/user_role.dart';
+import '../viewmodels/auth_viewmodel.dart';
 import '../viewmodels/navigation_viewmodel.dart';
 
 class ShellScaffold extends ConsumerWidget {
   final Widget child;
-  const ShellScaffold({super.key, required this.child});
+  final List<Widget>? actions;
+  const ShellScaffold({super.key, required this.child, this.actions});
 
-  String _getTitle(int index) {
+  String _getTitle(int index, UserModel currentUser) {
     switch (index) {
       case 0:
         return 'Kezdőlap';
       case 1:
-        return 'Keresés';
+        if (currentUser.role == UserRole.landlord) {
+          return 'Lakásaim';
+        } else if (currentUser.role == UserRole.tenant) {
+          return 'Albérletem';
+        }
+        return '';
       case 2:
         return 'Profil';
       default:
@@ -26,26 +33,25 @@ class ShellScaffold extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final index = ref.watch(bottomNavIndexProvider);
-    final title = _getTitle(index);
+    final currentUser = ref.watch(currentUserProvider).value;
+
+    if (currentUser == null) {
+      return const SizedBox();
+    }
+    final title = _getTitle(index, currentUser);
 
     return Scaffold(
       extendBody: true,
       body: Column(
         children: [
-          // Felső sáv
           SizedBox(
             height: 80,
             width: double.infinity,
             child: Stack(
               fit: StackFit.expand,
               children: [
-                Image.asset(
-                  'assets/images/bg1.png',
-                  fit: BoxFit.cover,
-                ),
-                Container(
-                  color: Colors.black.withOpacity(0.4),
-                ),
+                Image.asset('assets/images/bg1.png', fit: BoxFit.cover),
+                Container(color: Colors.black.withOpacity(0.4)),
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Padding(
@@ -67,47 +73,81 @@ class ShellScaffold extends ConsumerWidget {
                     ),
                   ),
                 ),
+
+                if (actions != null)
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 16.0),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: actions!,
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),
 
-          // Tartalom
           Expanded(
-            child: Stack(
-              children: [
-                Container(
-                  color: Colors.black.withOpacity(0.05),
-                  child: child,
-                ),
-              ],
+            child: Container(
+              color: Colors.black.withOpacity(0.05),
+              child: child,
             ),
           ),
         ],
       ),
 
-      // Curved Bottom Navigation Bar with animation
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: index,
-        onTap: (i) {
-          ref.read(bottomNavIndexProvider.notifier).state = i;
-          switch (i) {
-            case 0:
-              context.go('/home');
-              break;
-            case 1:
-              context.go('/search');
-              break;
-            case 2:
-              context.go('/profil');
-              break;
-          }
-        },
-        items: [
-          BottomNavigationBarItem(icon: Icon(FontAwesome.house), label: 'Kezdőlap'),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Keresés'),
-          BottomNavigationBarItem(icon: Icon(FontAwesome.user), label: 'Profil'),
-        ],
+        onTap: (i) => _handleTap(i, currentUser, context, ref),
+        items: _getNavigationItems(currentUser),
       ),
     );
   }
+}
+
+List<BottomNavigationBarItem> _getNavigationItems(UserModel currentUser) {
+  final items = [
+    BottomNavigationBarItem(icon: Icon(FontAwesome.house), label: 'Kezdőlap'),
+  ];
+
+  if (currentUser.role == UserRole.landlord) {
+    items.add(
+      BottomNavigationBarItem(
+        icon: Icon(FontAwesome.house_user),
+        label: 'Lakásaim',
+      ),
+    );
+  } else if (currentUser.role == UserRole.tenant) {
+    items.add(
+      BottomNavigationBarItem(icon: Icon(Icons.home_work), label: 'Albérletem'),
+    );
+  }
+
+  items.add(
+    BottomNavigationBarItem(icon: Icon(FontAwesome.user), label: 'Profil'),
+  );
+
+  return items;
+}
+
+void _handleTap(
+  int i,
+  UserModel currentUser,
+  BuildContext context,
+  WidgetRef ref,
+) {
+  ref.read(bottomNavIndexProvider.notifier).state = i;
+
+  if (i == 0) return context.go('/home');
+
+  if (i == 1) {
+    if (currentUser.role == UserRole.landlord) {
+      return context.go('/flats');
+    } else if (currentUser.role == UserRole.tenant) {
+      return context.go('/my-rental');
+    }
+  }
+  if (i == 2) return context.go('/profil');
 }

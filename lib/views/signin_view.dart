@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:rentmate/models/user_model.dart';
 import 'package:rentmate/routing/app_router.dart';
 import '../theme/theme.dart';
+import '../viewmodels/navigation_viewmodel.dart';
 import '../widgets/custom_scaffold.dart';
 import '../viewmodels/auth_viewmodel.dart';
 import '../widgets/loading_overlay.dart';
@@ -32,6 +33,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
         data: (user) {
           if (user != null) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
+              ref.read(bottomNavIndexProvider.notifier).state = 0;
               context.goNamed(AppRoute.home.name);
             });
           }

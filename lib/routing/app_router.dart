@@ -1,9 +1,9 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart'; // kell, ha Riverpodot használsz
 import 'package:go_router/go_router.dart';
 import 'package:rentmate/routing/router_notifier.dart';
 import 'package:rentmate/viewmodels/auth_viewmodel.dart';
+import 'package:rentmate/views/lakasaim_view.dart';
 import 'package:rentmate/views/profil_view.dart';
 import 'package:rentmate/views/signin_view.dart';
 import 'package:rentmate/views/signup_view.dart';
@@ -13,13 +13,7 @@ import '../views/splash_screen.dart';
 import '../widgets/shell_scaffold.dart';
 
 // Enum az útvonalakhoz
-enum AppRoute {
-  welcome,
-  signin,
-  signup,
-  home,
-  profile,
-}
+enum AppRoute { welcome, signin, signup, home, profile, lakasaim, alberleteim }
 
 // Riverpod provider a RouterNotifierhoz
 final routerNotifierProvider = Provider<RouterNotifier>((ref) {
@@ -37,7 +31,8 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       final asyncUser = ref.read(currentUserProvider);
       final user = asyncUser.asData?.value;
       final loggedIn = user != null;
-      final goingToAuth = state.matchedLocation == '/signin' ||
+      final goingToAuth =
+          state.matchedLocation == '/signin' ||
           state.matchedLocation == '/signup' ||
           state.matchedLocation == '/welcome';
 
@@ -52,33 +47,39 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
-      GoRoute(
-        path: '/',
-        builder: (context, state) => SplashScreen(),
-      ),
+      GoRoute(path: '/', builder: (context, state) => SplashScreen()),
       GoRoute(
         path: '/welcome',
         name: AppRoute.welcome.name,
-        pageBuilder: (context, state) => MaterialPage(
-          child: WelcomeScreen(),
-        ),
+        pageBuilder: (context, state) => MaterialPage(child: WelcomeScreen()),
       ),
       GoRoute(
         path: '/signin',
         name: AppRoute.signin.name,
-        pageBuilder: (context, state) => MaterialPage(
-          child: SignInScreen(),
-        ),
+        pageBuilder: (context, state) => MaterialPage(child: SignInScreen()),
       ),
       GoRoute(
         path: '/signup',
         name: AppRoute.signup.name,
-        pageBuilder: (context, state) => MaterialPage(
-          child: SignUpScreen(),
-        ),
+        pageBuilder: (context, state) => MaterialPage(child: SignUpScreen()),
       ),
       ShellRoute(
-        builder: (context, state, child) => ShellScaffold(child: child),
+        builder: (context, state, child) {
+          // Például a flats (lakasaim) oldalon gomb kell:
+          List<Widget>? actions;
+          if (state.matchedLocation == '/flats') {
+            actions = [
+              IconButton(
+                icon: const Icon(Icons.add, color: Colors.white),
+                tooltip: 'Új lakás hozzáadása',
+                onPressed: () {
+                  // Új lakás hozzáadás esemény
+                },
+              ),
+            ];
+          }
+          return ShellScaffold(actions: actions, child: child);
+        },
         routes: [
           GoRoute(
             path: '/home',
@@ -86,11 +87,20 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => const Center(child: Text('Home Page')),
           ),
           GoRoute(
-            path: '/search',
-            builder: (context, state) => const Center(child: Text('Search Page')),
+            path: '/flats',
+            name: AppRoute.lakasaim.name,
+            builder: (context, state) => LakasaimView(),
+          ),
+          GoRoute(
+            path: '/my-rental',
+            name: AppRoute.alberleteim.name,
+            builder:
+                (context, state) =>
+                    const Center(child: Text('Albérleteim Page')),
           ),
           GoRoute(
             path: '/profil',
+            name: AppRoute.profile.name,
             builder: (context, state) => ProfilView(),
           ),
         ],
