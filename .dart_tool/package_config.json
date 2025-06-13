@@ -62,6 +62,12 @@
       "languageVersion": "3.4"
     },
     {
+      "name": "cross_file",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/cross_file-0.3.4+2",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
+    },
+    {
       "name": "crypto",
       "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/crypto-3.0.6",
       "packageUri": "lib/",
@@ -98,6 +104,30 @@
       "languageVersion": "3.0"
     },
     {
+      "name": "file_selector_linux",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/file_selector_linux-0.9.3+2",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
+    },
+    {
+      "name": "file_selector_macos",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/file_selector_macos-0.9.4+3",
+      "packageUri": "lib/",
+      "languageVersion": "3.6"
+    },
+    {
+      "name": "file_selector_platform_interface",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/file_selector_platform_interface-2.6.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "file_selector_windows",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/file_selector_windows-0.9.3+4",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
       "name": "flutter",
       "rootUri": "file:///Users/rozsaistvan/development/flutter/packages/flutter",
       "packageUri": "lib/",
@@ -108,6 +138,12 @@
       "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/flutter_lints-5.0.0",
       "packageUri": "lib/",
       "languageVersion": "3.5"
+    },
+    {
+      "name": "flutter_plugin_android_lifecycle",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/flutter_plugin_android_lifecycle-2.0.28",
+      "packageUri": "lib/",
+      "languageVersion": "3.6"
     },
     {
       "name": "flutter_riverpod",
@@ -180,6 +216,54 @@
       "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/icons_plus-4.0.0",
       "packageUri": "lib/",
       "languageVersion": "2.16"
+    },
+    {
+      "name": "image_picker",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/image_picker-1.1.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
+    },
+    {
+      "name": "image_picker_android",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/image_picker_android-0.8.12+23",
+      "packageUri": "lib/",
+      "languageVersion": "3.6"
+    },
+    {
+      "name": "image_picker_for_web",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/image_picker_for_web-3.0.6",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
+      "name": "image_picker_ios",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/image_picker_ios-0.8.12+2",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
+      "name": "image_picker_linux",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/image_picker_linux-0.2.1+2",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
+      "name": "image_picker_macos",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/image_picker_macos-0.2.1+2",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
+      "name": "image_picker_platform_interface",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/image_picker_platform_interface-2.10.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
+      "name": "image_picker_windows",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/image_picker_windows-0.2.1+1",
+      "packageUri": "lib/",
+      "languageVersion": "2.19"
     },
     {
       "name": "intl",
@@ -578,7 +662,7 @@
       "languageVersion": "3.7"
     }
   ],
-  "generated": "2025-05-31T16:43:38.597404Z",
+  "generated": "2025-06-13T20:29:56.049658Z",
   "generator": "pub",
   "generatorVersion": "3.7.2",
   "flutterRoot": "file:///Users/rozsaistvan/development/flutter",

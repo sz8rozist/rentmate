@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rentmate/models/flat_status.dart';
 
 import '../models/flat_model.dart';
 
@@ -10,29 +11,26 @@ class LakasaimView extends StatelessWidget {
     final bottomPadding = MediaQuery.of(context).padding.bottom + kBottomNavigationBarHeight;
     final List<Flat> flats = [
       Flat(
-        title: 'Modern lakás a belvárosban',
         address: 'Budapest, Károly körút 12.',
         imageUrl:
             'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80',
-        rent: '180.000 Ft/hó',
-        status: 'Szabad',
+        price: 180,
+        status: FlatStatus.active,
       ),
       Flat(
-        title: 'Tágas lakás kerttel',
         address: 'Szeged, Petőfi Sándor utca 8.',
         imageUrl:
             'https://images.unsplash.com/photo-1599423300746-b62533397364?auto=format&fit=crop&w=800&q=80',
-        rent: '220.000 Ft/hó',
-        status: 'Kiadva',
+        price: 180,
+        status: FlatStatus.inactive,
         tenant: 'Rózsa István',
       ),
       Flat(
-        title: 'Skandináv stílusú apartman',
         address: 'Pécs, Király utca 22.',
         imageUrl:
             'https://images.unsplash.com/photo-1599423300746-b62533397364?auto=format&fit=crop&w=800&q=80',
-        rent: '195.000 Ft/hó',
-        status: 'Kiadva',
+        price: 180,
+        status: FlatStatus.inactive,
         tenant: 'Kele Dominik',
       ),
     ];
@@ -53,8 +51,8 @@ class FlatCard extends StatelessWidget {
 
   const FlatCard({super.key, required this.flat});
 
-  Color _getStatusColor(String status) {
-    switch (status.toLowerCase()) {
+  Color _getStatusColor(FlatStatus status) {
+    switch (status.value) {
       case 'szabad':
         return Colors.green.shade100;
       case 'kiadva':
@@ -64,8 +62,8 @@ class FlatCard extends StatelessWidget {
     }
   }
 
-  Color _getStatusTextColor(String status) {
-    switch (status.toLowerCase()) {
+  Color _getStatusTextColor(FlatStatus status) {
+    switch (status.value) {
       case 'szabad':
         return Colors.green.shade800;
       case 'kiadva':
@@ -87,7 +85,7 @@ class FlatCard extends StatelessWidget {
           ClipRRect(
             borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
             child: Image.network(
-              flat.imageUrl,
+              flat.imageUrl ?? '',
               height: 180,
               width: double.infinity,
               fit: BoxFit.cover,
@@ -116,7 +114,7 @@ class FlatCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    flat.status,
+                    flat.status.label,
                     style: TextStyle(
                       color: _getStatusTextColor(flat.status),
                       fontWeight: FontWeight.w600,

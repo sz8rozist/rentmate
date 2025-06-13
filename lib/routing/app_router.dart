@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart'; // kell, ha Riverpodot 
 import 'package:go_router/go_router.dart';
 import 'package:rentmate/routing/router_notifier.dart';
 import 'package:rentmate/viewmodels/auth_viewmodel.dart';
+import 'package:rentmate/views/flat_form_view.dart';
 import 'package:rentmate/views/lakasaim_view.dart';
 import 'package:rentmate/views/profil_view.dart';
 import 'package:rentmate/views/signin_view.dart';
@@ -13,7 +14,7 @@ import '../views/splash_screen.dart';
 import '../widgets/shell_scaffold.dart';
 
 // Enum az útvonalakhoz
-enum AppRoute { welcome, signin, signup, home, profile, lakasaim, alberleteim }
+enum AppRoute { welcome, signin, signup, home, profile, lakasaim, alberleteim, createFlat }
 
 // Riverpod provider a RouterNotifierhoz
 final routerNotifierProvider = Provider<RouterNotifier>((ref) {
@@ -63,6 +64,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         name: AppRoute.signup.name,
         pageBuilder: (context, state) => MaterialPage(child: SignUpScreen()),
       ),
+      GoRoute(
+        path: '/createFlat',
+        name: AppRoute.createFlat.name,
+        builder: (context, state) => FlatFormView(),
+      ),
       ShellRoute(
         builder: (context, state, child) {
           // Például a flats (lakasaim) oldalon gomb kell:
@@ -73,7 +79,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                 icon: const Icon(Icons.add, color: Colors.white),
                 tooltip: 'Új lakás hozzáadása',
                 onPressed: () {
-                  // Új lakás hozzáadás esemény
+                  context.pushNamed(AppRoute.createFlat.name);
                 },
               ),
             ];
