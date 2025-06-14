@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:rentmate/models/flat_status.dart';
 
 import '../models/flat_model.dart';
+import '../models/user_model.dart';
 import '../services/flat_service.dart';
 
 final flatServiceProvider = Provider((ref) => FlatService());
@@ -22,7 +23,21 @@ class FlatViewmodel extends StateNotifier<AsyncValue<Flat?>> {
 
   Future<List<File>?> pickImages() async {
     final picked = await ImagePicker().pickMultiImage();
-    return picked.isNotEmpty ? picked.map((x) => File(x.path)).toList() : null;
+
+    if (picked.isEmpty) return null;
+
+    // Csak jpg/jpeg/png fájlok
+    final allowedImages = picked.where((x) {
+      final path = x.path.toLowerCase();
+      return path.endsWith('.jpg') || path.endsWith('.jpeg') || path.endsWith('.png');
+    }).toList();
+
+    // Max 6 fájl engedélyezett
+    if (allowedImages.length > 6) {
+      return allowedImages.sublist(0, 6).map((x) => File(x.path)).toList();
+    }
+
+    return allowedImages.map((x) => File(x.path)).toList();
   }
 
   Future<File?> takePhoto() async {
@@ -37,6 +52,7 @@ class FlatViewmodel extends StateNotifier<AsyncValue<Flat?>> {
     required List<File> images,
     String? existingFlatId,
     required FlatStatus flatStatus,
+    required UserModel landlord
   }) async {
     try {
       state = const AsyncValue.loading();
@@ -48,10 +64,13 @@ class FlatViewmodel extends StateNotifier<AsyncValue<Flat?>> {
             images: images,
             existingFlatId: existingFlatId,
             status: flatStatus,
+            landlord: landlord
           );
       if (context.mounted) Navigator.of(context).pop();
       state = const AsyncValue.data(null);
     } catch (e, st) {
+      debugPrint('HIBA a mentésnél: $e');
+      debugPrintStack(stackTrace: st);
       state = AsyncValue.error(e, st);
     }
   }

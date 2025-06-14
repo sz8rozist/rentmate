@@ -1,8 +1,10 @@
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:rentmate/routing/app_router.dart';
+import 'package:rentmate/widgets/custom_snackbar.dart';
 import '../models/user_role.dart';
 import '../theme/theme.dart';
 import '../viewmodels/auth_viewmodel.dart';
@@ -38,8 +40,18 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     if (_formSignupKey.currentState!.validate() && agreePersonalData) {
       final role = ref.read(roleProvider);
       if (role == null) {
+        final snackBar = SnackBar(
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          content: AwesomeSnackbarContent(
+            title: 'Figyelmeztetés',
+            message: 'Kérlek válassz szerepkört.',
+            contentType: ContentType.warning,
+          ),
+        );
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Kérlek válassz szerepkört.')),
+         snackBar
         );
         return;
       }
@@ -57,22 +69,20 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
         data: (_) {
           ScaffoldMessenger.of(
             context,
-          ).showSnackBar(const SnackBar(content: Text('Sikeres regisztráció')));
+          ).showSnackBar(CustomSnackBar.success('Sikeres regisztráció!'));
           context.goNamed(AppRoute.signin.name);
         },
         loading: () {},
         error: (e, _) {
           ScaffoldMessenger.of(
             context,
-          ).showSnackBar(SnackBar(content: Text('Hiba történt: $e')));
+          ).showSnackBar(CustomSnackBar.error(e.toString()));
           print(e);
         },
       );
     } else if (!agreePersonalData) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Kérlek fogadd el az adatkezelési feltételeket.'),
-        ),
+        CustomSnackBar.info('Kérlet fogadd el az adatkezelési feltételeket.')
       );
     }
   }

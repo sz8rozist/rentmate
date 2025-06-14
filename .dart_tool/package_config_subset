@@ -22,6 +22,10 @@ async
 3.4
 file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/async-2.12.0/
 file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/async-2.12.0/lib/
+awesome_snackbar_content
+3.4
+file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/awesome_snackbar_content-0.1.6/
+file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/awesome_snackbar_content-0.1.6/lib/
 boolean_selector
 3.1
 file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/boolean_selector-2.1.2/
@@ -163,9 +167,9 @@ image_picker_windows
 file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/image_picker_windows-0.2.1+1/
 file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/image_picker_windows-0.2.1+1/lib/
 intl
-3.3
-file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/intl-0.20.2/
-file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/intl-0.20.2/lib/
+3.0
+file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/intl-0.19.0/
+file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/intl-0.19.0/lib/
 jwt_decode
 2.12
 file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/jwt_decode-0.3.1/
@@ -430,6 +434,10 @@ flutter
 3.7
 file:///Users/rozsaistvan/development/flutter/packages/flutter/
 file:///Users/rozsaistvan/development/flutter/packages/flutter/lib/
+flutter_localizations
+3.7
+file:///Users/rozsaistvan/development/flutter/packages/flutter_localizations/
+file:///Users/rozsaistvan/development/flutter/packages/flutter_localizations/lib/
 flutter_test
 3.7
 file:///Users/rozsaistvan/development/flutter/packages/flutter_test/

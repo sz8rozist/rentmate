@@ -1,9 +1,11 @@
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rentmate/models/user_model.dart';
 import 'package:rentmate/routing/app_router.dart';
+import 'package:rentmate/widgets/custom_snackbar.dart';
 import '../theme/theme.dart';
 import '../viewmodels/navigation_viewmodel.dart';
 import '../widgets/custom_scaffold.dart';
@@ -41,9 +43,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
         loading: () {},
         error: (err, _) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text(err.toString())));
+            ScaffoldMessenger.of(context).showSnackBar(CustomSnackBar.error(err.toString()));
           });
         },
       );

@@ -38,6 +38,12 @@
       "languageVersion": "3.4"
     },
     {
+      "name": "awesome_snackbar_content",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/awesome_snackbar_content-0.1.6",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
       "name": "boolean_selector",
       "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/boolean_selector-2.1.2",
       "packageUri": "lib/",
@@ -138,6 +144,12 @@
       "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/flutter_lints-5.0.0",
       "packageUri": "lib/",
       "languageVersion": "3.5"
+    },
+    {
+      "name": "flutter_localizations",
+      "rootUri": "file:///Users/rozsaistvan/development/flutter/packages/flutter_localizations",
+      "packageUri": "lib/",
+      "languageVersion": "3.7"
     },
     {
       "name": "flutter_plugin_android_lifecycle",
@@ -267,9 +279,9 @@
     },
     {
       "name": "intl",
-      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/intl-0.20.2",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/intl-0.19.0",
       "packageUri": "lib/",
-      "languageVersion": "3.3"
+      "languageVersion": "3.0"
     },
     {
       "name": "jwt_decode",
@@ -662,7 +674,7 @@
       "languageVersion": "3.7"
     }
   ],
-  "generated": "2025-06-13T20:29:56.049658Z",
+  "generated": "2025-06-14T15:36:17.886933Z",
   "generator": "pub",
   "generatorVersion": "3.7.2",
   "flutterRoot": "file:///Users/rozsaistvan/development/flutter",

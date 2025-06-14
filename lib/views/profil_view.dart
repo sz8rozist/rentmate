@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:rentmate/routing/app_router.dart';
 import 'package:rentmate/theme/theme.dart';
+import 'package:rentmate/widgets/custom_snackbar.dart';
 
 import '../viewmodels/auth_viewmodel.dart';
 
@@ -39,7 +40,7 @@ class ProfilView extends ConsumerWidget {
           } catch (e) {
             // Hibakezelés: pl. SnackBar
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Hiba a kijelentkezés során: $e')),
+              CustomSnackBar.error('Hiba a kijelentkezés során: $e')
             );
           }
         },

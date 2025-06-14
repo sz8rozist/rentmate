@@ -1,46 +1,75 @@
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rentmate/models/flat_status.dart';
-
+import 'package:rentmate/widgets/custom_snackbar.dart';
 import '../models/flat_model.dart';
+import '../viewmodels/flat_list_provider.dart';
 
-class LakasaimView extends StatelessWidget {
+class LakasaimView extends ConsumerWidget {
   const LakasaimView({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final bottomPadding = MediaQuery.of(context).padding.bottom + kBottomNavigationBarHeight;
-    final List<Flat> flats = [
-      Flat(
-        address: 'Budapest, Károly körút 12.',
-        imageUrl:
-            'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80',
-        price: 180,
-        status: FlatStatus.active,
-      ),
-      Flat(
-        address: 'Szeged, Petőfi Sándor utca 8.',
-        imageUrl:
-            'https://images.unsplash.com/photo-1599423300746-b62533397364?auto=format&fit=crop&w=800&q=80',
-        price: 180,
-        status: FlatStatus.inactive,
-        tenant: 'Rózsa István',
-      ),
-      Flat(
-        address: 'Pécs, Király utca 22.',
-        imageUrl:
-            'https://images.unsplash.com/photo-1599423300746-b62533397364?auto=format&fit=crop&w=800&q=80',
-        price: 180,
-        status: FlatStatus.inactive,
-        tenant: 'Kele Dominik',
-      ),
-    ];
+  Widget build(BuildContext context, WidgetRef ref) {
+    final flatList = ref.watch(flatListProvider);
+    return flatList.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => Center(child: Text('Hiba történt: $e')),
+      data: (flats) {
+        if (flats.isEmpty) {
+          return const Center(child: Text('Nincsenek lakások.'));
+        }
 
-    return ListView.builder(
-      padding: EdgeInsets.fromLTRB(16, 16, 16, bottomPadding + 10),
-      itemCount: flats.length,
-      itemBuilder: (context, index) {
-        final flat = flats[index];
-        return FlatCard(flat: flat);
+        return SafeArea(
+          bottom: true,
+          top: false,
+          child: ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: flats.length,
+            itemBuilder: (context, index) {
+              final flat = flats[index];
+              return Dismissible(
+                key: ValueKey(flat.id),
+                direction: DismissDirection.endToStart,
+                background: Container(
+                  color: Colors.red,
+                  alignment: Alignment.centerRight,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: const Icon(Icons.delete, color: Colors.white),
+                ),
+                confirmDismiss: (direction) async {
+                  bool? result = await showDialog<bool>(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text('Biztosan törlöd?'),
+                      actions: [
+                        TextButton.icon(
+                          onPressed: () => Navigator.of(context).pop(false),
+                          icon: const Icon(Icons.cancel, color: Colors.grey),
+                          label: const Text('Mégse'),
+                        ),
+                        TextButton.icon(
+                          onPressed: () => Navigator.of(context).pop(true),
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          label: const Text('Igen'),
+                        ),
+                      ],
+                    ),
+                  );
+
+                  return result == true;
+                },
+                onDismissed: (_) async {
+                  await ref.read(flatListProvider.notifier).removeFlat(flat);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    CustomSnackBar.success('${flat.address} törölve lett.')
+                  );
+                },
+                child: FlatCard(flat: flat),
+              );
+            },
+          ),
+        );
       },
     );
   }
@@ -85,7 +114,7 @@ class FlatCard extends StatelessWidget {
           ClipRRect(
             borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
             child: Image.network(
-              flat.imageUrl ?? '',
+              flat.images.first.imageUrl,
               height: 180,
               width: double.infinity,
               fit: BoxFit.cover,
@@ -121,13 +150,13 @@ class FlatCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (flat.tenant != null) ...[
-                  const SizedBox(height: 8),
-                  Text(
-                    'Bérlő: ${flat.tenant}',
-                    style: const TextStyle(fontSize: 14),
-                  ),
-                ],
+                ...[
+                const SizedBox(height: 8),
+                Text(
+                  'Bérlő: ${flat.landLord}',
+                  style: const TextStyle(fontSize: 14),
+                ),
+              ],
                 const SizedBox(height: 12),
                 Align(
                   alignment: Alignment.centerRight,
