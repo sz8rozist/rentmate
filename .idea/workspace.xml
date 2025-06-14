@@ -9,22 +9,12 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f7c025f7-f5d1-49bb-9496-3d397e9e2c84" name="Changes" comment="Lakás hozzáadás db-be, lakások listázása db ből">
-      <change afterPath="$PROJECT_DIR$/lib/widgets/custom_text_form_field.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.dart_tool/package_config.json" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/package_config.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.dart_tool/package_config_subset" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/package_config_subset" afterDir="false" />
+    <list default="true" id="f7c025f7-f5d1-49bb-9496-3d397e9e2c84" name="Changes" comment="Lakás részletek oldal">
       <change beforePath="$PROJECT_DIR$/.flutter-plugins-dependencies" beforeDir="false" afterPath="$PROJECT_DIR$/.flutter-plugins-dependencies" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/models/flat_model.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/models/flat_model.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/routing/app_router.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/routing/app_router.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/services/flat_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/services/flat_service.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/viewmodels/flat_list_provider.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/viewmodels/flat_list_provider.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/viewmodels/flat_viewmodel.dart" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/views/flat_details_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/flat_details_view.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/views/flat_form_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/flat_form_view.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/views/lakasaim_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/lakasaim_view.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -223,7 +213,15 @@
       <option name="project" value="LOCAL" />
       <updated>1749919076203</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="Lakás részletek oldal">
+      <option name="closed" value="true" />
+      <created>1749926959228</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1749926959228</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -253,6 +251,7 @@
     <MESSAGE value="Lakásaim menü, bejelentkezés role alapján, regisztráció role alapján" />
     <MESSAGE value="Kamera használat, kép galéria használat, Új lakás hozzáadás megkezdése" />
     <MESSAGE value="Lakás hozzáadás db-be, lakások listázása db ből" />
-    <option name="LAST_COMMIT_MESSAGE" value="Lakás hozzáadás db-be, lakások listázása db ből" />
+    <MESSAGE value="Lakás részletek oldal" />
+    <option name="LAST_COMMIT_MESSAGE" value="Lakás részletek oldal" />
   </component>
 </project>

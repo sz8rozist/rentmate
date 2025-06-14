@@ -12,24 +12,18 @@ import '../services/flat_service.dart';
 final flatServiceProvider = Provider((ref) => FlatService());
 
 final flatListProvider =
-StateNotifierProvider<FlatListNotifier, AsyncValue<List<Flat>>>((ref) {
-  final service = ref.read(flatServiceProvider);
-  return FlatListNotifier(service);
-});
+    StateNotifierProvider<FlatListNotifier, AsyncValue<List<Flat>>>((ref) {
+      final service = ref.read(flatServiceProvider);
+      return FlatListNotifier(service);
+    });
 
 class FlatListNotifier extends StateNotifier<AsyncValue<List<Flat>>> {
   final FlatService service;
-  FlatStatus? _flatStatus;
 
   FlatListNotifier(this.service) : super(const AsyncLoading()) {
     loadFlats();
   }
-  FlatStatus? get flatStatus => _flatStatus;
 
-  void setFlatStatus(FlatStatus? status) {
-    _flatStatus = status;
-    state = AsyncData(state.value ?? []);
-  }
   Future<void> loadFlats() async {
     try {
       final flats = await service.getFlats();
@@ -44,12 +38,13 @@ class FlatListNotifier extends StateNotifier<AsyncValue<List<Flat>>> {
 
     if (picked.isEmpty) return null;
 
-    final allowedImages = picked.where((x) {
-      final path = x.path.toLowerCase();
-      return path.endsWith('.jpg') ||
-          path.endsWith('.jpeg') ||
-          path.endsWith('.png');
-    }).toList();
+    final allowedImages =
+        picked.where((x) {
+          final path = x.path.toLowerCase();
+          return path.endsWith('.jpg') ||
+              path.endsWith('.jpeg') ||
+              path.endsWith('.png');
+        }).toList();
 
     if (allowedImages.length > 6) {
       return allowedImages.sublist(0, 6).map((x) => File(x.path)).toList();
@@ -82,7 +77,6 @@ class FlatListNotifier extends StateNotifier<AsyncValue<List<Flat>>> {
       );
 
       await loadFlats(); // Frissítjük az adatokat mentés után
-
     } catch (e, st) {
       state = AsyncError(e, st);
     }
@@ -108,7 +102,8 @@ class FlatListNotifier extends StateNotifier<AsyncValue<List<Flat>>> {
     required String address,
     required FlatStatus status,
     required String price,
-    required List<FlatImage> retainedImageUrls, // a felhasználó által megtartott képek URL-jei
+    required List<FlatImage>
+    retainedImageUrls, // a felhasználó által megtartott képek URL-jei
     List<File>? newImages, // újonnan feltöltendő képek
   }) async {
     try {
@@ -130,5 +125,4 @@ class FlatListNotifier extends StateNotifier<AsyncValue<List<Flat>>> {
       state = AsyncError(e, st);
     }
   }
-
 }

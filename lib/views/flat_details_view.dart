@@ -27,6 +27,7 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView> {
   late TextEditingController addressController;
   late TextEditingController priceController;
   late Flat flat;
+  FlatStatus? flatStatus;
   final _formKey = GlobalKey<FormState>();
   final ImagePicker _picker = ImagePicker();
 
@@ -40,45 +41,9 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView> {
     addressController = TextEditingController(text: flat.address);
     priceController = TextEditingController(text: flat.price.toString());
     retainedImages = List.from(flat.images); // Meglévő képek megtartása
-  }
-  Future<void> _showImageSourceOptions() async {
-    final source = await showModalBottomSheet<ImageSource>(
-      context: context,
-      builder: (ctx) => SafeArea(
-        child: Wrap(
-          children: [
-            ListTile(
-              leading: const Icon(Icons.photo_library),
-              title: const Text('Galéria'),
-              onTap: () => Navigator.of(ctx).pop(ImageSource.gallery),
-            ),
-            ListTile(
-              leading: const Icon(Icons.camera_alt),
-              title: const Text('Kamera'),
-              onTap: () => Navigator.of(ctx).pop(ImageSource.camera),
-            ),
-          ],
-        ),
-      ),
-    );
-
-    if (source != null) {
-      if (source == ImageSource.gallery) {
-        await _pickImages();
-      } else if (source == ImageSource.camera) {
-        await _takePicture();
-      }
-    }
+    flatStatus = flat.status;
   }
 
-  Future<void> _takePicture() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.camera);
-    if (pickedFile != null) {
-      setState(() {
-        newImages.add(File(pickedFile.path));
-      });
-    }
-  }
   Future<void> _pickImages() async {
     final pickedFiles = await _picker.pickMultiImage();
     if (pickedFiles != null && pickedFiles.isNotEmpty) {
@@ -120,6 +85,13 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView> {
       return;
     }
 
+    if (flatStatus == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        CustomSnackBar.error("Válassz státuszt!")
+      );
+      return;
+    }
+
     await ref
         .read(flatListProvider.notifier)
         .updateFlat(
@@ -128,7 +100,7 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView> {
           price: priceController.text,
           retainedImageUrls: retainedImages,
           newImages: newImages,
-          status: ref.read(flatListProvider.notifier).flatStatus!,
+          status: flatStatus!,
         );
 
     Navigator.of(context).pop();
@@ -144,7 +116,7 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView> {
   @override
   Widget build(BuildContext context) {
     final allImagesWidgets = <Widget>[];
-
+    final flatState = ref.watch(flatListProvider);
     // Meglévő képek megjelenítése, törlés gombbal
     for (final image in retainedImages) {
       allImagesWidgets.add(
@@ -284,7 +256,9 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView> {
           ),
         ),
       ),
-      body: Container(
+      body: flatState.isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Container(
         color: Colors.grey[100],
         padding: const EdgeInsets.all(16),
         child: SingleChildScrollView(
@@ -328,7 +302,7 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView> {
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<FlatStatus>(
-                  value: ref.watch(flatListProvider.notifier).flatStatus,
+                  value: flatStatus,
                   decoration: InputDecoration(
                     labelText: 'Állapot',
                     filled: true,
@@ -345,14 +319,14 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView> {
                       child: Text(status.label),
                     );
                   }).toList(),
-                  onChanged: (val) => val != null ? ref.read(flatListProvider.notifier).setFlatStatus(val) : null,
+                  onChanged: (val) => val != null ? setState(() => flatStatus = val) : null,
                   validator: (val) => val == null ? 'Válassz állapotot!' : null,
                 ),
                 const SizedBox(height: 20),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(
-                    onPressed: _showImageSourceOptions,
+                    onPressed: _pickImages,
                     icon: const Icon(Icons.add_a_photo),
                     label: const Text('Képek hozzáadása'),
                   ),

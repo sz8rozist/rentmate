@@ -33,7 +33,7 @@ class _FlatFormViewState extends ConsumerState<FlatFormView> {
 
   @override
   Widget build(BuildContext context) {
-    final flatState = ref.read(flatListProvider);
+    final flatState = ref.watch(flatListProvider);
     final flatVM = ref.read(flatListProvider.notifier);
     final asyncUser = ref.read(currentUserProvider);
     final user = asyncUser.asData?.value;
@@ -105,7 +105,7 @@ class _FlatFormViewState extends ConsumerState<FlatFormView> {
                       const SizedBox(height: 12),
                       CustomTextFormField(
                         controller: _priceController,
-                        labelText: 'Cím',
+                        labelText: 'Ár',
                         keyboardType: TextInputType.number,
                         validator:
                             MultiValidator([
@@ -293,6 +293,7 @@ class _FlatFormViewState extends ConsumerState<FlatFormView> {
                               flatStatus: FlatStatus.active,
                               landlord: user,
                             );
+                            Navigator.pop(context);
                           }
                         },
                         child: const Text('Mentés'),
