@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart'; // kell, ha Riverpodot 
 import 'package:go_router/go_router.dart';
 import 'package:rentmate/routing/router_notifier.dart';
 import 'package:rentmate/viewmodels/auth_viewmodel.dart';
+import 'package:rentmate/views/flat_details_view.dart';
 import 'package:rentmate/views/flat_form_view.dart';
 import 'package:rentmate/views/lakasaim_view.dart';
 import 'package:rentmate/views/profil_view.dart';
@@ -10,11 +11,12 @@ import 'package:rentmate/views/signin_view.dart';
 import 'package:rentmate/views/signup_view.dart';
 import 'package:rentmate/views/welcome_screen.dart';
 
+import '../viewmodels/flat_list_provider.dart';
 import '../views/splash_screen.dart';
 import '../widgets/shell_scaffold.dart';
 
 // Enum az útvonalakhoz
-enum AppRoute { welcome, signin, signup, home, profile, lakasaim, alberleteim, createFlat }
+enum AppRoute { welcome, signin, signup, home, profile, lakasaim, alberleteim, createFlat, flatDetail }
 
 // Riverpod provider a RouterNotifierhoz
 final routerNotifierProvider = Provider<RouterNotifier>((ref) {
@@ -68,6 +70,14 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: '/createFlat',
         name: AppRoute.createFlat.name,
         builder: (context, state) => FlatFormView(),
+      ),
+      GoRoute(
+        path: '/flatDetail/:id',
+        name: AppRoute.flatDetail.name,
+        builder: (context, state) {
+          final flatId = state.pathParameters['id']!;
+          return FlatDetailsView(flatId: flatId);
+        },
       ),
       ShellRoute(
         builder: (context, state, child) {

@@ -18,20 +18,30 @@ class Flat {
     required this.price,
     required this.status,
     required this.landLord,
-    this.tenants
+    this.tenants,
   });
 
   factory Flat.fromJson(Map<String, dynamic> json) {
     return Flat(
       id: json['id'] as String?,
       address: json['address'] as String,
-      images: (json['images'] as List<dynamic>)
-          .map((item) => FlatImage.fromJson(item as Map<String, dynamic>))
-          .toList(),
+      images:
+          (json['images'] as List<dynamic>)
+              .map((item) => FlatImage.fromJson(item as Map<String, dynamic>))
+              .toList(),
       price: json['price'] as int,
-      status: FlatStatusExtension.fromValue(json['status'] as String) ?? FlatStatus.active,
+      status:
+          FlatStatusExtension.fromValue(json['status'] as String) ??
+          FlatStatus.active,
       landLord: json['landlord_user_id'],
-      tenants: json['tenants'] != null ? (json['tenants'] as List<dynamic>?)?.map((item) => UserModel.fromJson(item as Map<String, dynamic>)).toList() : null
+      tenants:
+          json['tenants'] != null
+              ? (json['tenants'] as List<dynamic>?)
+                  ?.map(
+                    (item) => UserModel.fromJson(item as Map<String, dynamic>),
+                  )
+                  .toList()
+              : null,
     );
   }
 
@@ -43,7 +53,25 @@ class Flat {
       'price': price,
       'status': status.value,
       'landLord': landLord,
-      'tenants': tenants?.map((tenant) => tenant.toJson()).toList()
+      'tenants': tenants?.map((tenant) => tenant.toJson()).toList(),
     };
+  }
+
+  Flat copyWith({
+    String? id,
+    String? address,
+    int? price,
+    FlatStatus? status,
+    String? landLord,
+    List<FlatImage>? images,
+  }) {
+    return Flat(
+      id: id ?? this.id,
+      address: address ?? this.address,
+      status: status ?? this.status,
+      landLord: landLord ?? this.landLord,
+      images: images ?? this.images,
+      price: price ?? this.price,
+    );
   }
 }

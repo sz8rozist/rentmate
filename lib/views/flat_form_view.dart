@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_field_validator/form_field_validator.dart';
@@ -9,7 +8,7 @@ import 'package:rentmate/theme/theme.dart';
 import 'package:rentmate/viewmodels/auth_viewmodel.dart';
 import 'package:rentmate/widgets/custom_snackbar.dart';
 import '../viewmodels/flat_list_provider.dart';
-import '../viewmodels/flat_viewmodel.dart'; // vagy ahová tetted a FlatViewmodel-t
+import '../widgets/custom_text_form_field.dart';
 
 class FlatFormView extends ConsumerStatefulWidget {
   const FlatFormView({super.key});
@@ -34,8 +33,8 @@ class _FlatFormViewState extends ConsumerState<FlatFormView> {
 
   @override
   Widget build(BuildContext context) {
-    final flatState = ref.read(flatViewModelProvider);
-    final flatVM = ref.read(flatViewModelProvider.notifier);
+    final flatState = ref.read(flatListProvider);
+    final flatVM = ref.read(flatListProvider.notifier);
     final asyncUser = ref.read(currentUserProvider);
     final user = asyncUser.asData?.value;
     return Scaffold(
@@ -95,18 +94,18 @@ class _FlatFormViewState extends ConsumerState<FlatFormView> {
                   key: _formKey,
                   child: ListView(
                     children: [
-                      TextFormField(
+                      CustomTextFormField(
                         controller: _addressController,
-                        decoration: const InputDecoration(labelText: 'Cím'),
+                        labelText: 'Cím',
                         validator:
                             RequiredValidator(
-                              errorText: 'A cím megadása kötelező!',
+                              errorText: 'A cím kitöltése kötelező.',
                             ).call,
                       ),
                       const SizedBox(height: 12),
-                      TextFormField(
+                      CustomTextFormField(
                         controller: _priceController,
-                        decoration: const InputDecoration(labelText: 'Ár'),
+                        labelText: 'Cím',
                         keyboardType: TextInputType.number,
                         validator:
                             MultiValidator([
@@ -125,7 +124,7 @@ class _FlatFormViewState extends ConsumerState<FlatFormView> {
                         label: const Text('Képek kiválasztása'),
                         style: ButtonStyle(
                           backgroundColor: MaterialStateProperty.resolveWith<
-                              Color?
+                            Color?
                           >((Set<WidgetState> states) {
                             return lightMode.primaryColor; // alap háttérszín
                           }),
@@ -287,15 +286,13 @@ class _FlatFormViewState extends ConsumerState<FlatFormView> {
                               return;
                             }
 
-                            await flatVM.save(
-                              context,
+                            await flatVM.saveFlat(
                               address: _addressController.text.trim(),
                               price: _priceController.text.trim(),
                               images: selectedImages,
                               flatStatus: FlatStatus.active,
                               landlord: user,
                             );
-                            ref.read(flatListProvider.notifier).refresh();
                           }
                         },
                         child: const Text('Mentés'),
