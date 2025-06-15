@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class LoadingOverlay extends StatelessWidget {
@@ -16,11 +19,14 @@ class LoadingOverlay extends StatelessWidget {
       children: [
         child,
         if (isLoading)
-          Positioned.fill(
+          SizedBox.expand(
             child: Container(
               color: Colors.black.withOpacity(0.3),
-              child: const Center(
-                child: CircularProgressIndicator(),
+              child: Center(
+                child:
+                    Platform.isIOS
+                        ? const CupertinoActivityIndicator()
+                        : const CircularProgressIndicator(),
               ),
             ),
           ),

@@ -1,4 +1,6 @@
-import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'dart:io';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -15,7 +17,18 @@ class LakasaimView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final flatList = ref.watch(flatListProvider);
     return flatList.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading:
+          () => SizedBox.expand(
+            child: Container(
+              color: Colors.black.withOpacity(0.3),
+              child: Center(
+                child:
+                    Platform.isIOS
+                        ? const CupertinoActivityIndicator()
+                        : const CircularProgressIndicator(),
+              ),
+            ),
+          ),
       error: (e, _) => Center(child: Text('Hiba történt: $e')),
       data: (flats) {
         if (flats.isEmpty) {
@@ -42,21 +55,25 @@ class LakasaimView extends ConsumerWidget {
                 confirmDismiss: (direction) async {
                   bool? result = await showDialog<bool>(
                     context: context,
-                    builder: (context) => AlertDialog(
-                      title: const Text('Biztosan törlöd?'),
-                      actions: [
-                        TextButton.icon(
-                          onPressed: () => Navigator.of(context).pop(false),
-                          icon: const Icon(Icons.cancel, color: Colors.grey),
-                          label: const Text('Mégse'),
+                    builder:
+                        (context) => AlertDialog(
+                          title: const Text('Biztosan törlöd?'),
+                          actions: [
+                            TextButton.icon(
+                              onPressed: () => Navigator.of(context).pop(false),
+                              icon: const Icon(
+                                Icons.cancel,
+                                color: Colors.grey,
+                              ),
+                              label: const Text('Mégse'),
+                            ),
+                            TextButton.icon(
+                              onPressed: () => Navigator.of(context).pop(true),
+                              icon: const Icon(Icons.delete, color: Colors.red),
+                              label: const Text('Igen'),
+                            ),
+                          ],
                         ),
-                        TextButton.icon(
-                          onPressed: () => Navigator.of(context).pop(true),
-                          icon: const Icon(Icons.delete, color: Colors.red),
-                          label: const Text('Igen'),
-                        ),
-                      ],
-                    ),
                   );
 
                   return result == true;
@@ -64,7 +81,7 @@ class LakasaimView extends ConsumerWidget {
                 onDismissed: (_) async {
                   await ref.read(flatListProvider.notifier).removeFlat(flat);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    CustomSnackBar.success('${flat.address} törölve lett.')
+                    CustomSnackBar.success('${flat.address} törölve lett.'),
                   );
                 },
                 child: FlatCard(flat: flat),
@@ -109,7 +126,10 @@ class FlatCard extends StatelessWidget {
     return InkWell(
       borderRadius: BorderRadius.circular(16),
       onTap: () {
-        context.pushNamed(AppRoute.flatDetail.name, pathParameters: {'id': flat.id as String});
+        context.pushNamed(
+          AppRoute.flatDetail.name,
+          pathParameters: {'id': flat.id as String},
+        );
       },
       child: Card(
         margin: const EdgeInsets.only(bottom: 16),
@@ -121,7 +141,9 @@ class FlatCard extends StatelessWidget {
             Stack(
               children: [
                 ClipRRect(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(16),
+                  ),
                   child: Image.network(
                     flat.images.first.imageUrl,
                     height: 180,
@@ -145,7 +167,10 @@ class FlatCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: _getStatusColor(flat.status),
                       borderRadius: BorderRadius.circular(20),
@@ -173,4 +198,3 @@ class FlatCard extends StatelessWidget {
     );
   }
 }
-

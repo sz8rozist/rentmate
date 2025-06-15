@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:flutter/material.dart';
 import 'package:rentmate/models/flat_image.dart';
 import 'package:rentmate/models/flat_model.dart';
 import 'package:rentmate/models/flat_status.dart';
@@ -23,32 +22,17 @@ class FlatService {
     //Képek lekérése
     final imageRecords = await _supabase
         .from('flats_images')
-        .select('image_url')
+        .select('image_path')
         .eq('flat_id', id);
 
-    //TODO: Itt valamiért a storageból nem törli a képet.
     for (final record in imageRecords) {
-      final imageUrl = record['image_url'] as String;
-
-      String filePathInBucket = extractFilePathFromUrl(imageUrl);
+      final imagePath = record['image_path'] as String;
 
       // Fájl törlése
-      await _supabase.storage.from('flats').remove([filePathInBucket]);
+      await _supabase.storage.from('flats').remove([imagePath]);
     }
     //flat törlése - elég csak a flatet törölni mert az idegenkulcsokra be van állítva ON DELETE CASCADE
     await _supabase.from('flats').delete().eq('id', id);
-  }
-
-  String extractFilePathFromUrl(String imageUrl) {
-    final uri = Uri.parse(imageUrl);
-    final segments = uri.pathSegments;
-
-    // A bucket neve 'flats', így az utána jövő rész az útvonal a bucketben (fájl vagy almappa/fájl)
-    // Általános eset: bucket utáni részt kell megkapni
-    final bucketIndex = segments.indexOf('flats');
-
-    final filePathInBucket = segments.sublist(bucketIndex + 1).join('/');
-    return filePathInBucket;
   }
 
   Future<void> saveFlatWithImages({
@@ -58,11 +42,11 @@ class FlatService {
     required List<File> images,
     required UserModel landlord,
   }) async {
-    final imageUrls = <String>[];
+    final imageUrls = <({String publicUrl, String pathInBucket})>[];
     // 1️⃣ Képek feltöltése Storage-be
     for (final image in images) {
-      String publicUrl = await uploadImageToSupabase(image);
-      imageUrls.add(publicUrl);
+      final imageResult = await uploadImageToSupabase(image);
+      imageUrls.add(imageResult);
     }
 
     // 2️⃣ Lakás beszúrás vagy frissítés
@@ -82,16 +66,25 @@ class FlatService {
 
     flatId = insertResponse['id'] as String;
 
-    // 4️⃣ Képek beszúrása flat_images táblába
     final imageRecords =
-        imageUrls.map((url) => {'flat_id': flatId, 'image_url': url}).toList();
+        imageUrls
+            .map(
+              (info) => {
+                'flat_id': flatId,
+                'image_url': info.publicUrl,
+                'image_path': info.pathInBucket,
+              },
+            )
+            .toList();
 
     if (imageRecords.isNotEmpty) {
       await _supabase.from('flats_images').insert(imageRecords);
     }
   }
 
-  Future<String> uploadImageToSupabase(File image) async {
+  Future<({String publicUrl, String pathInBucket})> uploadImageToSupabase(
+    File image,
+  ) async {
     final fileName =
         'flat_${DateTime.now().millisecondsSinceEpoch}_${image.path.split('/').last}';
     final bytes = await image.readAsBytes();
@@ -104,7 +97,7 @@ class FlatService {
         );
 
     final publicUrl = _supabase.storage.from('flats').getPublicUrl(fileName);
-    return publicUrl;
+    return (publicUrl: publicUrl, pathInBucket: fileName);
   }
 
   //TODO: A képet a storageból valamiér nem törli ezt meg kell nézni.
@@ -119,22 +112,22 @@ class FlatService {
   }) async {
     final responseGet = await _supabase
         .from('flats_images')
-        .select('image_url')
+        .select('image_path')
         .eq('flat_id', id);
 
     List<String> oldImages = [];
 
-    if (responseGet != null && responseGet.isNotEmpty) {
+    if (responseGet.isNotEmpty) {
       for (final record in responseGet) {
-        final imageUrl = record['image_url'] as String?;
-        if (imageUrl != null) {
-          oldImages.add(imageUrl);
+        final imagePath = record['image_path'] as String?;
+        if (imagePath != null) {
+          oldImages.add(imagePath);
         }
       }
     }
 
     // 2. Feltöltjük az új képeket
-    List<String> newImagesUrls = [];
+    List<({String publicUrl, String pathInBucket})> newImagesUrls = [];
 
     if (newImages != null && newImages.isNotEmpty) {
       for (final image in newImages) {
@@ -144,17 +137,16 @@ class FlatService {
     }
 
     // 3. A megtartott képek URL-jeinek kinyerése a FlatImage objektumokból
-    final retainedUrls = retainedImageUrls.map((fi) => fi.imageUrl).toList();
+    final retainedPath = retainedImageUrls.map((fi) => fi.imagePath).toList();
 
     // 4. Meghatározzuk a törlendő képeket (amik benne voltak régen, de most nincsenek megtartva)
     final toDelete =
-        oldImages.where((url) => !retainedUrls.contains(url)).toList();
+        oldImages.where((url) => !retainedPath.contains(url)).toList();
 
     // 5. Töröljük a képeket a Storage-ból
-    for (final url in toDelete) {
+    for (final path in toDelete) {
       try {
-        final fileName = extractFilePathFromUrl(url);
-        await _supabase.storage.from('flats').remove([fileName]);
+        await _supabase.storage.from('flats').remove([path]);
       } catch (e) {
         print('Exception during image deletion: $e');
       }
@@ -166,17 +158,25 @@ class FlatService {
           .from('flats_images')
           .delete()
           .eq('flat_id', id)
-          .inFilter('image_url', toDelete);
+          .inFilter('image_path', toDelete);
     }
 
     // 7. Beszúrjuk az új képeket a flats_images táblába
     if (newImagesUrls.isNotEmpty) {
-      final newImageRecords =
+      final newImagesRecord =
           newImagesUrls
-              .map((url) => {'flat_id': id, 'image_url': url})
+              .map(
+                (info) => {
+                  'flat_id': id,
+                  'image_url': info.publicUrl,
+                  'image_path': info.pathInBucket,
+                },
+              )
               .toList();
 
-      await _supabase.from('flats_images').insert(newImageRecords);
+      if (newImagesRecord.isNotEmpty) {
+        await _supabase.from('flats_images').insert(newImagesRecord);
+      }
     }
 
     // 8. Frissítjük a flats rekordot az új adatokkal (kép lista nélkül, mert külön táblában vannak)

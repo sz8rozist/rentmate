@@ -1,12 +1,14 @@
 import 'dart:io';
 
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:rentmate/models/flat_image.dart';
 import 'package:rentmate/widgets/custom_snackbar.dart';
+import 'package:rentmate/widgets/loading_overlay.dart';
 import '../models/flat_model.dart';
 import '../models/flat_status.dart';
 import '../viewmodels/flat_list_provider.dart';
@@ -44,10 +46,48 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView> {
     flatStatus = flat.status;
   }
 
+  Future<void> _showImageSourceActionSheet() async {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.photo_library),
+                title: const Text('Galéria'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  _pickImages();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.camera_alt),
+                title: const Text('Kamera'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  _takePhoto();
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _takePhoto() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.camera);
+    if (pickedFile != null) {
+      setState(() {
+        newImages.add(File(pickedFile.path));
+      });
+    }
+  }
+
   Future<void> _pickImages() async {
     final pickedFiles = await _picker.pickMultiImage();
     if (pickedFiles != null && pickedFiles.isNotEmpty) {
-      // Szűrés, max 6 új kép (vagy igény szerint)
       final allowed =
           pickedFiles.where((x) {
             final p = x.path.toLowerCase();
@@ -80,15 +120,15 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView> {
     if (!_formKey.currentState!.validate()) {
       // Ha nem valid, nem mentünk tovább
       ScaffoldMessenger.of(context).showSnackBar(
-        CustomSnackBar.error("Kérlek töltsd ki helyesen a mezőket!")
+        CustomSnackBar.error("Kérlek töltsd ki helyesen a mezőket!"),
       );
       return;
     }
 
     if (flatStatus == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        CustomSnackBar.error("Válassz státuszt!")
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(CustomSnackBar.error("Válassz státuszt!"));
       return;
     }
 
@@ -199,7 +239,7 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView> {
                 onTap: () => _removeNewImage(imageFile),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.5),
+                    color: Colors.red.withOpacity(0.5),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(Icons.close, color: Colors.white),
@@ -256,91 +296,103 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView> {
           ),
         ),
       ),
-      body: flatState.isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Container(
-        color: Colors.grey[100],
-        padding: const EdgeInsets.all(16),
-        child: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                CarouselSlider(
-                  options: CarouselOptions(
-                    height: 280,
-                    enlargeCenterPage: true,
-                    enableInfiniteScroll: false,
-                    autoPlay: false,
-                    viewportFraction: 0.8,
+      body: LoadingOverlay(
+        isLoading: flatState.isLoading,
+        child: Container(
+          color: Colors.grey[100],
+          padding: const EdgeInsets.all(16),
+          child: SingleChildScrollView(
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CarouselSlider(
+                    options: CarouselOptions(
+                      height: 280,
+                      enlargeCenterPage: true,
+                      enableInfiniteScroll: false,
+                      autoPlay: false,
+                      viewportFraction: 0.8,
+                    ),
+                    items: allImagesWidgets,
                   ),
-                  items: allImagesWidgets,
-                ),
-                const SizedBox(height: 12),
-                CustomTextFormField(
-                  controller: addressController,
-                  labelText: 'Cím',
-                  validator:
-                      RequiredValidator(
-                        errorText: 'A cím kitöltése kötelező.',
-                      ).call,
-                ),
-                const SizedBox(height: 12),
-                CustomTextFormField(
-                  controller: priceController,
-                  labelText: 'Ár',
-                  keyboardType: TextInputType.number,
-                  validator:
-                      MultiValidator([
-                        RequiredValidator(errorText: 'Az ár kitöltése kötelező.'),
-                        PatternValidator(
-                          r'^\d+$',
-                          errorText: 'Az ár csak szám lehet!',
-                        ),
-                      ]).call,
-                ),
-                const SizedBox(height: 12),
-                DropdownButtonFormField<FlatStatus>(
-                  value: flatStatus,
-                  decoration: InputDecoration(
-                    labelText: 'Állapot',
-                    filled: true,
-                    fillColor: Colors.white,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
+                  const SizedBox(height: 12),
+                  CustomTextFormField(
+                    controller: addressController,
+                    labelText: 'Cím',
+                    validator:
+                        RequiredValidator(
+                          errorText: 'A cím kitöltése kötelező.',
+                        ).call,
+                  ),
+                  const SizedBox(height: 12),
+                  CustomTextFormField(
+                    controller: priceController,
+                    labelText: 'Ár',
+                    keyboardType: TextInputType.number,
+                    validator:
+                        MultiValidator([
+                          RequiredValidator(
+                            errorText: 'Az ár kitöltése kötelező.',
+                          ),
+                          PatternValidator(
+                            r'^\d+$',
+                            errorText: 'Az ár csak szám lehet!',
+                          ),
+                        ]).call,
+                  ),
+                  const SizedBox(height: 12),
+                  DropdownButtonFormField<FlatStatus>(
+                    value: flatStatus,
+                    decoration: InputDecoration(
+                      labelText: 'Állapot',
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                    items:
+                        FlatStatus.values.map((status) {
+                          return DropdownMenuItem(
+                            value: status,
+                            child: Text(status.label),
+                          );
+                        }).toList(),
+                    onChanged:
+                        (val) =>
+                            val != null
+                                ? setState(() => flatStatus = val)
+                                : null,
+                    validator:
+                        (val) => val == null ? 'Válassz állapotot!' : null,
+                  ),
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: _showImageSourceActionSheet,
+                      icon: const Icon(Icons.add_a_photo),
+                      label: const Text('Képek hozzáadása'),
                     ),
                   ),
-                  items: FlatStatus.values.map((status) {
-                    return DropdownMenuItem(
-                      value: status,
-                      child: Text(status.label),
-                    );
-                  }).toList(),
-                  onChanged: (val) => val != null ? setState(() => flatStatus = val) : null,
-                  validator: (val) => val == null ? 'Válassz állapotot!' : null,
-                ),
-                const SizedBox(height: 20),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: _pickImages,
-                    icon: const Icon(Icons.add_a_photo),
-                    label: const Text('Képek hozzáadása'),
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: _onSave,
+                      icon: const Icon(Icons.save),
+                      label: const Text('Mentés'),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 20),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: _onSave,
-                    icon: const Icon(Icons.save),
-                    label: const Text('Mentés'),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

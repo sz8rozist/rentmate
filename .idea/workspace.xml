@@ -9,12 +9,15 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f7c025f7-f5d1-49bb-9496-3d397e9e2c84" name="Changes" comment="Lakás részletek oldal">
+    <list default="true" id="f7c025f7-f5d1-49bb-9496-3d397e9e2c84" name="Changes" comment="Javítások">
       <change beforePath="$PROJECT_DIR$/.flutter-plugins-dependencies" beforeDir="false" afterPath="$PROJECT_DIR$/.flutter-plugins-dependencies" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/viewmodels/flat_list_provider.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/viewmodels/flat_list_provider.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/models/flat_image.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/models/flat_image.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/services/flat_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/services/flat_service.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/views/flat_details_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/flat_details_view.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/views/flat_form_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/flat_form_view.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/views/lakasaim_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/lakasaim_view.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/widgets/loading_overlay.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/widgets/loading_overlay.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -221,7 +224,15 @@
       <option name="project" value="LOCAL" />
       <updated>1749926959228</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="Javítások">
+      <option name="closed" value="true" />
+      <created>1749928398720</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1749928398720</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -252,6 +263,7 @@
     <MESSAGE value="Kamera használat, kép galéria használat, Új lakás hozzáadás megkezdése" />
     <MESSAGE value="Lakás hozzáadás db-be, lakások listázása db ből" />
     <MESSAGE value="Lakás részletek oldal" />
-    <option name="LAST_COMMIT_MESSAGE" value="Lakás részletek oldal" />
+    <MESSAGE value="Javítások" />
+    <option name="LAST_COMMIT_MESSAGE" value="Javítások" />
   </component>
 </project>
