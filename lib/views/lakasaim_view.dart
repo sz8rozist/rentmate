@@ -9,6 +9,7 @@ import 'package:rentmate/routing/app_router.dart';
 import 'package:rentmate/widgets/custom_snackbar.dart';
 import '../models/flat_model.dart';
 import '../viewmodels/flat_list_provider.dart';
+import 'package:icons_plus/icons_plus.dart';
 
 class LakasaimView extends ConsumerWidget {
   const LakasaimView({super.key});
@@ -135,66 +136,49 @@ class FlatCard extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 16),
         elevation: 2,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Stack(
-              children: [
-                ClipRRect(
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(16),
-                  ),
-                  child: Image.network(
-                    flat.images.first.imageUrl,
-                    height: 180,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              // Ikon
+              const Icon(
+                FontAwesome.house_chimney,
+                size: 36,
+                color: Colors.blueGrey,
+              ),
+              const SizedBox(width: 16),
+
+              // Cím
+              Expanded(
+                child: Text(
+                  flat.address,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    flat.address,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: _getStatusColor(flat.status),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      flat.status.label,
-                      style: TextStyle(
-                        color: _getStatusTextColor(flat.status),
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Bérlő: ${flat.landLord}',
-                    style: const TextStyle(fontSize: 14),
-                  ),
-                  const SizedBox(height: 12),
-                ],
               ),
-            ),
-          ],
+
+              // Státusz badge
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: _getStatusColor(flat.status),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  flat.status.label,
+                  style: TextStyle(
+                    color: _getStatusTextColor(flat.status),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
+

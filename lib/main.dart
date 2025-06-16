@@ -24,7 +24,10 @@ class MyApp extends ConsumerWidget {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       title: 'RentMate',
-      theme: lightMode,
+      theme: ThemeData(
+        colorSchemeSeed: Colors.blue,
+        useMaterial3: true,
+      ) ,
       routerConfig: router,
     );
   }

@@ -1,10 +1,11 @@
 import 'dart:io';
 
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:form_field_validator/form_field_validator.dart';
+import 'package:icons_plus/icons_plus.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:rentmate/models/flat_image.dart';
 import 'package:rentmate/widgets/custom_snackbar.dart';
@@ -142,7 +143,7 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView> {
           newImages: newImages,
           status: flatStatus!,
         );
-
+    CustomSnackBar.success("Lakás sikeresen frissítve!");
     Navigator.of(context).pop();
   }
 
@@ -299,9 +300,11 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView> {
       body: LoadingOverlay(
         isLoading: flatState.isLoading,
         child: Container(
+          height: double.infinity,
           color: Colors.grey[100],
           padding: const EdgeInsets.all(16),
           child: SingleChildScrollView(
+            padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
             child: Form(
               key: _formKey,
               child: Column(
@@ -374,18 +377,10 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView> {
                         (val) => val == null ? 'Válassz állapotot!' : null,
                   ),
                   const SizedBox(height: 20),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: _showImageSourceActionSheet,
-                      icon: const Icon(Icons.add_a_photo),
-                      label: const Text('Képek hozzáadása'),
-                    ),
-                  ),
                   const SizedBox(height: 20),
                   SizedBox(
                     width: double.infinity,
-                    child: ElevatedButton.icon(
+                    child: OutlinedButton.icon(
                       onPressed: _onSave,
                       icon: const Icon(Icons.save),
                       label: const Text('Mentés'),
@@ -396,6 +391,25 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView> {
             ),
           ),
         ),
+      ),
+      floatingActionButton: SpeedDial(
+        icon: Icons.add,
+        activeIcon: Icons.close,
+        backgroundColor: Colors.blueGrey,
+        foregroundColor: Colors.white,
+        children: [
+          SpeedDialChild(
+            child: Icon(Icons.add_a_photo),
+            label: 'Képek hozzáadása',
+            onTap: () => _showImageSourceActionSheet(),
+          ),
+          SpeedDialChild(
+            child: Icon(FontAwesome.user_plus),
+            label: 'Albérlő hozzáadása',
+            onTap: () => _pickImages(),
+          ),
+          // Itt adhatsz hozzá további gombokat
+        ],
       ),
     );
   }

@@ -67,9 +67,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
       final state = ref.read(authViewModelProvider);
       state.when(
         data: (_) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(CustomSnackBar.success('Sikeres regisztráció!'));
+          CustomSnackBar.success("Sikeres regisztráció!");
           context.goNamed(AppRoute.signin.name);
         },
         loading: () {},
