@@ -42,8 +42,12 @@ dependencies:
   curved_navigation_bar: ^1.0.6
   image_picker: ^1.1.2
   awesome_snackbar_content: ^0.1.6
-  carousel_slider: ^5.1.1
-  flutter_speed_dial: ^7.0.0
+  flutter_slidable: ^4.0.0
+  adaptive_dialog: ^2.4.1
+  swipe_image_gallery: ^0.10.2
+  motion_tab_bar: ^2.0.4
+  floating_action_bubble: ^1.1.4
+  flutter_typeahead: ^5.2.0
 
 dev_dependencies:
   flutter_test:

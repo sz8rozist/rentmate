@@ -1,8 +1,9 @@
 import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rentmate/models/flat_status.dart';
 import 'package:rentmate/routing/app_router.dart';
@@ -18,18 +19,16 @@ class LakasaimView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final flatList = ref.watch(flatListProvider);
     return flatList.when(
-      loading:
-          () => SizedBox.expand(
-            child: Container(
-              color: Colors.black.withOpacity(0.3),
-              child: Center(
-                child:
-                    Platform.isIOS
-                        ? const CupertinoActivityIndicator()
-                        : const CircularProgressIndicator(),
-              ),
-            ),
+      loading: () => SizedBox.expand(
+        child: Container(
+          color: Colors.black.withOpacity(0.3),
+          child: Center(
+            child: Platform.isIOS
+                ? const CupertinoActivityIndicator()
+                : const CircularProgressIndicator(),
           ),
+        ),
+      ),
       error: (e, _) => Center(child: Text('Hiba történt: $e')),
       data: (flats) {
         if (flats.isEmpty) {
@@ -44,47 +43,42 @@ class LakasaimView extends ConsumerWidget {
             itemCount: flats.length,
             itemBuilder: (context, index) {
               final flat = flats[index];
-              return Dismissible(
+              return Slidable(
                 key: ValueKey(flat.id),
-                direction: DismissDirection.endToStart,
-                background: Container(
-                  color: Colors.red,
-                  alignment: Alignment.centerRight,
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: const Icon(Icons.delete, color: Colors.white),
-                ),
-                confirmDismiss: (direction) async {
-                  bool? result = await showDialog<bool>(
-                    context: context,
-                    builder:
-                        (context) => AlertDialog(
-                          title: const Text('Biztosan törlöd?'),
-                          actions: [
-                            TextButton.icon(
-                              onPressed: () => Navigator.of(context).pop(false),
-                              icon: const Icon(
-                                Icons.cancel,
-                                color: Colors.grey,
-                              ),
-                              label: const Text('Mégse'),
-                            ),
-                            TextButton.icon(
-                              onPressed: () => Navigator.of(context).pop(true),
-                              icon: const Icon(Icons.delete, color: Colors.red),
-                              label: const Text('Igen'),
-                            ),
-                          ],
-                        ),
-                  );
+                endActionPane: ActionPane(
+                  motion: const DrawerMotion(),
+                  extentRatio: 0.25,
+                  dismissible: DismissiblePane(
+                    onDismissed: () async {
+                      final result = await showOkCancelAlertDialog(
+                        context: context,
+                        title: 'Biztosan törlöd?',
+                        okLabel: 'Igen',
+                        cancelLabel: 'Mégse',
+                        isDestructiveAction: true,
+                      );
 
-                  return result == true;
-                },
-                onDismissed: (_) async {
-                  await ref.read(flatListProvider.notifier).removeFlat(flat);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    CustomSnackBar.success('${flat.address} törölve lett.'),
-                  );
-                },
+                      if (result == OkCancelResult.ok) {
+                        await ref.read(flatListProvider.notifier).removeFlat(flat);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          CustomSnackBar.success('${flat.address} törölve lett.'),
+                        );
+                      } else {
+                        // ha mégsem törlöd, visszarakjuk az elemet a listába
+                        ref.read(flatListProvider.notifier).refresh();
+                      }
+                    },
+                  ),
+                  children: [
+                    SlidableAction(
+                      onPressed: (_) {},
+                      backgroundColor: Colors.red,
+                      foregroundColor: Colors.white,
+                      icon: Icons.delete,
+                      label: 'Törlés',
+                    ),
+                  ],
+                ),
                 child: FlatCard(flat: flat),
               );
             },
@@ -140,15 +134,12 @@ class FlatCard extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              // Ikon
               const Icon(
                 FontAwesome.house_chimney,
                 size: 36,
                 color: Colors.blueGrey,
               ),
               const SizedBox(width: 16),
-
-              // Cím
               Expanded(
                 child: Text(
                   flat.address,
@@ -158,8 +149,6 @@ class FlatCard extends StatelessWidget {
                   ),
                 ),
               ),
-
-              // Státusz badge
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
@@ -181,4 +170,3 @@ class FlatCard extends StatelessWidget {
     );
   }
 }
-

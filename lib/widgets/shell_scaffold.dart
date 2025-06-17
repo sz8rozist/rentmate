@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:icons_plus/icons_plus.dart';
+import 'package:motion_tab_bar/MotionTabBar.dart';
 import 'package:rentmate/models/user_model.dart';
+import 'package:rentmate/theme/theme.dart';
 import '../models/user_role.dart';
 import '../viewmodels/auth_viewmodel.dart';
 import '../viewmodels/navigation_viewmodel.dart';
@@ -40,6 +42,21 @@ class ShellScaffold extends ConsumerWidget {
     }
     final title = _getTitle(index, currentUser);
 
+    // Összeállítjuk a tabokat dinamikusan
+    final tabLabels = <String>['Kezdőlap'];
+    final tabIcons = <IconData>[FontAwesome.house];
+
+    if (currentUser.role == UserRole.landlord) {
+      tabLabels.add('Lakásaim');
+      tabIcons.add(FontAwesome.house_user);
+    } else if (currentUser.role == UserRole.tenant) {
+      tabLabels.add('Albérletem');
+      tabIcons.add(Icons.home_work);
+    }
+
+    tabLabels.add('Profil');
+    tabIcons.add(FontAwesome.user);
+
     return Scaffold(
       extendBody: true,
       body: Column(
@@ -73,7 +90,6 @@ class ShellScaffold extends ConsumerWidget {
                     ),
                   ),
                 ),
-
                 if (actions != null)
                   Align(
                     alignment: Alignment.centerRight,
@@ -88,7 +104,6 @@ class ShellScaffold extends ConsumerWidget {
               ],
             ),
           ),
-
           Expanded(
             child: Container(
               color: Colors.black.withOpacity(0.05),
@@ -97,57 +112,36 @@ class ShellScaffold extends ConsumerWidget {
           ),
         ],
       ),
-
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: index,
-        onTap: (i) => _handleTap(i, currentUser, context, ref),
-        items: _getNavigationItems(currentUser),
+      bottomNavigationBar: MotionTabBar(
+        labels: tabLabels,
+        initialSelectedTab: tabLabels[index],
+        tabIconColor: Colors.grey,
+        tabSelectedColor: Colors.blueAccent,
+        textStyle: const TextStyle(color: Colors.blueAccent),
+        icons: tabIcons,
+        tabSize: 50,
+        onTabItemSelected: (newIndex) {
+          ref.read(bottomNavIndexProvider.notifier).state = newIndex;
+          _handleTap(newIndex, currentUser, context);
+        },
       ),
     );
   }
-}
 
-List<BottomNavigationBarItem> _getNavigationItems(UserModel currentUser) {
-  final items = [
-    BottomNavigationBarItem(icon: Icon(FontAwesome.house), label: 'Kezdőlap'),
-  ];
+  void _handleTap(
+      int i,
+      UserModel currentUser,
+      BuildContext context,
+      ) {
+    if (i == 0) return context.go('/home');
 
-  if (currentUser.role == UserRole.landlord) {
-    items.add(
-      BottomNavigationBarItem(
-        icon: Icon(FontAwesome.house_user),
-        label: 'Lakásaim',
-      ),
-    );
-  } else if (currentUser.role == UserRole.tenant) {
-    items.add(
-      BottomNavigationBarItem(icon: Icon(Icons.home_work), label: 'Albérletem'),
-    );
-  }
-
-  items.add(
-    BottomNavigationBarItem(icon: Icon(FontAwesome.user), label: 'Profil'),
-  );
-
-  return items;
-}
-
-void _handleTap(
-  int i,
-  UserModel currentUser,
-  BuildContext context,
-  WidgetRef ref,
-) {
-  ref.read(bottomNavIndexProvider.notifier).state = i;
-
-  if (i == 0) return context.go('/home');
-
-  if (i == 1) {
-    if (currentUser.role == UserRole.landlord) {
-      return context.go('/flats');
-    } else if (currentUser.role == UserRole.tenant) {
-      return context.go('/my-rental');
+    if (i == 1) {
+      if (currentUser.role == UserRole.landlord) {
+        return context.go('/flats');
+      } else if (currentUser.role == UserRole.tenant) {
+        return context.go('/my-rental');
+      }
     }
+    if (i == 2 || (i == 1)) return context.go('/profil');
   }
-  if (i == 2) return context.go('/profil');
 }
