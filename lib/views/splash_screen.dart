@@ -2,8 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:rentmate/routing/app_router.dart';
-import 'package:rentmate/theme/theme.dart';
+
+import '../routing/app_router.dart';
+import '../theme/theme.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -13,12 +14,11 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 3), (){
-      context.goNamed(AppRoute.welcome.name);
+    Future.delayed(const Duration(milliseconds: 3000), () {
+       context.goNamed(AppRoute.welcome.name);
     });
   }
 
@@ -46,15 +46,12 @@ class _SplashScreenState extends State<SplashScreen> {
                   ),
                 ),
                 const SizedBox(height: 30),
-                if (defaultTargetPlatform == TargetPlatform.iOS)
-                  const CupertinoActivityIndicator(
-                    color: Colors.white,
-                    radius: 20,
-                  )
-                else
-                  const CircularProgressIndicator(
-                    color: Colors.white,
-                  ),
+                defaultTargetPlatform == TargetPlatform.iOS
+                    ? const CupertinoActivityIndicator(
+                  color: Colors.white,
+                  radius: 20,
+                )
+                    : const CircularProgressIndicator(color: Colors.white),
               ],
             ),
           ),
@@ -62,5 +59,4 @@ class _SplashScreenState extends State<SplashScreen> {
       ),
     );
   }
-
 }

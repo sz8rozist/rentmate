@@ -36,7 +36,6 @@ class AuthService {
     if (userId == null) {
       throw Exception('Hibás e-mail vagy jelszó.');
     }
-
     // Felhasználó lekérése a saját users táblából
     final response =
         await _client.from('users').select().eq('id', userId).single();

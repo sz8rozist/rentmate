@@ -51,5 +51,9 @@
         <string>Allow access to photo library</string>
         <key>NSCameraUsageDescription</key>
         <string>Allow access to camera to capture photos</string>
+        <key>NSFaceIDUsageDescription</key>
+        <string>Az arcfelismerést a biztonságos bejelentkezéshez használjuk.</string>
+        <key>NSBiometricsUsageDescription</key>
+        <string>Biometrikus azonosítást használunk a biztonságos bejelentkezéshez.</string>
 	</dict>
 </plist>

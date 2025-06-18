@@ -48,6 +48,8 @@ dependencies:
   motion_tab_bar: ^2.0.4
   floating_action_bubble: ^1.1.4
   flutter_typeahead: ^5.2.0
+  flutter_secure_storage: ^9.2.4
+  local_auth: ^2.3.0
 
 dev_dependencies:
   flutter_test:

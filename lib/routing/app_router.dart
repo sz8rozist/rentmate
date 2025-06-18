@@ -30,8 +30,14 @@ final goRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: '/',
     refreshListenable: routerNotifier,
-    redirect: (context, state) {
+   /* redirect: (context, state) {
       final asyncUser = ref.read(currentUserProvider);
+
+      // Ha még töltődik az auth állapot
+      if (asyncUser.isLoading || asyncUser.isRefreshing) {
+        // Ne redirectelj, amíg töltődik
+        return null;
+      }
       final user = asyncUser.asData?.value;
       final loggedIn = user != null;
       final goingToAuth =
@@ -48,7 +54,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       }
 
       return null;
-    },
+    },*/
     routes: [
       GoRoute(path: '/', builder: (context, state) => SplashScreen()),
       GoRoute(

@@ -22,9 +22,8 @@ final currentUserProvider = StreamProvider<UserModel?>((ref) {
     return await authService.fetchUserModel(user.id);
   });
 });
-
 final roleProvider = StateProvider<UserRole?>((ref) => UserRole.tenant);
-
+final biometricVerifiedProvider = StateProvider<bool>((ref) => false);
 class AuthViewModel extends StateNotifier<AsyncValue<UserModel?>> {
   final Ref ref;
 

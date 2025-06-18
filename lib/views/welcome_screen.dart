@@ -1,14 +1,72 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:local_auth/local_auth.dart';
 import 'package:rentmate/routing/app_router.dart';
+import 'package:rentmate/widgets/custom_snackbar.dart';
 import '../theme/theme.dart';
+import '../viewmodels/auth_viewmodel.dart';
 import '../widgets/custom_scaffold.dart';
 import '../widgets/welcome_button.dart';
 
-class WelcomeScreen extends StatelessWidget {
+class WelcomeScreen extends ConsumerStatefulWidget {
   const WelcomeScreen({super.key});
 
   @override
+  ConsumerState<WelcomeScreen> createState() => _WelcomeScreenState();
+}
+
+class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
+  final LocalAuthentication auth = LocalAuthentication();
+  @override
+  void initState() {
+    super.initState();
+    _tryBiometricAuthLoop();
+  }
+
+  Future<void> _tryBiometricAuthLoop() async {
+    final user = await ref.read(currentUserProvider.future);
+    if (user == null) return;
+
+    int attempts = 0;
+    const int maxAttempts = 3;
+
+    while (attempts < maxAttempts && mounted) {
+      try {
+        final authenticated = await auth.authenticate(
+          localizedReason: 'Kérlek azonosítsd magad',
+          options: const AuthenticationOptions(
+            biometricOnly: true,
+            stickyAuth: true,
+          ),
+        );
+
+        if (authenticated && mounted) {
+          context.goNamed(AppRoute.home.name);
+          return;
+        } else {
+          attempts++;
+        }
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          CustomSnackBar.error("TÚl sok sikertelen próbálkozás!")
+        );
+        break; // hibánál kilépünk a loopból
+      }
+    }
+
+    if (attempts >= maxAttempts && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Túl sok sikertelen próbálkozás')),
+      );
+      // Itt akár át is irányíthatod a login képernyőre:
+      // context.goNamed(AppRoute.signin.name);
+    }
+  }
+  @override
   Widget build(BuildContext context) {
+    final biometricVerified = ref.watch(biometricVerifiedProvider);
     return CustomScaffold(
       child: Column(
         children: [
@@ -16,7 +74,10 @@ class WelcomeScreen extends StatelessWidget {
             flex: 8,
             child: Center(
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 40.0, vertical: 20.0),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 40.0,
+                  vertical: 20.0,
+                ),
                 margin: const EdgeInsets.symmetric(horizontal: 20.0),
                 decoration: BoxDecoration(
                   color: Colors.black.withOpacity(0.5),
@@ -42,11 +103,9 @@ class WelcomeScreen extends StatelessWidget {
                         ),
                       ),
                       TextSpan(
-                        text: '\nEnter personal details to your employee account',
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: Colors.white,
-                        ),
+                        text:
+                            '\nEnter personal details to your employee account',
+                        style: TextStyle(fontSize: 20, color: Colors.white),
                       ),
                     ],
                   ),
