@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart'; // kell, ha Riverpodot használsz
 import 'package:go_router/go_router.dart';
+import 'package:rentmate/models/user_model.dart';
 import 'package:rentmate/routing/router_notifier.dart';
 import 'package:rentmate/viewmodels/auth_viewmodel.dart';
+import 'package:rentmate/views/chat_message_view.dart';
+import 'package:rentmate/views/chat_view.dart';
 import 'package:rentmate/views/flat_details_view.dart';
 import 'package:rentmate/views/flat_form_view.dart';
 import 'package:rentmate/views/lakasaim_view.dart';
@@ -16,7 +19,7 @@ import '../views/splash_screen.dart';
 import '../widgets/shell_scaffold.dart';
 
 // Enum az útvonalakhoz
-enum AppRoute { welcome, signin, signup, home, profile, lakasaim, alberleteim, createFlat, flatDetail }
+enum AppRoute { welcome, signin, signup, home, profile, lakasaim, alberleteim, createFlat, flatDetail, chat, chatMessage }
 
 // Riverpod provider a RouterNotifierhoz
 final routerNotifierProvider = Provider<RouterNotifier>((ref) {
@@ -85,6 +88,14 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           return FlatDetailsView(flatId: flatId);
         },
       ),
+      GoRoute(
+        path: '/chatMessage/:tenantId',
+        name: AppRoute.chatMessage.name,
+        builder: (context, state) {
+          final tenantId = state.pathParameters['tenantId']!;
+          return ChatMessageView(tenantId: tenantId);
+        },
+      ),
       ShellRoute(
         builder: (context, state, child) {
           // Például a flats (lakasaim) oldalon gomb kell:
@@ -124,6 +135,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             path: '/profil',
             name: AppRoute.profile.name,
             builder: (context, state) => ProfilView(),
+          ),
+          GoRoute(
+            path: '/chat',
+            name: AppRoute.chat.name,
+            builder: (context, state) => ChatView(),
           ),
         ],
       ),

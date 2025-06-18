@@ -56,12 +56,12 @@ class _FlatFormViewState extends ConsumerState<FlatFormView> {
               Padding(
                 padding: EdgeInsets.fromLTRB(60, MediaQuery.of(context).padding.top, 16, 0),
                 child: Align(
-                  alignment: Alignment.centerLeft,
+                  alignment: Alignment.center,
                   child: Text(
-                    'Lakás adatai',
+                    'Lakás hozzáadása',
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 24,
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
                       shadows: [
                         Shadow(
