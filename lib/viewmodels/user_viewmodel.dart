@@ -9,7 +9,6 @@ StateNotifierProvider<TenantListNotifier, AsyncValue<List<UserModel>>>((ref) {
   final service = ref.read(userServiceProvider);
   return TenantListNotifier(service);
 });
-
 class TenantListNotifier extends StateNotifier<AsyncValue<List<UserModel>>> {
   final UserService service;
 

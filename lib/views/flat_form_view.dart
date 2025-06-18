@@ -41,23 +41,24 @@ class _FlatFormViewState extends ConsumerState<FlatFormView> {
     final asyncUser = ref.read(currentUserProvider);
     final user = asyncUser.asData?.value;
     return Scaffold(
-      extendBodyBehindAppBar: true, // hogy az appbar rárajzoljon a body-ra
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(80),
+        preferredSize: Size.fromHeight(80 + MediaQuery.of(context).padding.top),
         child: SizedBox(
-          height: 80,
+          height: 80 + MediaQuery.of(context).padding.top,
           width: double.infinity,
+          // A háttér lefedi a státusz sávot is
           child: Stack(
             fit: StackFit.expand,
             children: [
               Image.asset('assets/images/bg1.png', fit: BoxFit.cover),
               Container(color: Colors.black.withOpacity(0.4)),
+              // A tartalmat beljebb húzzuk, hogy ne lógjon be a status bar területére
               Padding(
-                padding: const EdgeInsets.fromLTRB(60, 0, 16, 0),
+                padding: EdgeInsets.fromLTRB(60, MediaQuery.of(context).padding.top, 16, 0),
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    'Lakás hozzáadása',
+                    'Lakás adatai',
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 24,
@@ -73,21 +74,21 @@ class _FlatFormViewState extends ConsumerState<FlatFormView> {
                   ),
                 ),
               ),
-              // Ha kell vissza gomb:
               Positioned(
                 left: 0,
-                top: 0,
+                top: MediaQuery.of(context).padding.top,
                 bottom: 0,
                 child: IconButton(
                   icon: const Icon(Icons.arrow_back, color: Colors.white),
                   onPressed: () => Navigator.of(context).pop(),
+                  padding: const EdgeInsets.all(16),
+                  constraints: const BoxConstraints(),
                 ),
               ),
             ],
           ),
         ),
       ),
-
       body: LoadingOverlay(
         isLoading: flatState.isLoading || user == null,
         child: Padding(

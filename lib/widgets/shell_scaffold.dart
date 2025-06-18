@@ -42,7 +42,6 @@ class ShellScaffold extends ConsumerWidget {
     }
     final title = _getTitle(index, currentUser);
 
-    // Összeállítjuk a tabokat dinamikusan
     final tabLabels = <String>['Kezdőlap'];
     final tabIcons = <IconData>[FontAwesome.house];
 
@@ -61,23 +60,49 @@ class ShellScaffold extends ConsumerWidget {
       extendBody: true,
       body: Column(
         children: [
-          SizedBox(
-            height: 80,
+          Container(
+            height: 80 + MediaQuery.of(context).padding.top,
             width: double.infinity,
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                Image.asset('assets/images/bg1.png', fit: BoxFit.cover),
-                Container(color: Colors.black.withOpacity(0.4)),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/images/bg1.png'),
+                fit: BoxFit.cover,
+              ),
+            ),
+            child: Container(
+              color: Colors.black.withOpacity(0.4),
+              padding: EdgeInsets.only(
+                top: MediaQuery.of(context).padding.top,
+                left: 16,
+                right: 16,
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // Bal oldali hárompontos ikon
+                  IconButton(
+                    icon: const Icon(Icons.more_vert, color: Colors.white),
+                    onPressed: () {
+                      showModalBottomSheet(
+                        context: context,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(20)),
+                        ),
+                        builder: (context) {
+                          return _buildBottomSheetMenu(context, ref);
+                        },
+                      );
+                    },
+                  ),
+
+                  // Középen a cím, kitölti a helyet
+                  Expanded(
                     child: Text(
                       title,
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 24,
+                        fontSize: 20,
                         fontWeight: FontWeight.bold,
                         shadows: [
                           Shadow(
@@ -87,21 +112,23 @@ class ShellScaffold extends ConsumerWidget {
                           ),
                         ],
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
                     ),
                   ),
-                ),
-                if (actions != null)
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: Padding(
-                      padding: const EdgeInsets.only(right: 16.0),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: actions!,
-                      ),
-                    ),
+
+                  SizedBox(
+                    width: 48, // vagy annyi, amekkora hely kell az ikonoknak (pl. egy IconButton mérete)
+                    child: actions != null
+                        ? Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: actions!,
+                    )
+                        : const SizedBox.shrink(),
                   ),
-              ],
+                ],
+              ),
             ),
           ),
           Expanded(
@@ -112,6 +139,7 @@ class ShellScaffold extends ConsumerWidget {
           ),
         ],
       ),
+
       bottomNavigationBar: MotionTabBar(
         labels: tabLabels,
         initialSelectedTab: tabLabels[index],
@@ -128,11 +156,53 @@ class ShellScaffold extends ConsumerWidget {
     );
   }
 
-  void _handleTap(
-      int i,
-      UserModel currentUser,
-      BuildContext context,
-      ) {
+  Widget _buildBottomSheetMenu(BuildContext context, WidgetRef ref) {
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Wrap(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.settings),
+              title: const Text('Beállítások'),
+              onTap: () {
+                Navigator.pop(context);
+                context.go('/settings');
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.info),
+              title: const Text('Névjegy'),
+              onTap: () {
+                Navigator.pop(context);
+                context.go('/about');
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.logout),
+              title: const Text('Kijelentkezés'),
+              onTap: () async {
+                Navigator.pop(context);
+                final authService = ref.read(authServiceProvider);
+                try {
+                  await authService.signOut();
+                  context.goNamed('welcome');
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Hiba a kijelentkezés során: $e'),
+                    ),
+                  );
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _handleTap(int i, UserModel currentUser, BuildContext context) {
     if (i == 0) return context.go('/home');
 
     if (i == 1) {

@@ -25,6 +25,11 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
   }
 
   Future<void> _tryBiometricAuthLoop() async {
+
+    if(!await auth.canCheckBiometrics){
+      return;
+    }
+
     final user = await ref.read(currentUserProvider.future);
     if (user == null) return;
 
@@ -60,13 +65,10 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Túl sok sikertelen próbálkozás')),
       );
-      // Itt akár át is irányíthatod a login képernyőre:
-      // context.goNamed(AppRoute.signin.name);
     }
   }
   @override
   Widget build(BuildContext context) {
-    final biometricVerified = ref.watch(biometricVerifiedProvider);
     return CustomScaffold(
       child: Column(
         children: [

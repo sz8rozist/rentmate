@@ -47,41 +47,43 @@ class ProfilView extends ConsumerWidget {
       ),
     ];
 
-    return  Padding(
+    return  SafeArea(
+      top: false,
+      bottom: true,
+      child: ListView.builder(
         padding: const EdgeInsets.all(16),
-        child: ListView.builder(
-          itemCount: items.length,
-          itemBuilder: (context, index) {
-            final item = items[index];
-            return Card(
-              elevation: 3,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              margin: const EdgeInsets.symmetric(vertical: 10),
-              child: InkWell(
-                borderRadius: BorderRadius.circular(16),
-                onTap: item.onTap,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-                  child: Row(
-                    children: [
-                      Icon(item.icon, size: 20, color: lightColorScheme.secondary),
-                      const SizedBox(width: 16),
-                      Text(
-                        item.title,
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-                      ),
-                      const Spacer(),
-                      const Icon(Icons.chevron_right, color: Colors.grey),
-                    ],
-                  ),
+        itemCount: items.length,
+        itemBuilder: (context, index) {
+          final item = items[index];
+          return Card(
+            elevation: 3,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            margin: const EdgeInsets.symmetric(vertical: 10),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(16),
+              onTap: item.onTap,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                child: Row(
+                  children: [
+                    Icon(item.icon, size: 20, color: lightColorScheme.secondary),
+                    const SizedBox(width: 16),
+                    Text(
+                      item.title,
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                    ),
+                    const Spacer(),
+                    const Icon(Icons.chevron_right, color: Colors.grey),
+                  ],
                 ),
               ),
-            );
-          },
-        ),
-      );
+            ),
+          );
+        },
+      ),
+    );
 
   }
 }
