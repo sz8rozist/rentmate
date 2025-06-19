@@ -35,13 +35,9 @@ class Flat {
           FlatStatus.active,
       landLord: json['landlord_user_id'],
       tenants:
-          json['tenants'] != null
-              ? (json['tenants'] as List<dynamic>?)
-                  ?.map(
-                    (item) => UserModel.fromJson(item as Map<String, dynamic>),
-                  )
-                  .toList()
-              : null,
+      (json['flats_for_rent'] as List<dynamic>?)
+          ?.map((item) => UserModel.fromJson((item as Map<String, dynamic>)['tenant'] as Map<String, dynamic>))
+          .toList()
     );
   }
 
@@ -64,6 +60,7 @@ class Flat {
     FlatStatus? status,
     String? landLord,
     List<FlatImage>? images,
+    List<UserModel>? tenants
   }) {
     return Flat(
       id: id ?? this.id,
@@ -72,6 +69,7 @@ class Flat {
       landLord: landLord ?? this.landLord,
       images: images ?? this.images,
       price: price ?? this.price,
+      tenants: tenants ?? this.tenants
     );
   }
 }

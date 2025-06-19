@@ -12,7 +12,7 @@ class FlatService {
   Future<List<Flat>> getFlats() async {
     final response = await _supabase
         .from('flats')
-        .select('*, images:flats_images(*)');
+        .select('*, images:flats_images(*), flats_for_rent(tenant:users(*))');
     return (response as List)
         .map((e) => Flat.fromJson(e as Map<String, dynamic>))
         .toList();
@@ -100,15 +100,10 @@ class FlatService {
     return (publicUrl: publicUrl, pathInBucket: fileName);
   }
 
-  //TODO: A képet a storageból valamiér nem törli ezt meg kell nézni.
-  Future<void> updateFlatWithImages({
+  Future<void> updateImages({
     required String id,
-    required String address,
-    required String price,
-    required List<FlatImage>
-    retainedImageUrls, // a felhasználó által megtartott képek URL-jei
-    List<File>? newImages, // újonnan feltöltendő képek
-    required FlatStatus status,
+    required List<FlatImage> retainedImageUrls,
+    List<File>? newImages,
   }) async {
     final responseGet = await _supabase
         .from('flats_images')
@@ -178,7 +173,14 @@ class FlatService {
         await _supabase.from('flats_images').insert(newImagesRecord);
       }
     }
+  }
 
+  Future<void> updateFlatWithImages({
+    required String id,
+    required String address,
+    required String price,
+    required FlatStatus status,
+  }) async {
     // 8. Frissítjük a flats rekordot az új adatokkal (kép lista nélkül, mert külön táblában vannak)
     final updates = {
       'address': address,
@@ -187,5 +189,20 @@ class FlatService {
     };
 
     await _supabase.from('flats').update(updates).eq('id', id);
+  }
+
+  Future<void> addTenantToFlat(String flatId, String tenantUserId) async {
+    await _supabase.from('flats_for_rent').insert({
+      'flat_id': flatId,
+      'tenant_user_id': tenantUserId,
+    });
+  }
+
+  Future<void> removeTenantFromFlat(String flatId, String tenantUserId) async {
+    await _supabase
+        .from('flats_for_rent')
+        .delete()
+        .eq('flat_id', flatId)
+        .eq('tenant_user_id', tenantUserId);
   }
 }

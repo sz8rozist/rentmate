@@ -26,6 +26,7 @@ class FlatListNotifier extends StateNotifier<AsyncValue<List<Flat>>> {
 
   Future<void> loadFlats() async {
     try {
+      state = AsyncLoading();
       final flats = await service.getFlats();
       state = AsyncData(flats);
     } catch (e, st) {
@@ -102,9 +103,6 @@ class FlatListNotifier extends StateNotifier<AsyncValue<List<Flat>>> {
     required String address,
     required FlatStatus status,
     required String price,
-    required List<FlatImage>
-    retainedImageUrls, // a felhasználó által megtartott képek URL-jei
-    List<File>? newImages, // újonnan feltöltendő képek
   }) async {
     try {
       state = const AsyncLoading();
@@ -114,12 +112,51 @@ class FlatListNotifier extends StateNotifier<AsyncValue<List<Flat>>> {
         id: flatId,
         address: address,
         price: price,
-        retainedImageUrls: retainedImageUrls,
-        newImages: newImages,
         status: status,
       );
 
       // Frissítjük a listát a mentés után
+      await loadFlats();
+    } catch (e, st) {
+      state = AsyncError(e, st);
+    }
+  }
+
+  Future<void> updateImage({
+    required String flatId,
+    required List<FlatImage>
+    retainedImageUrls, // a felhasználó által megtartott képek URL-jei
+    List<File>? newImages, // újonnan feltöltendő képek
+  }) async {
+    try {
+      state = const AsyncLoading();
+
+      await service.updateImages(
+        id: flatId,
+        retainedImageUrls: retainedImageUrls,
+        newImages: newImages,
+      );
+
+      await loadFlats();
+    } catch (e, st) {
+      state = AsyncError(e, st);
+    }
+  }
+
+  Future<void> addTenantToFlat(String flatId, String tenantUserId) async {
+    try {
+      state = const AsyncLoading();
+      await service.addTenantToFlat(flatId, tenantUserId);
+      await loadFlats();
+    } catch (e, st) {
+      state = AsyncError(e, st);
+    }
+  }
+
+  Future<void> removeTenantFromFlat(String flatId, String tenantUserId) async {
+    try {
+      state = const AsyncLoading();
+      await service.removeTenantFromFlat(flatId, tenantUserId);
       await loadFlats();
     } catch (e, st) {
       state = AsyncError(e, st);
