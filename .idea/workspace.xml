@@ -9,21 +9,10 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f7c025f7-f5d1-49bb-9496-3d397e9e2c84" name="Changes" comment="Sötét - világos mód">
-      <change afterPath="$PROJECT_DIR$/lib/models/message_model.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/services/chat_service.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/viewmodels/chat_view_viewmodel.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/widgets/swipe_image_galery.dart" afterDir="false" />
+    <list default="true" id="f7c025f7-f5d1-49bb-9496-3d397e9e2c84" name="Changes" comment="Chat funkció">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/models/chat_message.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/models/flat_model.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/models/flat_model.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/models/user_model.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/models/user_model.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/routing/app_router.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/routing/app_router.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/theme.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/theme.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/viewmodels/chat_message_viewmodel.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/viewmodels/chat_view_viewmodel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/viewmodels/chat_view_viewmodel.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/views/chat_message_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/chat_message_view.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/views/chat_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/chat_view.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/views/flat_details_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/flat_details_view.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -302,7 +291,15 @@
       <option name="project" value="LOCAL" />
       <updated>1750511670324</updated>
     </task>
-    <option name="localTasksCounter" value="25" />
+    <task id="LOCAL-00025" summary="Chat funkció">
+      <option name="closed" value="true" />
+      <created>1750538398044</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1750538398044</updated>
+    </task>
+    <option name="localTasksCounter" value="26" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -339,6 +336,7 @@
     <MESSAGE value="chat" />
     <MESSAGE value="Lakás adatok oldal javítások" />
     <MESSAGE value="Sötét - világos mód" />
-    <option name="LAST_COMMIT_MESSAGE" value="Sötét - világos mód" />
+    <MESSAGE value="Chat funkció" />
+    <option name="LAST_COMMIT_MESSAGE" value="Chat funkció" />
   </component>
 </project>

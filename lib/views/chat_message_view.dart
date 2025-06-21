@@ -23,7 +23,7 @@ class _ChatMessageViewState extends ConsumerState<ChatMessageView> {
   final TextEditingController _controller = TextEditingController();
   final ImagePicker _picker = ImagePicker();
 
-  List<File> _imageFiles = [];
+  final List<File> _imageFiles = [];
 
   void _sendMessage() async {
     final text = _controller.text.trim();
@@ -35,7 +35,7 @@ class _ChatMessageViewState extends ConsumerState<ChatMessageView> {
     if (user == null) return;
 
     final sendMessage = ref.read(sendMessageProvider);
-    await sendMessage(widget.flatId, user.id, text, file: _imageFiles);
+    await sendMessage(widget.flatId, user.id, text, _imageFiles);
 
     FocusScope.of(context).unfocus();
 
@@ -63,6 +63,72 @@ class _ChatMessageViewState extends ConsumerState<ChatMessageView> {
       setState(() {
         _imageFiles.add(File(pickedFile.path));
       });
+    }
+  }
+  Widget _buildImagesGrid(List<String> imageUrls) {
+    if (imageUrls.length == 1) {
+      return GestureDetector(
+        onTap: () {
+          showSwipeImageGallery(
+            context,
+            children: [NetworkImage(imageUrls.first)],
+            swipeDismissible: true,
+          );
+        },
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: Image.network(
+            imageUrls.first,
+            width: 150,
+            height: 150,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) =>
+            const Center(child: Text('Kép betöltési hiba')),
+          ),
+        ),
+      );
+    } else {
+      final crossAxisCount = 3;
+      final imageSize = 150.0;
+      final spacing = 8.0;
+      final rowCount = (imageUrls.length / crossAxisCount).ceil();
+
+      return SizedBox(
+        height: rowCount * imageSize + (rowCount - 1) * spacing,
+        child: GridView.builder(
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            crossAxisSpacing: spacing,
+            mainAxisSpacing: spacing,
+            childAspectRatio: 1,
+          ),
+          itemCount: imageUrls.length,
+          itemBuilder: (context, imgIndex) {
+            final imageUrl = imageUrls[imgIndex];
+            return GestureDetector(
+              onTap: () {
+                showSwipeImageGallery(
+                  context,
+                  initialIndex: imgIndex,
+                  children:
+                  imageUrls.map((url) => NetworkImage(url)).toList(),
+                  swipeDismissible: true,
+                );
+              },
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.network(
+                  imageUrl,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) =>
+                  const Center(child: Text('Kép betöltési hiba')),
+                ),
+              ),
+            );
+          },
+        ),
+      );
     }
   }
 
@@ -149,80 +215,54 @@ class _ChatMessageViewState extends ConsumerState<ChatMessageView> {
                         final isMe = message.senderUser.id == user.id;
 
                         Widget messageContent;
-                        if (message.imageUrls.isNotEmpty) {
-                          if (message.imageUrls.length == 1) {
-                            // Egy kép - lehet kattintható nagyításra
-                            messageContent = GestureDetector(
-                              onTap: () {
-                                // Megnyitjuk a galériát, egy képpel
-                                showSwipeImageGallery(
-                                  context,
-                                  children: [
-                                    NetworkImage(message.imageUrls.first),
-                                  ],
-                                  swipeDismissible: true,
-                                );
-                              },
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(8),
-                                child: Image.network(
-                                  message.imageUrls.first,
-                                  width: 150,
-                                  height: 150,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) =>
-                                  const Center(child: Text('Kép betöltési hiba')),
-                                ),
-                              ),
-                            );
-                          } else {
-                            // Több kép - GridView, mindegyik képre rárakunk GestureDetector-t
-                            final crossAxisCount = 3;
-                            final imageSize = 150.0;
-                            final spacing = 8.0;
-                            final rowCount = (message.imageUrls.length / crossAxisCount).ceil();
+                        final hasText = message.content.trim().isNotEmpty;
+                        final hasImages = message.imageUrls.isNotEmpty;
 
-                            messageContent = SizedBox(
-                              height: rowCount * imageSize + (rowCount - 1) * spacing,
-                              child: GridView.builder(
-                                physics: const NeverScrollableScrollPhysics(),
-                                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: crossAxisCount,
-                                  crossAxisSpacing: spacing,
-                                  mainAxisSpacing: spacing,
-                                  childAspectRatio: 1,
+                        if (hasText && hasImages) {
+                          // Van szöveg és kép is: külön containerben legyen a szöveg, alatta a képek
+                          messageContent = Column(
+                            crossAxisAlignment: isMe
+                                ? CrossAxisAlignment.end
+                                : CrossAxisAlignment.start,
+                            children: [
+                              ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  maxWidth: MediaQuery.of(context).size.width * 0.7,
                                 ),
-                                itemCount: message.imageUrls.length,
-                                itemBuilder: (context, imgIndex) {
-                                  final imageUrl = message.imageUrls[imgIndex];
-                                  return GestureDetector(
-                                    onTap: () {
-                                      // Megnyitjuk a galériát a message képeivel, az épp kijelölt indexszel
-                                      showSwipeImageGallery(
-                                        context,
-                                        initialIndex: imgIndex,
-                                        children: message.imageUrls
-                                            .map((url) => NetworkImage(url))
-                                            .toList(),
-                                        swipeDismissible: true,
-                                      );
-                                    },
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(8),
-                                      child: Image.network(
-                                        imageUrl,
-                                        fit: BoxFit.cover,
-                                        errorBuilder: (context, error, stackTrace) =>
-                                        const Center(child: Text('Kép betöltési hiba')),
-                                      ),
+                                child: Container(
+                                  padding: const EdgeInsets.all(12), // egységes padding, nem csak bottom
+                                  decoration: BoxDecoration(
+                                    color: isMe
+                                        ? Colors.blueAccent.shade200
+                                        : Colors.lightBlueAccent.shade400,
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: const Radius.circular(16),
+                                      topRight: const Radius.circular(16),
+                                      bottomLeft: Radius.circular(isMe ? 16 : 0),
+                                      bottomRight: Radius.circular(isMe ? 0 : 16),
                                     ),
-                                  );
-                                },
+                                  ),
+                                  child: Text(
+                                    message.content,
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                ),
                               ),
-                            );
-                          }
+                              const SizedBox(height: 8), // kis távolság a szöveg és a kép között
+                              ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  maxWidth: MediaQuery.of(context).size.width * 0.7,
+                                ),
+                                child: _buildImagesGrid(message.imageUrls),
+                              ),
+                            ],
+                          );
+
+                        } else if (hasImages) {
+                          // Csak képek
+                          messageContent = _buildImagesGrid(message.imageUrls);
                         } else {
-                          // Szöveg
+                          // Csak szöveg
                           messageContent = Text(
                             message.content,
                             style: const TextStyle(color: Colors.white),
