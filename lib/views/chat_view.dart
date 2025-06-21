@@ -77,9 +77,6 @@ class _ChatViewState extends ConsumerState<ChatView> {
           }
 
           return Card(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            margin: const EdgeInsets.symmetric(vertical: 8),
-            elevation: 4,
             child: ExpansionTile(
               tilePadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               collapsedShape: RoundedRectangleBorder(
@@ -112,9 +109,6 @@ class _ChatViewState extends ConsumerState<ChatView> {
               childrenPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
               children: flat.tenants!.map((tenant) {
                 return Card(
-                  margin: const EdgeInsets.symmetric(vertical: 6),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  elevation: 2,
                   child: ListTile(
                     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     leading: CircleAvatar(

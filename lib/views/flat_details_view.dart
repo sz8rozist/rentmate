@@ -1,10 +1,12 @@
 import 'dart:io';
 
+import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:floating_action_bubble/floating_action_bubble.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:rentmate/widgets/custom_text_form_field.dart';
 import 'package:rentmate/widgets/loading_overlay.dart';
 import 'package:swipe_image_gallery/swipe_image_gallery.dart';
 
@@ -13,9 +15,9 @@ import '../models/flat_model.dart';
 import '../models/flat_status.dart';
 import '../models/user_model.dart';
 import '../viewmodels/flat_list_provider.dart';
+import '../viewmodels/theme_provider.dart';
 import '../viewmodels/user_viewmodel.dart';
 import '../widgets/custom_snackbar.dart';
-import '../widgets/custom_text_form_field.dart';
 
 class FlatDetailsView extends ConsumerStatefulWidget {
   final String flatId;
@@ -255,7 +257,6 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView>
 
   Widget _buildTenantsList() {
     final flatListState = ref.watch(flatListProvider);
-
     return flatListState.when(
       data: (flats) {
         final flatToDisplay = flats.firstWhere((f) => f.id == widget.flatId);
@@ -272,36 +273,42 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView>
           separatorBuilder: (_, __) => const SizedBox(height: 8),
           itemBuilder: (context, index) {
             final tenant = tenantList[index];
-            return Card(
-              elevation: 2,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              child: ListTile(
-                leading: const Icon(Icons.person, color: Colors.blueAccent),
-                title: Text(tenant.name),
-                subtitle: Text(tenant.email),
-                trailing: IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.blueAccent),
-                  onPressed: () async {
-                    final confirm = await showDialog<bool>(
-                      context: context,
-                      builder: (ctx) => AlertDialog(
-                        title: const Text('Bérlő törlése'),
-                        content: Text('Biztosan törlöd a bérlőt: ${tenant.name}?'),
-                        actions: [
-                          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Mégse')),
-                          ElevatedButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Törlés')),
-                        ],
-                      ),
-                    );
+            return Dismissible(
+              key: ValueKey(tenant.id),
+              direction: DismissDirection.endToStart, // jobbról balra swipe a törléshez
+              confirmDismiss: (direction) async {
+                final result = await showOkCancelAlertDialog(
+                  context: context,
+                  title: 'Biztosan törlöd?',
+                  okLabel: 'Igen',
+                  cancelLabel: 'Mégse',
+                  isDestructiveAction: true,
+                );
 
-                    if (confirm ?? false) {
-                      ref.read(flatListProvider.notifier).removeTenantFromFlat(widget.flatId, tenant.id);
-                      ref.read(tenantListProvider.notifier).includeTenant(tenant.id);
-                    }
-                  },
+                if (result == OkCancelResult.ok) {
+                  await ref.read(flatListProvider.notifier).removeTenantFromFlat(widget.flatId, tenant.id);
+                  ref.read(tenantListProvider.notifier).includeTenant(tenant.id);
+
+                  return true; // ténylegesen törölje az elemet a listából
+                } else {
+                  return false; // ne törölje, maradjon az elem
+                }
+              },
+              background: Container(
+                alignment: Alignment.centerRight,
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                color: Colors.red,
+                child: const Icon(Icons.delete, color: Colors.white),
+              ),
+              child: Card(
+                child: ListTile(
+                  leading: const Icon(Icons.person, color: Colors.blueAccent),
+                  title: Text(tenant.name),
+                  subtitle: Text(tenant.email),
                 ),
               ),
             );
+
           },
         );
       },
@@ -312,9 +319,6 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView>
 
   Widget _buildDataCard(String label, String? value) {
     return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      margin: const EdgeInsets.all(8),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
         child: Column(
@@ -344,6 +348,8 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView>
     final flatList = ref.watch(flatListProvider);
     final flat = flatList.value?.firstWhere((f) => f.id == widget.flatId);
 
+    final fabTheme = Theme.of(context).floatingActionButtonTheme;
+
     final List<Widget> dataCards = [
       _buildDataCard('Cím', flat?.address),
       _buildDataCard('Ár (Ft)', flat?.price.toString()),
@@ -359,8 +365,9 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView>
           child: Stack(
             fit: StackFit.expand,
             children: [
-              Image.asset('assets/images/bg1.png', fit: BoxFit.cover),
-              Container(color: Colors.black.withOpacity(0.4)),
+              Image.asset('assets/images/header-image.png', fit: BoxFit.cover),
+              Container(color: ref.watch(themeModeProvider) == ThemeMode.dark ? Colors.black.withOpacity(0.5) : Colors.black.withOpacity(0.2),
+              ),
               // A tartalmat beljebb húzzuk, hogy ne lógjon be a status bar területére
               Padding(
                 padding: EdgeInsets.fromLTRB(
@@ -571,37 +578,34 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView>
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               CustomTextFormField(
+                                labelText: "Cím",
                                 controller: addressController,
-                                labelText: 'Cím',
                                 validator:
-                                    RequiredValidator(
-                                      errorText: 'A cím kitöltése kötelező.',
-                                    ).call,
+                                RequiredValidator(
+                                  errorText: 'A cím kitöltése kötelező.',
+                                ).call,
                               ),
                               const SizedBox(height: 12),
                               CustomTextFormField(
+                                labelText: "Ár",
                                 controller: priceController,
-                                labelText: 'Ár',
                                 keyboardType: TextInputType.number,
                                 validator:
-                                    MultiValidator([
-                                      RequiredValidator(
-                                        errorText: 'Az ár kitöltése kötelező.',
-                                      ),
-                                      PatternValidator(
-                                        r'^\d+$',
-                                        errorText: 'Az ár csak szám lehet!',
-                                      ),
-                                    ]).call,
+                                MultiValidator([
+                                  RequiredValidator(
+                                    errorText: 'Az ár megadása kötelező!',
+                                  ),
+                                  PatternValidator(
+                                    r'^\d+$',
+                                    errorText: 'Az ár csak szám lehet!',
+                                  ),
+                                ]).call,
                               ),
                               const SizedBox(height: 12),
                               DropdownButtonFormField<FlatStatus>(
                                 value: flatStatus,
                                 decoration: InputDecoration(
                                   labelText: 'Állapot',
-                                  filled: true,
-                                  fillColor: Colors.white,
-                                  border: InputBorder.none
                                 ),
                                 items:
                                     FlatStatus.values.map((status) {
@@ -648,9 +652,9 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView>
             _animationController.forward();
           }
         },
-        iconColor: Colors.black,
+        iconColor: fabTheme.foregroundColor ?? Colors.white,
         animatedIconData: AnimatedIcons.menu_close,
-        backGroundColor: Colors.white,
+        backGroundColor: fabTheme.backgroundColor ?? Colors.white,
       ),
     );
   }

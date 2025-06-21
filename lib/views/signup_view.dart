@@ -5,8 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:rentmate/routing/app_router.dart';
 import 'package:rentmate/widgets/custom_snackbar.dart';
+import 'package:rentmate/widgets/custom_text_form_field.dart';
 import '../models/user_role.dart';
-import '../theme/theme.dart';
 import '../viewmodels/auth_viewmodel.dart';
 import '../widgets/custom_scaffold.dart';
 import 'package:form_field_validator/form_field_validator.dart';
@@ -115,39 +115,22 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                           'Kezdjük',
                           style: TextStyle(
                             fontSize: 30.0,
-                            fontWeight: FontWeight.w900,
-                            color: lightColorScheme.primary,
+                            fontWeight: FontWeight.w900
                           ),
                         ),
                         const SizedBox(height: 40.0),
                         // Teljes név
-                        TextFormField(
+                        CustomTextFormField(
                           controller: _nameController,
                           validator:
                               RequiredValidator(
                                 errorText: 'Teljes név megadása kötelező.',
                               ).call,
-                          decoration: InputDecoration(
-                            label: const Text('Teljes név'),
-                            hintText: 'Írja be a teljes nevét',
-                            hintStyle: const TextStyle(color: Colors.black26),
-                            border: OutlineInputBorder(
-                              borderSide: const BorderSide(
-                                color: Colors.black12,
-                              ),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(
-                                color: Colors.black12,
-                              ),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
+                          labelText: "Teljes név",
                         ),
                         const SizedBox(height: 25.0),
                         // Email
-                        TextFormField(
+                        CustomTextFormField(
                           controller: _emailController,
                           validator:
                               MultiValidator([
@@ -158,31 +141,14 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                   errorText: 'Érvényes email címet adjon meg.',
                                 ),
                               ]).call,
-                          decoration: InputDecoration(
-                            label: const Text('Email'),
-                            hintText: 'Írja be az email címét',
-                            hintStyle: const TextStyle(color: Colors.black26),
-                            border: OutlineInputBorder(
-                              borderSide: const BorderSide(
-                                color: Colors.black12,
-                              ),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(
-                                color: Colors.black12,
-                              ),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
+                          labelText: "Email",
                         ),
                         const SizedBox(height: 25.0),
                         // Jelszó
-                        TextFormField(
+                        CustomTextFormField(
                           controller: _passwordController,
                           obscureText: true,
-                          obscuringCharacter: '*',
-                          validator:
+                         validator:
                               MultiValidator([
                                 RequiredValidator(
                                   errorText: 'Jelszó megadása kötelező.',
@@ -193,23 +159,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                       'A jelszónak legalább 6 karakter hosszúnak kell lennie.',
                                 ),
                               ]).call,
-                          decoration: InputDecoration(
-                            label: const Text('Jelszó'),
-                            hintText: 'Írja be a jelszavát',
-                            hintStyle: const TextStyle(color: Colors.black26),
-                            border: OutlineInputBorder(
-                              borderSide: const BorderSide(
-                                color: Colors.black12,
-                              ),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(
-                                color: Colors.black12,
-                              ),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
+                         labelText: "Jelszó",
                         ),
                         const SizedBox(height: 25.0),
                         const SizedBox(height: 16),
@@ -252,7 +202,6 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                   () => agreePersonalData = value ?? false,
                                 );
                               },
-                              activeColor: lightColorScheme.primary,
                             ),
                             Flexible(
                               child: RichText(
@@ -261,15 +210,8 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                 text: TextSpan(
                                   children: [
                                     const TextSpan(
-                                      text: 'Elfogadom a ',
+                                      text: 'Elfogadom a személyes adatok kezelését',
                                       style: TextStyle(color: Colors.black45),
-                                    ),
-                                    TextSpan(
-                                      text: 'személyes adatok kezelését',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: lightColorScheme.primary,
-                                      ),
                                     ),
                                   ],
                                 ),
@@ -307,7 +249,6 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                 'Jelentkezz be',
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  color: lightColorScheme.primary,
                                 ),
                               ),
                             ),

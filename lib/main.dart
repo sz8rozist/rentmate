@@ -1,7 +1,9 @@
+import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rentmate/routing/app_router.dart';
-import 'package:rentmate/theme/theme.dart';
+import 'package:rentmate/theme.dart';
+import 'package:rentmate/viewmodels/theme_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {
@@ -21,10 +23,13 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(goRouterProvider);
+    final isDarkMode = ref.watch(themeModeProvider); // Riverpod state provider (lásd lentebb)
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       title: 'RentMate',
-      theme: lightMode,
+      theme: realEstateTheme,
+      darkTheme: realEstateDarkTheme,
+      themeMode: isDarkMode,
       routerConfig: router,
     );
   }

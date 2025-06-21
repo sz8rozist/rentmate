@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:rentmate/models/user_model.dart';
 import 'package:rentmate/routing/app_router.dart';
 import 'package:rentmate/widgets/custom_snackbar.dart';
-import '../theme/theme.dart';
+import 'package:rentmate/widgets/custom_text_form_field.dart';
 import '../viewmodels/navigation_viewmodel.dart';
 import '../widgets/custom_scaffold.dart';
 import '../viewmodels/auth_viewmodel.dart';
@@ -82,12 +82,12 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                           style: TextStyle(
                             fontSize: 30.0,
                             fontWeight: FontWeight.w900,
-                            color: lightColorScheme.primary,
                           ),
                         ),
                         const SizedBox(height: 40.0),
-                        TextFormField(
+                        CustomTextFormField(
                           controller: _emailController,
+                          labelText: "Email",
                           validator:
                               MultiValidator([
                                 RequiredValidator(
@@ -97,50 +97,16 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                                   errorText: 'Érvénytelen email cím',
                                 ),
                               ]).call,
-                          decoration: InputDecoration(
-                            label: const Text('Email'),
-                            hintText: 'Írja be az email címét',
-                            hintStyle: const TextStyle(color: Colors.black26),
-                            border: OutlineInputBorder(
-                              borderSide: const BorderSide(
-                                color: Colors.black12,
-                              ),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(
-                                color: Colors.black12,
-                              ),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
                         ),
                         const SizedBox(height: 25.0),
-                        TextFormField(
+                        CustomTextFormField(
                           controller: _passwordController,
                           obscureText: true,
-                          obscuringCharacter: '*',
                           validator:
                               RequiredValidator(
                                 errorText: 'Jelszó megadása kötelező',
                               ).call,
-                          decoration: InputDecoration(
-                            label: const Text('Jelszó'),
-                            hintText: 'Írja be a jelszavát',
-                            hintStyle: const TextStyle(color: Colors.black26),
-                            border: OutlineInputBorder(
-                              borderSide: const BorderSide(
-                                color: Colors.black12,
-                              ),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(
-                                color: Colors.black12,
-                              ),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
+                          labelText: "Jelszó",
                         ),
                         const SizedBox(height: 25.0),
                         Row(
@@ -155,7 +121,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                                       rememberPassword = value!;
                                     });
                                   },
-                                  activeColor: lightColorScheme.primary,
                                 ),
                                 const Text(
                                   'Emlékezz rám',
@@ -168,7 +133,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                                 'Elfelejtett jelszó?',
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  color: lightColorScheme.primary,
                                 ),
                               ),
                             ),
@@ -214,7 +178,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                                 'Regisztrálj',
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  color: lightColorScheme.primary,
                                 ),
                               ),
                             ),

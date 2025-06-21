@@ -5,6 +5,7 @@ import '../models/user_model.dart';
 import '../models/chat_message.dart';
 
 import '../viewmodels/chat_message_viewmodel.dart';
+import '../viewmodels/theme_provider.dart';
 
 class ChatMessageView extends ConsumerStatefulWidget {
   final String tenantId;
@@ -52,8 +53,9 @@ class _ChatMessageViewState extends ConsumerState<ChatMessageView> {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              Image.asset('assets/images/bg1.png', fit: BoxFit.cover),
-              Container(color: Colors.black.withOpacity(0.4)),
+              Image.asset('assets/images/header-image.png', fit: BoxFit.cover),
+              Container(color: ref.watch(themeModeProvider) == ThemeMode.dark ? Colors.black.withOpacity(0.5) : Colors.black.withOpacity(0.2),
+              ),
               // A tartalmat beljebb húzzuk, hogy ne lógjon be a status bar területére
               Padding(
                 padding: EdgeInsets.fromLTRB(60, MediaQuery.of(context).padding.top, 16, 0),

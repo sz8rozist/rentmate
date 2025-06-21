@@ -5,6 +5,7 @@ import 'package:icons_plus/icons_plus.dart';
 import 'package:motion_tab_bar/MotionTabBar.dart';
 import 'package:rentmate/models/user_model.dart';
 import 'package:rentmate/routing/app_router.dart';
+import 'package:rentmate/viewmodels/theme_provider.dart';
 import '../models/user_role.dart';
 import '../viewmodels/auth_viewmodel.dart';
 import '../viewmodels/navigation_viewmodel.dart';
@@ -67,12 +68,12 @@ class ShellScaffold extends ConsumerWidget {
             width: double.infinity,
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage('assets/images/bg1.png'),
+                image: AssetImage('assets/images/header-image.png'),
                 fit: BoxFit.cover,
               ),
             ),
             child: Container(
-              color: Colors.black.withOpacity(0.4),
+              color: ref.watch(themeModeProvider) == ThemeMode.dark ? Colors.black.withOpacity(0.5) : Colors.black.withOpacity(0.2),
               padding: EdgeInsets.only(
                 top: MediaQuery.of(context).padding.top,
                 left: 16,
@@ -135,7 +136,7 @@ class ShellScaffold extends ConsumerWidget {
           ),
           Expanded(
             child: Container(
-              color: Colors.black.withOpacity(0.05),
+              color: Theme.of(context).colorScheme.background.withOpacity(0.3),
               child: child,
             ),
           ),
@@ -146,9 +147,9 @@ class ShellScaffold extends ConsumerWidget {
         labels: tabLabels,
         initialSelectedTab: tabLabels[index],
         tabIconColor: Colors.grey,
-        tabSelectedColor: Colors.blueAccent,
-        textStyle: const TextStyle(color: Colors.blueAccent),
-        icons: tabIcons,
+        tabBarColor: Theme.of(context).colorScheme.background,
+        tabSelectedColor: Theme.of(context).colorScheme.primary,
+        textStyle: TextStyle(color: Theme.of(context).colorScheme.primary),        icons: tabIcons,
         tabSize: 50,
         onTabItemSelected: (newIndex) {
           ref.read(bottomNavIndexProvider.notifier).state = newIndex;

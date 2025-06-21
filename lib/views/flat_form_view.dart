@@ -1,16 +1,15 @@
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:rentmate/models/flat_status.dart';
 import 'package:rentmate/models/user_model.dart';
-import 'package:rentmate/theme/theme.dart';
 import 'package:rentmate/viewmodels/auth_viewmodel.dart';
 import 'package:rentmate/widgets/custom_snackbar.dart';
 import 'package:rentmate/widgets/loading_overlay.dart';
 import '../viewmodels/flat_list_provider.dart';
+import '../viewmodels/theme_provider.dart';
 import '../widgets/custom_text_form_field.dart';
 
 class FlatFormView extends ConsumerStatefulWidget {
@@ -50,8 +49,9 @@ class _FlatFormViewState extends ConsumerState<FlatFormView> {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              Image.asset('assets/images/bg1.png', fit: BoxFit.cover),
-              Container(color: Colors.black.withOpacity(0.4)),
+              Image.asset('assets/images/header-image.png', fit: BoxFit.cover),
+              Container(color: ref.watch(themeModeProvider) == ThemeMode.dark ? Colors.black.withOpacity(0.5) : Colors.black.withOpacity(0.2),
+              ),
               // A tartalmat beljebb húzzuk, hogy ne lógjon be a status bar területére
               Padding(
                 padding: EdgeInsets.fromLTRB(60, MediaQuery.of(context).padding.top, 16, 0),
@@ -125,13 +125,6 @@ class _FlatFormViewState extends ConsumerState<FlatFormView> {
                 ElevatedButton.icon(
                   icon: const Icon(Icons.image),
                   label: const Text('Képek kiválasztása'),
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.resolveWith<Color?>((
-                      Set<WidgetState> states,
-                    ) {
-                      return lightMode.primaryColor; // alap háttérszín
-                    }),
-                  ),
                   onPressed: () async {
                     showModalBottomSheet(
                       context: context,
@@ -265,13 +258,6 @@ class _FlatFormViewState extends ConsumerState<FlatFormView> {
                   ),
                 const SizedBox(height: 24),
                 ElevatedButton(
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.resolveWith<Color?>((
-                      Set<WidgetState> states,
-                    ) {
-                      return lightMode.primaryColor; // alap háttérszín
-                    }),
-                  ),
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
                       if (selectedImages.isEmpty) {

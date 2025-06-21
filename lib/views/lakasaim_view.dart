@@ -39,7 +39,6 @@ class LakasaimView extends ConsumerWidget {
           bottom: true,
           top: false,
           child: ListView.builder(
-            padding: const EdgeInsets.all(16),
             itemCount: flats.length,
             itemBuilder: (context, index) {
               final flat = flats[index];
@@ -127,9 +126,6 @@ class FlatCard extends StatelessWidget {
         );
       },
       child: Card(
-        margin: const EdgeInsets.only(bottom: 16),
-        elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Row(

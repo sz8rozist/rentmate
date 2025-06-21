@@ -4,10 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:rentmate/routing/app_router.dart';
 import 'package:rentmate/widgets/custom_snackbar.dart';
-import '../theme/theme.dart';
+import '../models/snackbar_message.dart';
 import '../viewmodels/auth_viewmodel.dart';
 import '../widgets/custom_scaffold.dart';
-import '../widgets/welcome_button.dart';
 
 class WelcomeScreen extends ConsumerStatefulWidget {
   const WelcomeScreen({super.key});
@@ -19,14 +18,28 @@ class WelcomeScreen extends ConsumerStatefulWidget {
 class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
   final LocalAuthentication auth = LocalAuthentication();
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final extra = GoRouterState.of(context).extra;
+    if (extra != null && extra is SnackBarMessage) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          extra.isError
+              ? CustomSnackBar.error(extra.message)
+              : CustomSnackBar.success(extra.message),
+        );
+      });
+    }
+  }
+  @override
   void initState() {
     super.initState();
     _tryBiometricAuthLoop();
   }
 
   Future<void> _tryBiometricAuthLoop() async {
-
-    if(!await auth.canCheckBiometrics){
+    if (!await auth.canCheckBiometrics) {
       return;
     }
 
@@ -55,9 +68,9 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
       } catch (e) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          CustomSnackBar.error("TÚl sok sikertelen próbálkozás!")
+            CustomSnackBar.error("Túl sok sikertelen próbálkozás!")
         );
-        break; // hibánál kilépünk a loopból
+        break;
       }
     }
 
@@ -67,76 +80,80 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
       );
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return CustomScaffold(
-      child: Column(
-        children: [
-          Expanded(
-            flex: 8,
-            child: Center(
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 40.0,
-                  vertical: 20.0,
-                ),
-                margin: const EdgeInsets.symmetric(horizontal: 20.0),
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.5),
-                  borderRadius: BorderRadius.circular(10.0),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.3),
-                      blurRadius: 8.0,
-                      offset: const Offset(2, 2),
-                    ),
-                  ],
-                ),
-                child: RichText(
-                  textAlign: TextAlign.center,
-                  text: const TextSpan(
-                    children: [
-                      TextSpan(
-                        text: 'Üdv Újra!\n',
-                        style: TextStyle(
-                          fontSize: 45.0,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
-                      ),
-                      TextSpan(
-                        text:
-                            '\nEnter personal details to your employee account',
-                        style: TextStyle(fontSize: 20, color: Colors.white),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 40.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Expanded(
+              child: Center(
+                child: Container(
+                  padding: const EdgeInsets.all(30.0),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.5),
+                    borderRadius: BorderRadius.circular(16.0),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.3),
+                        blurRadius: 8.0,
+                        offset: const Offset(2, 2),
                       ),
                     ],
+                  ),
+                  child: RichText(
+                    textAlign: TextAlign.center,
+                    text: const TextSpan(
+                      children: [
+                        TextSpan(
+                          text: 'Üdv Újra!\n',
+                          style: TextStyle(
+                            fontSize: 45.0,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
+                        TextSpan(
+                          text: '\nEnter personal details to your employee account',
+                          style: TextStyle(fontSize: 20, color: Colors.white),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
+            const SizedBox(height: 30),
+            _buildButton(
+              text: 'Bejelentkezés',
+              onPressed: () => context.goNamed(AppRoute.signin.name),
+            ),
+            const SizedBox(height: 16),
+            _buildButton(
+              text: 'Regisztráció',
+              onPressed: () => context.goNamed(AppRoute.signup.name),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
-          Row(
-            children: [
-              Expanded(
-                child: WelcomeButton(
-                  buttonText: 'Bejelentkezés',
-                  routeName: AppRoute.signin.name,
-                  color: Colors.transparent,
-                  textColor: Colors.white,
-                ),
-              ),
-              Expanded(
-                child: WelcomeButton(
-                  buttonText: 'Regisztráció',
-                  routeName: AppRoute.signup.name,
-                  color: Colors.white,
-                  textColor: lightColorScheme.primary,
-                ),
-              ),
-            ],
-          ),
-        ],
+  Widget _buildButton({
+    required String text,
+    required VoidCallback onPressed,
+  }) {
+    return SizedBox(
+      width: double.infinity,
+      height: 55,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        child: Text(
+          text,
+        ),
       ),
     );
   }
