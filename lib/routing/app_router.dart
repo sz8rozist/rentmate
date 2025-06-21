@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart'; // kell, ha Riverpodot használsz
 import 'package:go_router/go_router.dart';
-import 'package:rentmate/models/user_model.dart';
 import 'package:rentmate/routing/router_notifier.dart';
-import 'package:rentmate/viewmodels/auth_viewmodel.dart';
 import 'package:rentmate/views/chat_message_view.dart';
 import 'package:rentmate/views/chat_view.dart';
 import 'package:rentmate/views/flat_details_view.dart';
@@ -13,13 +11,24 @@ import 'package:rentmate/views/profil_view.dart';
 import 'package:rentmate/views/signin_view.dart';
 import 'package:rentmate/views/signup_view.dart';
 import 'package:rentmate/views/welcome_screen.dart';
-
-import '../viewmodels/flat_list_provider.dart';
+import '../viewmodels/auth_viewmodel.dart';
 import '../views/splash_screen.dart';
 import '../widgets/shell_scaffold.dart';
 
 // Enum az útvonalakhoz
-enum AppRoute { welcome, signin, signup, home, profile, lakasaim, alberleteim, createFlat, flatDetail, chat, chatMessage }
+enum AppRoute {
+  welcome,
+  signin,
+  signup,
+  home,
+  profile,
+  lakasaim,
+  alberleteim,
+  createFlat,
+  flatDetail,
+  chat,
+  chatMessage,
+}
 
 // Riverpod provider a RouterNotifierhoz
 final routerNotifierProvider = Provider<RouterNotifier>((ref) {
@@ -33,7 +42,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: '/',
     refreshListenable: routerNotifier,
-   /* redirect: (context, state) {
+    /* redirect: (context, state) {
       final asyncUser = ref.read(currentUserProvider);
 
       // Ha még töltődik az auth állapot
@@ -89,11 +98,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
-        path: '/chatMessage/:tenantId',
+        path: '/chatMessage/:flatId',
         name: AppRoute.chatMessage.name,
         builder: (context, state) {
-          final tenantId = state.pathParameters['tenantId']!;
-          return ChatMessageView(tenantId: tenantId);
+          final flatId = state.pathParameters['flatId']!;
+          return ChatMessageView(flatId: flatId);
         },
       ),
       ShellRoute(
@@ -139,7 +148,34 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/chat',
             name: AppRoute.chat.name,
-            builder: (context, state) => ChatView(),
+            builder: (context, state) {
+              return Consumer(
+                builder: (context, ref, _) {
+                  final asyncUser = ref.watch(currentUserProvider);
+
+                  return asyncUser.when(
+                    data: (user) {
+                      if (user == null) {
+                        return const Scaffold(
+                          body: Center(
+                            child: Text('Nincs bejelentkezett felhasználó'),
+                          ),
+                        );
+                      } else {
+                        return ChatView(loggedInUser: user);
+                      }
+                    },
+                    loading:
+                        () => const Scaffold(
+                          body: Center(child: CircularProgressIndicator()),
+                        ),
+                    error:
+                        (err, stack) =>
+                            Scaffold(body: Center(child: Text('Hiba: $err'))),
+                  );
+                },
+              );
+            },
           ),
         ],
       ),

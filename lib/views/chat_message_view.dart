@@ -1,16 +1,19 @@
+import 'dart:io';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:rentmate/viewmodels/chat_view_viewmodel.dart';
 
-import '../models/user_model.dart';
-import '../models/chat_message.dart';
-
-import '../viewmodels/chat_message_viewmodel.dart';
+import '../viewmodels/auth_viewmodel.dart';
 import '../viewmodels/theme_provider.dart';
+import '../widgets/swipe_image_galery.dart';
 
 class ChatMessageView extends ConsumerStatefulWidget {
-  final String tenantId;
+  final String flatId;
 
-  const ChatMessageView({super.key, required this.tenantId});
+  const ChatMessageView({super.key, required this.flatId});
 
   @override
   ConsumerState<ChatMessageView> createState() => _ChatMessageViewState();
@@ -18,30 +21,55 @@ class ChatMessageView extends ConsumerStatefulWidget {
 
 class _ChatMessageViewState extends ConsumerState<ChatMessageView> {
   final TextEditingController _controller = TextEditingController();
-  final String landlordId = 'landlord1';
+  final ImagePicker _picker = ImagePicker();
 
-  void _sendMessage() {
+  List<File> _imageFiles = [];
+
+  void _sendMessage() async {
     final text = _controller.text.trim();
-    if (text.isEmpty) return;
 
-    final message = ChatMessage(
-      senderId: landlordId,
-      receiverId: widget.tenantId,
-      message: text,
-      timestamp: DateTime.now(),
+    // Ha sem kép, sem szöveg nincs, nem küldünk
+    if (text.isEmpty && _imageFiles.isEmpty) return;
+
+    final user = ref.read(currentUserProvider).asData?.value;
+    if (user == null) return;
+
+    final sendMessage = ref.read(sendMessageProvider);
+    await sendMessage(widget.flatId, user.id, text, file: _imageFiles);
+
+    FocusScope.of(context).unfocus();
+
+    setState(() {
+      _controller.clear();
+      _imageFiles.clear();
+    });
+  }
+
+  Future<void> _pickImage() async {
+    final List<XFile> pickedFiles = await _picker.pickMultiImage();
+    if (pickedFiles.isNotEmpty) {
+      setState(() {
+        _imageFiles.addAll(pickedFiles.map((xfile) => File(xfile.path)));
+      });
+    }
+  }
+
+  Future<void> _pickImageFromCamera() async {
+    final pickedFile = await _picker.pickImage(
+      source: ImageSource.camera,
+      imageQuality: 80,
     );
-
-    ref.read(chatMessagesProvider.notifier).addMessage(message);
-    _controller.clear();
+    if (pickedFile != null) {
+      setState(() {
+        _imageFiles.add(File(pickedFile.path));
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final messages = ref.watch(chatMessagesProvider).where((msg) =>
-    (msg.senderId == landlordId && msg.receiverId ==  widget.tenantId) ||
-        (msg.senderId ==  widget.tenantId && msg.receiverId == landlordId)).toList();
-
-    messages.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+    final asyncMessages = ref.watch(messagesProvider(widget.flatId));
+    final asyncUser = ref.watch(currentUserProvider);
 
     return Scaffold(
       appBar: PreferredSize(
@@ -54,15 +82,24 @@ class _ChatMessageViewState extends ConsumerState<ChatMessageView> {
             fit: StackFit.expand,
             children: [
               Image.asset('assets/images/header-image.png', fit: BoxFit.cover),
-              Container(color: ref.watch(themeModeProvider) == ThemeMode.dark ? Colors.black.withOpacity(0.5) : Colors.black.withOpacity(0.2),
+              Container(
+                color:
+                    ref.watch(themeModeProvider) == ThemeMode.dark
+                        ? Colors.black.withOpacity(0.5)
+                        : Colors.black.withOpacity(0.2),
               ),
               // A tartalmat beljebb húzzuk, hogy ne lógjon be a status bar területére
               Padding(
-                padding: EdgeInsets.fromLTRB(60, MediaQuery.of(context).padding.top, 16, 0),
+                padding: EdgeInsets.fromLTRB(
+                  60,
+                  MediaQuery.of(context).padding.top,
+                  16,
+                  0,
+                ),
                 child: Align(
                   alignment: Alignment.center,
                   child: Text(
-                    'Chat with - ${widget.tenantId}',
+                    'Chat szoba',
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 20,
@@ -93,74 +130,278 @@ class _ChatMessageViewState extends ConsumerState<ChatMessageView> {
           ),
         ),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(12),
-              itemCount: messages.length,
-              itemBuilder: (context, index) {
-                final message = messages[index];
-                final isMe = message.senderId == landlordId;
-                return Align(
-                  alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxWidth: MediaQuery.of(context).size.width * 0.7,  // max 70% szélesség
-                    ),
-                    child: Container(
+      body: asyncUser.when(
+        data: (user) {
+          if (user == null) {
+            return const Center(child: Text('Nem vagy bejelentkezve'));
+          }
+          return asyncMessages.when(
+            data: (messages) {
+              messages.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+              return Column(
+                children: [
+                  Expanded(
+                    child: ListView.builder(
                       padding: const EdgeInsets.all(12),
-                      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                      decoration: BoxDecoration(
-                        color: isMe ? Colors.blueAccent.shade200 : Colors.lightBlueAccent.shade400,
-                        borderRadius: BorderRadius.only(
-                          topLeft: const Radius.circular(16),
-                          topRight: const Radius.circular(16),
-                          bottomLeft: Radius.circular(isMe ? 16 : 0),
-                          bottomRight: Radius.circular(isMe ? 0 : 16),
-                        ),
-                      ),
-                      child: Text(message.message, style: TextStyle(color: Colors.white),),
+                      itemCount: messages.length,
+                      itemBuilder: (context, index) {
+                        final message = messages[index];
+                        final isMe = message.senderUser.id == user.id;
+
+                        Widget messageContent;
+                        if (message.imageUrls.isNotEmpty) {
+                          if (message.imageUrls.length == 1) {
+                            // Egy kép - lehet kattintható nagyításra
+                            messageContent = GestureDetector(
+                              onTap: () {
+                                // Megnyitjuk a galériát, egy képpel
+                                showSwipeImageGallery(
+                                  context,
+                                  children: [
+                                    NetworkImage(message.imageUrls.first),
+                                  ],
+                                  swipeDismissible: true,
+                                );
+                              },
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.network(
+                                  message.imageUrls.first,
+                                  width: 150,
+                                  height: 150,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) =>
+                                  const Center(child: Text('Kép betöltési hiba')),
+                                ),
+                              ),
+                            );
+                          } else {
+                            // Több kép - GridView, mindegyik képre rárakunk GestureDetector-t
+                            final crossAxisCount = 3;
+                            final imageSize = 150.0;
+                            final spacing = 8.0;
+                            final rowCount = (message.imageUrls.length / crossAxisCount).ceil();
+
+                            messageContent = SizedBox(
+                              height: rowCount * imageSize + (rowCount - 1) * spacing,
+                              child: GridView.builder(
+                                physics: const NeverScrollableScrollPhysics(),
+                                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: crossAxisCount,
+                                  crossAxisSpacing: spacing,
+                                  mainAxisSpacing: spacing,
+                                  childAspectRatio: 1,
+                                ),
+                                itemCount: message.imageUrls.length,
+                                itemBuilder: (context, imgIndex) {
+                                  final imageUrl = message.imageUrls[imgIndex];
+                                  return GestureDetector(
+                                    onTap: () {
+                                      // Megnyitjuk a galériát a message képeivel, az épp kijelölt indexszel
+                                      showSwipeImageGallery(
+                                        context,
+                                        initialIndex: imgIndex,
+                                        children: message.imageUrls
+                                            .map((url) => NetworkImage(url))
+                                            .toList(),
+                                        swipeDismissible: true,
+                                      );
+                                    },
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: Image.network(
+                                        imageUrl,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (context, error, stackTrace) =>
+                                        const Center(child: Text('Kép betöltési hiba')),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            );
+                          }
+                        } else {
+                          // Szöveg
+                          messageContent = Text(
+                            message.content,
+                            style: const TextStyle(color: Colors.white),
+                          );
+                        }
+                        return Align(
+                          alignment:
+                              isMe
+                                  ? Alignment.centerRight
+                                  : Alignment.centerLeft,
+                          child: Column(
+                            crossAxisAlignment:
+                                isMe
+                                    ? CrossAxisAlignment.end
+                                    : CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                  left: 8,
+                                  right: 8,
+                                  bottom: 2,
+                                ),
+                                child: Text(
+                                  message.senderUser.name,
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  maxWidth:
+                                      MediaQuery.of(context).size.width * 0.7,
+                                ),
+                                child: Container(
+                                  padding: const EdgeInsets.all(12),
+                                  margin: const EdgeInsets.symmetric(
+                                    vertical: 4,
+                                    horizontal: 8,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color:
+                                        message.imageUrls.isNotEmpty
+                                            ? Colors.transparent
+                                            : (isMe
+                                                ? Colors.blueAccent.shade200
+                                                : Colors
+                                                    .lightBlueAccent
+                                                    .shade400),
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: const Radius.circular(16),
+                                      topRight: const Radius.circular(16),
+                                      bottomLeft: Radius.circular(
+                                        isMe ? 16 : 0,
+                                      ),
+                                      bottomRight: Radius.circular(
+                                        isMe ? 0 : 16,
+                                      ),
+                                    ),
+                                  ),
+                                  child: messageContent,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
                     ),
                   ),
-                );
-              },
-
-            ),
-          ),
-          Divider(height: 1),
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade200,
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: _controller,
-                        decoration: const InputDecoration(
-                          hintText: 'Írj üzenetet...',
-                          border: InputBorder.none,
+                  const Divider(height: 1),
+                  SafeArea(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
                         ),
-                        onSubmitted: (_) => _sendMessage(),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (_imageFiles.isNotEmpty)
+                              SizedBox(
+                                height: 70,
+                                // fix magasság, hogy ne foglaljon sok helyet
+                                child: ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: _imageFiles.length,
+                                  itemBuilder: (context, index) {
+                                    final file = _imageFiles[index];
+                                    return Padding(
+                                      padding: const EdgeInsets.only(right: 8),
+                                      child: Stack(
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
+                                            child: Image.file(
+                                              file,
+                                              width: 60,
+                                              height: 60,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                          Positioned(
+                                            top: -6,
+                                            right: -6,
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                setState(() {
+                                                  _imageFiles.removeAt(index);
+                                                });
+                                              },
+                                              child: CircleAvatar(
+                                                radius: 10,
+                                                backgroundColor: Colors.black54,
+                                                child: const Icon(
+                                                  Icons.close,
+                                                  size: 14,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            Row(
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.camera_alt),
+                                  onPressed: _pickImageFromCamera,
+                                ),
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.photo,
+                                    color: Colors.blueAccent,
+                                  ),
+                                  onPressed: _pickImage,
+                                ),
+                                Expanded(
+                                  child: TextFormField(
+                                    controller: _controller,
+                                    decoration: const InputDecoration(
+                                      hintText: 'Írj üzenetet...',
+                                    ),
+                                    onFieldSubmitted: (_) => _sendMessage(),
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.send,
+                                    color: Colors.blueAccent,
+                                  ),
+                                  onPressed: _sendMessage,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.send, color: Colors.blueAccent),
-                      onPressed: _sendMessage,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-
-        ],
+                  ),
+                ],
+              );
+            },
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error:
+                (error, stack) => Center(child: Text('Hiba történt: $error')),
+          );
+        },
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, stack) => Center(child: Text('Hiba történt: $error')),
       ),
     );
   }

@@ -4,13 +4,13 @@ class UserModel {
   final String id;
   final String email;
   final String name;
-  final UserRole role;
+  final UserRole? role;
 
   UserModel({
     required this.id,
     required this.email,
     required this.name,
-    required this.role
+    this.role
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -18,7 +18,7 @@ class UserModel {
       id: json['id'] as String,
       email: json['email'] as String,
       name: json['name'] as String,
-      role: UserRoleExtension.fromValue(json['role'] as String) ?? UserRole.tenant,
+      role: UserRoleExtension.fromValue(json['role'] as String),
     );
   }
 
@@ -27,7 +27,7 @@ class UserModel {
       'id': id,
       'email': email,
       'name': name,
-      'role': role.value
+      'role': role?.value
     };
   }
 }

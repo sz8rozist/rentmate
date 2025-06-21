@@ -18,6 +18,7 @@ import '../viewmodels/flat_list_provider.dart';
 import '../viewmodels/theme_provider.dart';
 import '../viewmodels/user_viewmodel.dart';
 import '../widgets/custom_snackbar.dart';
+import '../widgets/swipe_image_galery.dart';
 
 class FlatDetailsView extends ConsumerStatefulWidget {
   final String flatId;
@@ -165,18 +166,17 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView>
   }
 
   void _openGallery(int initialIndex) {
-    final allImages = [
-      ..._retainedImages.map(
-        (e) => Image.network(e.imageUrl, fit: BoxFit.contain),
-      ),
-      ..._newImages.map((file) => Image.file(file, fit: BoxFit.contain)),
+    final allImages = <ImageProvider>[
+      ..._retainedImages.map((e) => NetworkImage(e.imageUrl)),
+      ..._newImages.map((file) => FileImage(file)),
     ];
 
-    SwipeImageGallery(
-      context: context,
-      children: allImages,
+    showSwipeImageGallery(
+      context,
       initialIndex: initialIndex,
-    ).show();
+      children: allImages,
+      swipeDismissible: true,
+    );
   }
 
   Widget _buildImageList() {
@@ -416,7 +416,7 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView>
           top: true,
           bottom: false,
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

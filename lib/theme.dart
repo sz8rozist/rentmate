@@ -122,6 +122,16 @@ final ThemeData realEstateTheme = ThemeData(
     ),
   ),
 
+  expansionTileTheme: ExpansionTileThemeData(
+    backgroundColor: Colors.grey.shade100,              // kibontott állapot háttér
+    collapsedBackgroundColor: Colors.transparent,        // összecsukott háttér
+    textColor: Colors.blue.shade700,                      // kibontott cím szín
+    collapsedTextColor: Colors.black87,                   // összecsukott cím szín
+    iconColor: Colors.blue.shade700,                      // kibontott ikon szín
+    collapsedIconColor: Colors.grey.shade600,             // összecsukott ikon szín
+    childrenPadding: EdgeInsets.symmetric(horizontal: 16), // opcionális, a tartalom paddingje
+    tilePadding: EdgeInsets.symmetric(horizontal: 16),     // az egész tile paddingje
+  ),
 );
 
 final ThemeData realEstateDarkTheme = ThemeData(
@@ -248,6 +258,15 @@ final ThemeData realEstateDarkTheme = ThemeData(
       ),
     ),
   ),
-
+  expansionTileTheme: ExpansionTileThemeData(
+    backgroundColor: Colors.grey.shade800,                // kibontott háttér (sötét)
+    collapsedBackgroundColor: Colors.transparent,          // összecsukott háttér (sötét)
+    textColor: Colors.blue.shade300,                        // kibontott cím szín (sötét)
+    collapsedTextColor: Colors.white70,                     // összecsukott cím szín (sötét)
+    iconColor: Colors.blue.shade300,                        // kibontott ikon szín (sötét)
+    collapsedIconColor: Colors.grey.shade500,               // összecsukott ikon szín (sötét)
+    childrenPadding: EdgeInsets.symmetric(horizontal: 16),
+    tilePadding: EdgeInsets.symmetric(horizontal: 16),
+  ),
 
 );

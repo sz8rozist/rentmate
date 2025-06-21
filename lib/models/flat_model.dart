@@ -26,9 +26,9 @@ class Flat {
       id: json['id'] as String?,
       address: json['address'] as String,
       images:
-          (json['images'] as List<dynamic>)
-              .map((item) => FlatImage.fromJson(item as Map<String, dynamic>))
-              .toList(),
+          (json['images'] as List<dynamic>?)
+              ?.map((item) => FlatImage.fromJson(item as Map<String, dynamic>))
+              .toList() ?? [],
       price: json['price'] as int,
       status:
           FlatStatusExtension.fromValue(json['status'] as String) ??
@@ -37,7 +37,7 @@ class Flat {
       tenants:
       (json['flats_for_rent'] as List<dynamic>?)
           ?.map((item) => UserModel.fromJson((item as Map<String, dynamic>)['tenant'] as Map<String, dynamic>))
-          .toList()
+          .toList() ?? []
     );
   }
 
