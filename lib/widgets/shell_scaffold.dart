@@ -197,31 +197,14 @@ class ShellScaffold extends ConsumerWidget {
 
             // Menü elemek
             ListTile(
-              leading: const Icon(Icons.settings, color: Colors.blueAccent),
+              leading: const Icon(Icons.payments, color: Colors.blueAccent),
               title: const Text(
-                'Beállítások',
+                'Számlák',
                 style: TextStyle(fontSize: 18),
               ),
               onTap: () {
                 Navigator.pop(context);
-                context.go('/settings');
-              },
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              tileColor: Colors.blueAccent.withOpacity(0.1),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-            ),
-            const SizedBox(height: 8),
-            ListTile(
-              leading: const Icon(Icons.info, color: Colors.blueAccent),
-              title: const Text(
-                'Névjegy',
-                style: TextStyle(fontSize: 18),
-              ),
-              onTap: () {
-                Navigator.pop(context);
-                context.go('/about');
+                context.goNamed(AppRoute.invoices.name);
               },
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),

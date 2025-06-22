@@ -1,0 +1,331 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:rentmate/models/invoice_status.dart';
+import '../routing/app_router.dart';
+import '../viewmodels/invoice_viewmodel.dart';
+
+class LandlordInvoicesScreen extends ConsumerWidget {
+  final String landlordUserId;
+
+  const LandlordInvoicesScreen({required this.landlordUserId, super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final selectedStatus = ref.watch(invoiceStatusFilterProvider);
+    final invoicesAsync = ref.watch(landlordInvoicesProvider(landlordUserId));
+
+    return Scaffold(
+      body: Column(
+        children: [
+          // Szűrő rész
+          Container(
+            color: colorScheme.background,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
+              children: [
+                Icon(Icons.filter_alt, color: colorScheme.primary),
+                const SizedBox(width: 8),
+                Text(
+                  'Szűrő státuszra:',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                    color: colorScheme.primary,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: DropdownButton<String?>(
+                    value: selectedStatus,
+                    isExpanded: true,
+                    underline: Container(height: 2, color: colorScheme.primary),
+                    hint: const Text('Összes'),
+                    items: const [
+                      DropdownMenuItem(value: null, child: Text('Összes')),
+                      DropdownMenuItem(
+                        value: 'kiallitva',
+                        child: Text('Kiallítva'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'fizetve',
+                        child: Text('Fizetve'),
+                      ),
+                      DropdownMenuItem(value: 'lejart', child: Text('Lejárt')),
+                    ],
+                    onChanged: (value) {
+                      ref.read(invoiceStatusFilterProvider.notifier).state =
+                          value;
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Új számla hozzáadása gomb (a szűrő alatt)
+          invoicesAsync.when(
+            data: (data) {
+              if (data.isEmpty) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: ElevatedButton(
+                    onPressed: null,
+                    child: const Text('Nincs lakás'),
+                  ),
+                );
+              }
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    showModalBottomSheet(
+                      context: context,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                      ),
+                      clipBehavior: Clip.antiAliasWithSaveLayer,
+                      builder: (_) {
+                        final flatsList = data.entries.toList();
+                        return Container(
+                          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                          constraints: BoxConstraints(
+                            maxHeight: MediaQuery.of(context).size.height * 0.5,
+                          ),
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: flatsList.length * 2 - 1, // az elemek és a köztük lévő SizedBox miatt
+                            itemBuilder: (context, index) {
+                              if (index.isOdd) {
+                                // Minden páratlan indexen legyen SizedBox
+                                return const SizedBox(height: 12);
+                              }
+                              final flat = flatsList[index ~/ 2].key;
+                              return InkWell(
+                                borderRadius: BorderRadius.circular(12),
+                                onTap: () async {
+                                  Navigator.pop(context);
+                                  final result = await context.pushNamed(
+                                    AppRoute.newInvoice.name,
+                                    pathParameters: {
+                                      'flatId': flat.id.toString(),
+                                    },
+                                  );
+                                  if (result == true) {
+                                    ref.invalidate(landlordInvoicesProvider(landlordUserId));
+                                  }
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                                  decoration: BoxDecoration(
+                                    color: colorScheme.surface,
+                                    borderRadius: BorderRadius.circular(12),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.05),
+                                        blurRadius: 6,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.home_outlined, color: colorScheme.primary),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Text(
+                                          flat.address,
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                            color: colorScheme.onSurface,
+                                          ),
+                                        ),
+                                      ),
+                                      const Icon(Icons.chevron_right, color: Colors.grey),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        );
+
+                      },
+                    );
+
+                  },
+                  icon: const Icon(Icons.add),
+                  label: const Text('Új számla hozzáadása'),
+                ),
+              );
+            },
+            loading: () => const SizedBox.shrink(),
+            error: (_, __) => const SizedBox.shrink(),
+          ),
+
+          // A lista
+          Expanded(
+            child: SafeArea(
+              child: invoicesAsync.when(
+                data: (data) {
+                  if (data.isEmpty) {
+                    return Center(
+                      child: Text(
+                        'Nincs számla.',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: colorScheme.onBackground.withOpacity(0.6),
+                        ),
+                      ),
+                    );
+                  }
+                  return ListView.separated(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    itemCount: data.length,
+                    separatorBuilder:
+                        (_, __) => Divider(
+                          color: colorScheme.outline,
+                          height: 32,
+                          thickness: 1,
+                        ),
+                    itemBuilder: (context, index) {
+                      final flat = data.entries.elementAt(index).key;
+                      final invoices = data.entries.elementAt(index).value;
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            flat.address,
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: colorScheme.primary,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          if (invoices.isEmpty)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 8.0,
+                                horizontal: 16,
+                              ),
+                              child: Text(
+                                'Nincsenek számlák ehhez a lakáshoz.',
+                                style: TextStyle(
+                                  fontStyle: FontStyle.italic,
+                                  color: colorScheme.onSurface.withOpacity(0.6),
+                                ),
+                              ),
+                            )
+                          else
+                            ...invoices.map((invoice) {
+                              final statusColor = InvoiceStatusExtension.getColor(
+                                invoice.status.value,
+                              );
+                              return InkWell(
+                                borderRadius: BorderRadius.circular(12),
+                                onTap: () {
+                                  context.pushNamed(
+                                    AppRoute.invoiceDetaul.name,
+                                    pathParameters:{"invoiceId": invoice.id as String},
+                                  );
+                                },
+                                child: Container(
+                                  margin: const EdgeInsets.symmetric(vertical: 6),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 12,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: colorScheme.surfaceVariant,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: statusColor.withOpacity(0.5),
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: statusColor.withOpacity(0.15),
+                                        blurRadius: 4,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            '${invoice.year}.${invoice.month.toString().padLeft(2, '0')}',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 16,
+                                              color: colorScheme.onSurface,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            'Összeg: ${invoice.totalAmount.toInt()} Ft',
+                                            style: TextStyle(
+                                              color: colorScheme.onSurface
+                                                  .withOpacity(0.7),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 14,
+                                          vertical: 8,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: statusColor.withOpacity(0.85),
+                                          borderRadius: BorderRadius.circular(20),
+                                        ),
+                                        child: Text(
+                                          InvoiceStatusExtension.getLabel(
+                                            invoice.status.value,
+                                          ),
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }),
+                        ],
+                      );
+                    },
+                  );
+                },
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error:
+                    (e, _) => Center(
+                      child: Text(
+                        'Hiba történt: $e',
+                        style: TextStyle(
+                          color: colorScheme.error,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

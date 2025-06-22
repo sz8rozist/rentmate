@@ -188,6 +188,12 @@
       "languageVersion": "3.4"
     },
     {
+      "name": "fixnum",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/fixnum-1.1.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.1"
+    },
+    {
       "name": "flex_color_scheme",
       "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/flex_color_scheme-8.2.0",
       "packageUri": "lib/",
@@ -800,6 +806,12 @@
       "languageVersion": "3.1"
     },
     {
+      "name": "sprintf",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/sprintf-7.0.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "stack_trace",
       "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/stack_trace-1.12.1",
       "packageUri": "lib/",
@@ -918,6 +930,12 @@
       "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/url_launcher_windows-3.1.4",
       "packageUri": "lib/",
       "languageVersion": "3.4"
+    },
+    {
+      "name": "uuid",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/uuid-4.5.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
     },
     {
       "name": "vector_graphics",
