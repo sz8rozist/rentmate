@@ -24,4 +24,18 @@ class InvoiceItem {
     'description': description,
     'amount': amount,
   };
+
+  InvoiceItem copyWith({
+    String? id,
+    String? invoiceId,
+    String? description,
+    double? amount,
+  }) {
+    return InvoiceItem(
+      id: id ?? this.id,
+      invoiceId: invoiceId ?? this.invoiceId,
+      description: description ?? this.description,
+      amount: amount ?? this.amount,
+    );
+  }
 }

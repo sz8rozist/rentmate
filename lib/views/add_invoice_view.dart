@@ -329,7 +329,7 @@ class _AddInvoiceScreenState extends ConsumerState<AddInvoiceScreen> {
                       InvoiceStatus.values.map((status) {
                         return DropdownMenuItem(
                           value: status,
-                          child: Text(status.name),
+                          child: Text(status.label),
                         );
                       }).toList(),
                   onChanged: (val) {

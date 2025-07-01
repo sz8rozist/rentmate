@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/invoice_model.dart';
+import 'package:go_router/go_router.dart';
+import 'package:rentmate/routing/app_router.dart';
 import '../models/invoice_status.dart';
 import '../viewmodels/invoice_viewmodel.dart';
 import '../viewmodels/theme_provider.dart';
@@ -28,9 +29,9 @@ class InvoiceDetailsScreen extends ConsumerWidget {
               Image.asset('assets/images/header-image.png', fit: BoxFit.cover),
               Container(
                 color:
-                ref.watch(themeModeProvider) == ThemeMode.dark
-                    ? Colors.black.withOpacity(0.5)
-                    : Colors.black.withOpacity(0.2),
+                    ref.watch(themeModeProvider) == ThemeMode.dark
+                        ? Colors.black.withOpacity(0.5)
+                        : Colors.black.withOpacity(0.2),
               ),
               // A tartalmat beljebb húzzuk, hogy ne lógjon be a status bar területére
               Padding(
@@ -65,7 +66,22 @@ class InvoiceDetailsScreen extends ConsumerWidget {
                 bottom: 0,
                 child: IconButton(
                   icon: const Icon(Icons.arrow_back, color: Colors.white),
-                  onPressed: () => Navigator.of(context).pop(),
+                  onPressed: () => context.goNamed(AppRoute.home.name),
+                  padding: const EdgeInsets.all(16),
+                  constraints: const BoxConstraints(),
+                ),
+              ),
+              Positioned(
+                right: 0,
+                top: MediaQuery.of(context).padding.top,
+                bottom: 0,
+                child: IconButton(
+                  icon: const Icon(Icons.edit, color: Colors.white),
+                  onPressed:
+                      () => context.goNamed(
+                        AppRoute.editInvoice.name,
+                        pathParameters: {"invoiceId": invoiceId},
+                      ),
                   padding: const EdgeInsets.all(16),
                   constraints: const BoxConstraints(),
                 ),
@@ -98,9 +114,8 @@ class InvoiceDetailsScreen extends ConsumerWidget {
           ];
 
           final paymentsSorted =
-          invoice.payments?.toList()?..sort(
-                (a, b) => a.paymentDate.compareTo(b.paymentDate),
-          );
+              invoice.payments?.toList()
+                ?..sort((a, b) => a.paymentDate.compareTo(b.paymentDate));
 
           for (var payment in paymentsSorted!) {
             remainingAmount -= payment.amount;
@@ -108,7 +123,7 @@ class InvoiceDetailsScreen extends ConsumerWidget {
             timelineEvents.add(
               TimelineEvent(
                 title:
-                'Befizetés: ${payment.amount.toInt()} Ft, Hátralék: ${remainingAmount.toInt()} Ft',
+                    'Befizetés: ${payment.amount.toInt()} Ft, Hátralék: ${remainingAmount.toInt()} Ft',
                 date: payment.paymentDate,
                 icon: Icons.check_circle,
                 color: remainingAmount > 0 ? Colors.red : Colors.green,
@@ -116,117 +131,152 @@ class InvoiceDetailsScreen extends ConsumerWidget {
             );
           }
 
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                // Számla adatokat tartalmazó kártya
-                Card(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 6,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 20.0,
-                      horizontal: 24.0,
+          return SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  // Számla adatokat tartalmazó kártya
+                  Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Számla azonosító: #${invoice.id}',
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: colorScheme.primary,
+                    elevation: 6,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 20.0,
+                        horizontal: 24.0,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Számla azonosító: #${invoice.id}',
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: colorScheme.primary,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 12),
-                        Row(
-                          children: [
-                            const Icon(Icons.date_range),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Dátum: ${_formatDate(invoice.issueDate)}',
-                              style: const TextStyle(fontSize: 16),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            const Icon(Icons.monetization_on),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Összeg: ${invoice.totalAmount.toInt()} Ft',
-                              style: const TextStyle(fontSize: 16),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            const Icon(Icons.info),
-                            const SizedBox(width: 8),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 14,
-                                vertical: 6,
+                          const SizedBox(height: 12),
+                          Row(
+                            children: [
+                              const Icon(Icons.date_range),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Dátum: ${_formatDate(invoice.issueDate)}',
+                                style: const TextStyle(fontSize: 16),
                               ),
-                              decoration: BoxDecoration(
-                                color: InvoiceStatusExtension.getColor(
-                                  invoice.status.value,
-                                ).withOpacity(0.85),
-                                borderRadius: BorderRadius.circular(20),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              const Icon(Icons.monetization_on),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Összeg: ${invoice.totalAmount.toInt()} Ft',
+                                style: const TextStyle(fontSize: 16),
                               ),
-                              child: Text(
-                                InvoiceStatusExtension.getLabel(
-                                  invoice.status.value,
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              const Icon(Icons.info),
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 6,
                                 ),
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
+                                decoration: BoxDecoration(
+                                  color: InvoiceStatusExtension.getColor(
+                                    invoice.status.value,
+                                  ).withOpacity(0.85),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Text(
+                                  InvoiceStatusExtension.getLabel(
+                                    invoice.status.value,
+                                  ),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-
-                const SizedBox(height: 16),
-
-                // Timeline fejléc
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Események',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                      color: colorScheme.onSurface,
+                  const SizedBox(height: 16),
+                  if (invoice.items != null && invoice.items!.isNotEmpty) ...[
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Tételek',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                          color: colorScheme.onSurface,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: invoice.items!.length,
+                      itemBuilder: (context, index) {
+                        final item = invoice.items![index];
+                        return Card(
+                          elevation: 2,
+                          margin: const EdgeInsets.symmetric(vertical: 4),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: ListTile(
+                            title: Text(item.description),
+                            trailing: Text(
+                              '${item.amount.toStringAsFixed(0)} Ft',
+                              style: const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                  const SizedBox(height: 16),
+            
+                  // Timeline fejléc
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Események',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                        color: colorScheme.onSurface,
+                      ),
                     ),
                   ),
-                ),
-
-                const SizedBox(height: 12),
-
-                // Itt jön a lista, Expanded-ben, hogy kitöltse a maradék helyet és scrollozható legyen
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: timelineEvents.length,
-                    itemBuilder: (context, index) {
+            
+                  const SizedBox(height: 12),
+            
+                  // Itt jön a lista, Expanded-ben, hogy kitöltse a maradék helyet és scrollozható legyen
+                  Column(
+                    children: List.generate(timelineEvents.length, (index) {
                       final event = timelineEvents[index];
                       final isLast = index == timelineEvents.length - 1;
-
                       return TimelineTile(event: event, isLast: isLast);
-                    },
+                    }),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         },

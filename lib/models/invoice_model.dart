@@ -72,4 +72,30 @@ class Invoice {
     'total_amount': totalAmount,
     'status': status.value,
   };
+
+  Invoice copyWith({
+    String? id,
+    String? flatId,
+    int? year,
+    int? month,
+    DateTime? issueDate,
+    DateTime? dueDate,
+    double? totalAmount,
+    InvoiceStatus? status,
+    List<InvoiceItem>? items,
+    List<Payment>? payments,
+  }) {
+    return Invoice(
+      id: id ?? this.id,
+      flatId: flatId ?? this.flatId,
+      year: year ?? this.year,
+      month: month ?? this.month,
+      issueDate: issueDate ?? this.issueDate,
+      dueDate: dueDate ?? this.dueDate,
+      totalAmount: totalAmount ?? this.totalAmount,
+      status: status ?? this.status,
+      items: items ?? this.items,
+      payments: payments ?? this.payments,
+    );
+  }
 }

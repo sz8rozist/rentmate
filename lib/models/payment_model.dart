@@ -1,13 +1,13 @@
 
 class Payment {
-  final String id;
-  final String invoiceId;
+  final String? id;
+  final String? invoiceId;
   final DateTime paymentDate;
   final double amount;
 
   Payment({
-    required this.id,
-    required this.invoiceId,
+    this.id,
+    this.invoiceId,
     required this.paymentDate,
     required this.amount,
   });
@@ -25,4 +25,18 @@ class Payment {
     'payment_date': paymentDate.toIso8601String(),
     'amount': amount,
   };
+
+  Payment copyWith({
+    String? id,
+    String? invoiceId,
+    DateTime? paymentDate,
+    double? amount,
+  }) {
+    return Payment(
+      id: id ?? this.id,
+      invoiceId: invoiceId ?? this.invoiceId,
+      paymentDate: paymentDate ?? this.paymentDate,
+      amount: amount ?? this.amount,
+    );
+  }
 }

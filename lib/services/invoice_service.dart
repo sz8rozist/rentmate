@@ -93,4 +93,48 @@ class InvoiceService {
         }).toList();
     await supabase.from('invoice_items').insert(itemsToInsert);
   }
+
+  Future<void> updateInvoice(Invoice invoice) async {
+    if (invoice.id == null) {
+      throw Exception('Invoice ID is required to update.');
+    }
+
+    final invoiceId = invoice.id!;
+    final uuid = Uuid();
+
+    // 1. Számla frissítése
+    await supabase.from('invoices').update(invoice.toMap()).eq('id', invoiceId);
+
+    // 2. Régi tételek törlése
+    await supabase.from('invoice_items').delete().eq('invoice_id', invoiceId);
+
+    // 3. Új tételek beszúrása
+    if (invoice.items != null && invoice.items!.isNotEmpty) {
+      final itemsToInsert =
+          invoice.items!.map((item) {
+            final map = item.toMap();
+            map['id'] = item.id ?? uuid.v4();
+            map['invoice_id'] = invoiceId;
+            return map;
+          }).toList();
+
+      await supabase.from('invoice_items').insert(itemsToInsert);
+    }
+
+    // 4. Régi befizetések törlése
+    await supabase.from('payments').delete().eq('invoice_id', invoiceId);
+
+    // 5. Új befizetések beszúrása
+    if (invoice.payments != null && invoice.payments!.isNotEmpty) {
+      final paymentsToInsert =
+          invoice.payments!.map((payment) {
+            final map = payment.toMap();
+            map['id'] = payment.id ?? uuid.v4();
+            map['invoice_id'] = invoiceId;
+            return map;
+          }).toList();
+
+      await supabase.from('payments').insert(paymentsToInsert);
+    }
+  }
 }

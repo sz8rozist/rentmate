@@ -8,7 +8,6 @@ import 'package:form_field_validator/form_field_validator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:rentmate/widgets/custom_text_form_field.dart';
 import 'package:rentmate/widgets/loading_overlay.dart';
-import 'package:swipe_image_gallery/swipe_image_gallery.dart';
 
 import '../models/flat_image.dart';
 import '../models/flat_model.dart';

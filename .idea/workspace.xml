@@ -9,28 +9,21 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f7c025f7-f5d1-49bb-9496-3d397e9e2c84" name="Changes" comment="chat javítások">
-      <change afterPath="$PROJECT_DIR$/lib/models/invoice_item.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/models/invoice_model.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/models/invoice_status.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/models/payment_model.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/services/invoice_item_service.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/services/invoice_service.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/services/payment_service.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/viewmodels/invoice_viewmodel.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/views/add_invoice_view.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/views/invoice_details_view.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/views/landlord_invoices_view.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/views/tenant_invoices_view.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.dart_tool/package_config.json" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/package_config.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.dart_tool/package_config_subset" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/package_config_subset" afterDir="false" />
+    <list default="true" id="f7c025f7-f5d1-49bb-9496-3d397e9e2c84" name="Changes" comment="Számlázás menüpont">
+      <change afterPath="$PROJECT_DIR$/lib/views/invoice_edit_view.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/main.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/models/invoice_item.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/models/invoice_item.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/models/invoice_model.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/models/invoice_model.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/models/payment_model.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/models/payment_model.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/routing/app_router.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/routing/app_router.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/views/chat_message_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/chat_message_view.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/widgets/shell_scaffold.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/widgets/shell_scaffold.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/services/invoice_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/services/invoice_service.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/viewmodels/invoice_viewmodel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/viewmodels/invoice_viewmodel.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/views/add_invoice_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/add_invoice_view.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/views/flat_details_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/flat_details_view.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/views/invoice_details_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/invoice_details_view.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/views/landlord_invoices_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/landlord_invoices_view.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/widgets/custom_text_form_field.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/widgets/custom_text_form_field.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -325,7 +318,15 @@
       <option name="project" value="LOCAL" />
       <updated>1750540352989</updated>
     </task>
-    <option name="localTasksCounter" value="27" />
+    <task id="LOCAL-00027" summary="Számlázás menüpont">
+      <option name="closed" value="true" />
+      <created>1750597243559</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1750597243559</updated>
+    </task>
+    <option name="localTasksCounter" value="28" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -364,6 +365,7 @@
     <MESSAGE value="Sötét - világos mód" />
     <MESSAGE value="Chat funkció" />
     <MESSAGE value="chat javítások" />
-    <option name="LAST_COMMIT_MESSAGE" value="chat javítások" />
+    <MESSAGE value="Számlázás menüpont" />
+    <option name="LAST_COMMIT_MESSAGE" value="Számlázás menüpont" />
   </component>
 </project>

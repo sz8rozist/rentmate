@@ -18,6 +18,7 @@ import 'package:rentmate/views/signup_view.dart';
 import 'package:rentmate/views/tenant_invoices_view.dart';
 import 'package:rentmate/views/welcome_screen.dart';
 import '../viewmodels/auth_viewmodel.dart';
+import '../views/invoice_edit_view.dart';
 import '../views/splash_screen.dart';
 import '../widgets/shell_scaffold.dart';
 
@@ -36,7 +37,8 @@ enum AppRoute {
   chatMessage,
   invoices,
   newInvoice,
-  invoiceDetaul
+  invoiceDetaul,
+  editInvoice
 }
 
 // Riverpod provider a RouterNotifierhoz
@@ -130,6 +132,52 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           return InvoiceDetailsScreen(invoiceId: invoiceId as String);
         },
       ),
+      GoRoute(
+        path: '/editInvoice/:invoiceId',
+        name: AppRoute.editInvoice.name,
+        builder: (context, state) {
+          final invoiceId = state.pathParameters['invoiceId'];
+          return InvoiceEditView(invoiceId: invoiceId as String);
+        },
+      ),
+      GoRoute(
+        path: '/invoices',
+        name: AppRoute.invoices.name,
+        builder: (context, state) {
+          return Consumer(
+            builder: (context, ref, _) {
+              final asyncUser = ref.watch(currentUserProvider);
+
+              return asyncUser.when(
+                data: (user) {
+                  if (user == null) {
+                    return const Scaffold(
+                      body: Center(
+                        child: Text('Nincs bejelentkezett felhasználó'),
+                      ),
+                    );
+                  } else {
+                    if (user.role?.value == UserRole.tenant.value) {
+                      return TenantInvoicesView(tenantUserId: user.id);
+                    } else {
+                      return LandlordInvoicesScreen(
+                        landlordUserId: user.id,
+                      );
+                    }
+                  }
+                },
+                loading:
+                    () => const Scaffold(
+                  body: Center(child: CircularProgressIndicator()),
+                ),
+                error:
+                    (err, stack) =>
+                    Scaffold(body: Center(child: Text('Hiba: $err'))),
+              );
+            },
+          );
+        },
+      ),
       ShellRoute(
         builder: (context, state, child) {
           // Például a flats (lakasaim) oldalon gomb kell:
@@ -188,44 +236,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                         );
                       } else {
                         return ChatView(loggedInUser: user);
-                      }
-                    },
-                    loading:
-                        () => const Scaffold(
-                          body: Center(child: CircularProgressIndicator()),
-                        ),
-                    error:
-                        (err, stack) =>
-                            Scaffold(body: Center(child: Text('Hiba: $err'))),
-                  );
-                },
-              );
-            },
-          ),
-          GoRoute(
-            path: '/invoices',
-            name: AppRoute.invoices.name,
-            builder: (context, state) {
-              return Consumer(
-                builder: (context, ref, _) {
-                  final asyncUser = ref.watch(currentUserProvider);
-
-                  return asyncUser.when(
-                    data: (user) {
-                      if (user == null) {
-                        return const Scaffold(
-                          body: Center(
-                            child: Text('Nincs bejelentkezett felhasználó'),
-                          ),
-                        );
-                      } else {
-                        if (user.role?.value == UserRole.tenant.value) {
-                          return TenantInvoicesView(tenantUserId: user.id);
-                        } else {
-                          return LandlordInvoicesScreen(
-                            landlordUserId: user.id,
-                          );
-                        }
                       }
                     },
                     loading:
