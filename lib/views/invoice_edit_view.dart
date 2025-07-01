@@ -242,7 +242,10 @@ class _InvoiceEditViewState extends ConsumerState<InvoiceEditView> with SingleTi
                         .read(invoiceEditViewModelProvider(invoiceId).notifier)
                         .save();
                     if (context.mounted) {
-                      context.pop();
+                      context.goNamed(
+                        AppRoute.invoiceDetaul.name,
+                        pathParameters: {"invoiceId": invoiceId},
+                      );
                     }
                   },
                   padding: const EdgeInsets.all(16),
