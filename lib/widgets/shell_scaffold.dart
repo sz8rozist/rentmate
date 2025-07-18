@@ -14,7 +14,17 @@ class ShellScaffold extends ConsumerWidget {
   final Widget child;
   final List<Widget>? actions;
   const ShellScaffold({super.key, required this.child, this.actions});
+  int _getIndexFromRoute(String location, UserModel user) {
+    if (location.startsWith('/home')) return 0;
+    if (location.startsWith('/chat')) return 1;
 
+    if (user.role == UserRole.landlord && location.startsWith('/lakasaim')) return 2;
+    if (user.role == UserRole.tenant && location.startsWith('/my-rental')) return 2;
+
+    if (location.startsWith('/profil')) return 3;
+
+    return 0; // default fallback
+  }
   String _getTitle(int index, UserModel currentUser) {
     switch (index) {
       case 0:
@@ -37,12 +47,13 @@ class ShellScaffold extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final index = ref.watch(bottomNavIndexProvider);
     final currentUser = ref.watch(currentUserProvider).value;
 
     if (currentUser == null) {
       return const SizedBox();
     }
+    final location = GoRouterState.of(context).matchedLocation;
+    final index = _getIndexFromRoute(location, currentUser);
     final title = _getTitle(index, currentUser);
 
     final tabLabels = <String>['Kezdőlap', 'Chat'];
