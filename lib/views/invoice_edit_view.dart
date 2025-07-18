@@ -231,27 +231,6 @@ class _InvoiceEditViewState extends ConsumerState<InvoiceEditView> with SingleTi
                   constraints: const BoxConstraints(),
                 ),
               ),
-              Positioned(
-                right: 0,
-                top: MediaQuery.of(context).padding.top,
-                bottom: 0,
-                child: IconButton(
-                  icon: const Icon(Icons.save, color: Colors.white),
-                  onPressed: () async {
-                    await ref
-                        .read(invoiceEditViewModelProvider(invoiceId).notifier)
-                        .save();
-                    if (context.mounted) {
-                      context.goNamed(
-                        AppRoute.invoiceDetaul.name,
-                        pathParameters: {"invoiceId": invoiceId},
-                      );
-                    }
-                  },
-                  padding: const EdgeInsets.all(16),
-                  constraints: const BoxConstraints(),
-                ),
-              ),
             ],
           ),
         ),
@@ -384,6 +363,21 @@ class _InvoiceEditViewState extends ConsumerState<InvoiceEditView> with SingleTi
                     ),
                   );
                 }),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () async {
+                    await ref
+                        .read(invoiceEditViewModelProvider(invoiceId).notifier)
+                        .save();
+                    if (context.mounted) {
+                      context.goNamed(
+                        AppRoute.invoiceDetaul.name,
+                        pathParameters: {"invoiceId": invoiceId},
+                      );
+                    }
+                  },
+                  child: const Text('Mentés'),
+                ),
               ],
             ),
           );

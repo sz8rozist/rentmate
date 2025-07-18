@@ -205,4 +205,22 @@ class FlatService {
         .eq('flat_id', flatId)
         .eq('tenant_user_id', tenantUserId);
   }
+
+  Future<Flat?> fetchFlatForTenant(String tenantUserId) async {
+    final response =
+        await _supabase
+            .from('flats')
+            .select('''
+          *,
+          images:flats_images(*),
+flats_for_rent:flats_for_rent!inner(tenant:users(*))
+        ''')
+            .eq('flats_for_rent.tenant_user_id', tenantUserId)
+            .maybeSingle();
+
+    if (response == null) {
+      return null;
+    }
+    return Flat.fromJson(response);
+  }
 }

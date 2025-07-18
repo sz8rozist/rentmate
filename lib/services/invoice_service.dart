@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 import '../models/flat_model.dart';
@@ -137,4 +139,44 @@ class InvoiceService {
       await supabase.from('payments').insert(paymentsToInsert);
     }
   }
+
+  Future<List<Invoice>> getTenantInvoices(
+      String tenantUserId, {
+        String? statusFilter,
+      }) async {
+    // 1. Lekérjük a flats_for_rent rekordot, hogy megkapjuk a flat_id-t
+    final rentResponse = await supabase
+        .from('flats_for_rent')
+        .select('flat_id')
+        .eq('tenant_user_id', tenantUserId)
+        .single();
+
+
+    final flatId = rentResponse['flat_id'] as String;
+print(flatId);
+    // 2. Lekérjük a flat rekordot a flat táblából flat_id alapján
+    final flatResponse = await supabase
+        .from('flats')
+        .select('*')
+        .eq('id', flatId)
+        .single();
+
+    final flat = Flat.fromJson(flatResponse);
+
+      var query = supabase
+          .from('invoices')
+          .select('*')
+          .eq('flat_id', flat.id as String);
+
+      if (statusFilter != null) {
+        query = query.eq('status', statusFilter);
+      }
+
+      final invoiceResponse = await query
+          .order('year', ascending: false)
+          .order('month', ascending: false);
+
+      return (invoiceResponse as List).map((i) => Invoice.fromMap(i)).toList();
+  }
+
 }

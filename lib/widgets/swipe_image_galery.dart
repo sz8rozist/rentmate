@@ -12,7 +12,7 @@ Future<void> showSwipeImageGallery(
       int initialIndex = 0,
       bool swipeDismissible = false,
     }) {
-  return Navigator.of(context).push(
+  return Navigator.of(context, rootNavigator: true).push(
     PageRouteBuilder(
       opaque: false,
       barrierDismissible: swipeDismissible,

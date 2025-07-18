@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -30,9 +33,9 @@ class LandlordInvoicesScreen extends ConsumerWidget {
               Image.asset('assets/images/header-image.png', fit: BoxFit.cover),
               Container(
                 color:
-                ref.watch(themeModeProvider) == ThemeMode.dark
-                    ? Colors.black.withOpacity(0.5)
-                    : Colors.black.withOpacity(0.2),
+                    ref.watch(themeModeProvider) == ThemeMode.dark
+                        ? Colors.black.withOpacity(0.5)
+                        : Colors.black.withOpacity(0.2),
               ),
               // A tartalmat beljebb húzzuk, hogy ne lógjon be a status bar területére
               Padding(
@@ -67,8 +70,7 @@ class LandlordInvoicesScreen extends ConsumerWidget {
                 bottom: 0,
                 child: IconButton(
                   icon: const Icon(Icons.arrow_back, color: Colors.white),
-                  onPressed:
-                      () => context.goNamed(AppRoute.home.name),
+                  onPressed: () => context.goNamed(AppRoute.home.name),
                   padding: const EdgeInsets.all(16),
                   constraints: const BoxConstraints(),
                 ),
@@ -102,17 +104,17 @@ class LandlordInvoicesScreen extends ConsumerWidget {
                     isExpanded: true,
                     underline: Container(height: 2, color: colorScheme.primary),
                     hint: const Text('Összes'),
-                    items: const [
-                      DropdownMenuItem(value: null, child: Text('Összes')),
-                      DropdownMenuItem(
-                        value: 'kiallitva',
-                        child: Text('Kiallítva'),
+                    items: [
+                      const DropdownMenuItem(
+                        value: null,
+                        child: Text('Összes'),
                       ),
-                      DropdownMenuItem(
-                        value: 'fizetve',
-                        child: Text('Fizetve'),
+                      ...InvoiceStatus.values.map(
+                        (status) => DropdownMenuItem(
+                          value: status.name,
+                          child: Text(status.label),
+                        ),
                       ),
-                      DropdownMenuItem(value: 'lejart', child: Text('Lejárt')),
                     ],
                     onChanged: (value) {
                       ref.read(invoiceStatusFilterProvider.notifier).state =
@@ -143,19 +145,25 @@ class LandlordInvoicesScreen extends ConsumerWidget {
                     showModalBottomSheet(
                       context: context,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(20),
+                        ),
                       ),
                       clipBehavior: Clip.antiAliasWithSaveLayer,
                       builder: (_) {
                         final flatsList = data.entries.toList();
                         return Container(
-                          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 16,
+                            horizontal: 12,
+                          ),
                           constraints: BoxConstraints(
                             maxHeight: MediaQuery.of(context).size.height * 0.5,
                           ),
                           child: ListView.builder(
                             shrinkWrap: true,
-                            itemCount: flatsList.length * 2 - 1, // az elemek és a köztük lévő SizedBox miatt
+                            itemCount: flatsList.length * 2 - 1,
+                            // az elemek és a köztük lévő SizedBox miatt
                             itemBuilder: (context, index) {
                               if (index.isOdd) {
                                 // Minden páratlan indexen legyen SizedBox
@@ -173,11 +181,16 @@ class LandlordInvoicesScreen extends ConsumerWidget {
                                     },
                                   );
                                   if (result == true) {
-                                    ref.invalidate(landlordInvoicesProvider(landlordUserId));
+                                    ref.invalidate(
+                                      landlordInvoicesProvider(landlordUserId),
+                                    );
                                   }
                                 },
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 14,
+                                    horizontal: 16,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: colorScheme.surface,
                                     borderRadius: BorderRadius.circular(12),
@@ -191,7 +204,10 @@ class LandlordInvoicesScreen extends ConsumerWidget {
                                   ),
                                   child: Row(
                                     children: [
-                                      Icon(Icons.home_outlined, color: colorScheme.primary),
+                                      Icon(
+                                        Icons.home_outlined,
+                                        color: colorScheme.primary,
+                                      ),
                                       const SizedBox(width: 12),
                                       Expanded(
                                         child: Text(
@@ -203,7 +219,10 @@ class LandlordInvoicesScreen extends ConsumerWidget {
                                           ),
                                         ),
                                       ),
-                                      const Icon(Icons.chevron_right, color: Colors.grey),
+                                      const Icon(
+                                        Icons.chevron_right,
+                                        color: Colors.grey,
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -211,10 +230,8 @@ class LandlordInvoicesScreen extends ConsumerWidget {
                             },
                           ),
                         );
-
                       },
                     );
-
                   },
                   icon: const Icon(Icons.add),
                   label: const Text('Új számla hozzáadása'),
@@ -284,19 +301,24 @@ class LandlordInvoicesScreen extends ConsumerWidget {
                             )
                           else
                             ...invoices.map((invoice) {
-                              final statusColor = InvoiceStatusExtension.getColor(
-                                invoice.status.value,
-                              );
+                              final statusColor =
+                                  InvoiceStatusExtension.getColor(
+                                    invoice.status.value,
+                                  );
                               return InkWell(
                                 borderRadius: BorderRadius.circular(12),
                                 onTap: () {
                                   final result = context.pushNamed(
                                     AppRoute.invoiceDetaul.name,
-                                    pathParameters:{"invoiceId": invoice.id as String},
+                                    pathParameters: {
+                                      "invoiceId": invoice.id as String,
+                                    },
                                   );
                                 },
                                 child: Container(
-                                  margin: const EdgeInsets.symmetric(vertical: 6),
+                                  margin: const EdgeInsets.symmetric(
+                                    vertical: 6,
+                                  ),
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 16,
                                     vertical: 12,
@@ -348,7 +370,9 @@ class LandlordInvoicesScreen extends ConsumerWidget {
                                         ),
                                         decoration: BoxDecoration(
                                           color: statusColor.withOpacity(0.85),
-                                          borderRadius: BorderRadius.circular(20),
+                                          borderRadius: BorderRadius.circular(
+                                            20,
+                                          ),
                                         ),
                                         child: Text(
                                           InvoiceStatusExtension.getLabel(
@@ -370,7 +394,13 @@ class LandlordInvoicesScreen extends ConsumerWidget {
                     },
                   );
                 },
-                loading: () => const Center(child: CircularProgressIndicator()),
+                loading:
+                    () => Center(
+                      child:
+                          Platform.isIOS
+                              ? const CupertinoActivityIndicator()
+                              : const CircularProgressIndicator(),
+                    ),
                 error:
                     (e, _) => Center(
                       child: Text(

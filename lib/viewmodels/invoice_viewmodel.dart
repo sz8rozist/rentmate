@@ -38,6 +38,16 @@ final invoiceEditViewModelProvider = AsyncNotifierProvider.family<
   String // paraméter típusa
 >(InvoiceEditViewModel.new);
 
+final tenantInvoicesProvider = FutureProvider.autoDispose
+    .family<List<Invoice>, String>((ref, tenantUserId) {
+  final service = ref.watch(invoiceServiceProvider);
+  final statusFilter = ref.watch(invoiceStatusFilterProvider);
+  return service.getTenantInvoices(
+    tenantUserId,
+    statusFilter: statusFilter,
+  );
+});
+
 class InvoiceEditViewModel extends FamilyAsyncNotifier<Invoice, String> {
   late final InvoiceService _service;
 

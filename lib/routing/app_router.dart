@@ -15,6 +15,7 @@ import 'package:rentmate/views/landlord_invoices_view.dart';
 import 'package:rentmate/views/profil_view.dart';
 import 'package:rentmate/views/signin_view.dart';
 import 'package:rentmate/views/signup_view.dart';
+import 'package:rentmate/views/tenant_flat_screen.dart';
 import 'package:rentmate/views/tenant_invoices_view.dart';
 import 'package:rentmate/views/welcome_screen.dart';
 import '../viewmodels/auth_viewmodel.dart';
@@ -53,31 +54,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: '/',
     refreshListenable: routerNotifier,
-    /* redirect: (context, state) {
-      final asyncUser = ref.read(currentUserProvider);
-
-      // Ha még töltődik az auth állapot
-      if (asyncUser.isLoading || asyncUser.isRefreshing) {
-        // Ne redirectelj, amíg töltődik
-        return null;
-      }
-      final user = asyncUser.asData?.value;
-      final loggedIn = user != null;
-      final goingToAuth =
-          state.matchedLocation == '/signin' ||
-          state.matchedLocation == '/signup' ||
-          state.matchedLocation == '/welcome';
-
-      if (!loggedIn && !goingToAuth) {
-        return '/welcome';
-      }
-
-      if (loggedIn && goingToAuth) {
-        return '/home';
-      }
-
-      return null;
-    },*/
     routes: [
       GoRoute(path: '/', builder: (context, state) => SplashScreen()),
       GoRoute(
@@ -211,7 +187,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             name: AppRoute.alberleteim.name,
             builder:
                 (context, state) =>
-                    const Center(child: Text('Albérleteim Page')),
+                    TenantFlatScreen(),
           ),
           GoRoute(
             path: '/profil',

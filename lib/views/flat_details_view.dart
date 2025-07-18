@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:floating_action_bubble/floating_action_bubble.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_field_validator/form_field_validator.dart';
@@ -523,7 +524,9 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView>
                                 },
                                 loading:
                                     () => Center(
-                                      child: CircularProgressIndicator(),
+                                      child: Platform.isIOS
+                                          ? const CupertinoActivityIndicator()
+                                          : const CircularProgressIndicator(),
                                     ),
                                 error:
                                     (e, st) =>

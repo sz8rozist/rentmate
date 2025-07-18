@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -434,12 +435,16 @@ class _ChatMessageViewState extends ConsumerState<ChatMessageView> {
                 ],
               );
             },
-            loading: () => const Center(child: CircularProgressIndicator()),
+            loading: () => Center(child: Platform.isIOS
+                ? const CupertinoActivityIndicator()
+                : const CircularProgressIndicator()),
             error:
                 (error, stack) => Center(child: Text('Hiba történt: $error')),
           );
         },
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => Center(child: Platform.isIOS
+            ? const CupertinoActivityIndicator()
+            : const CircularProgressIndicator()),
         error: (error, stack) => Center(child: Text('Hiba történt: $error')),
       ),
     );

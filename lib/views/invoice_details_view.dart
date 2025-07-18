@@ -1,7 +1,12 @@
+import 'dart:io';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:rentmate/models/user_role.dart';
 import 'package:rentmate/routing/app_router.dart';
+import 'package:rentmate/viewmodels/auth_viewmodel.dart';
 import '../models/invoice_status.dart';
 import '../viewmodels/invoice_viewmodel.dart';
 import '../viewmodels/theme_provider.dart';
@@ -15,7 +20,7 @@ class InvoiceDetailsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
     final invoiceAsyncValue = ref.watch(invoiceByIdProvider(invoiceId));
-
+    final currentUser = ref.watch(currentUserProvider).value;
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(80 + MediaQuery.of(context).padding.top),
@@ -66,26 +71,27 @@ class InvoiceDetailsScreen extends ConsumerWidget {
                 bottom: 0,
                 child: IconButton(
                   icon: const Icon(Icons.arrow_back, color: Colors.white),
-                  onPressed: () => context.goNamed(AppRoute.home.name),
+                  onPressed: () => context.goNamed(AppRoute.invoices.name),
                   padding: const EdgeInsets.all(16),
                   constraints: const BoxConstraints(),
                 ),
               ),
-              Positioned(
-                right: 0,
-                top: MediaQuery.of(context).padding.top,
-                bottom: 0,
-                child: IconButton(
-                  icon: const Icon(Icons.edit, color: Colors.white),
-                  onPressed:
-                      () => context.goNamed(
-                        AppRoute.editInvoice.name,
-                        pathParameters: {"invoiceId": invoiceId},
-                      ),
-                  padding: const EdgeInsets.all(16),
-                  constraints: const BoxConstraints(),
+              if (currentUser?.role == UserRole.landlord)
+                Positioned(
+                  right: 0,
+                  top: MediaQuery.of(context).padding.top,
+                  bottom: 0,
+                  child: IconButton(
+                    icon: const Icon(Icons.edit, color: Colors.white),
+                    onPressed:
+                        () => context.goNamed(
+                          AppRoute.editInvoice.name,
+                          pathParameters: {"invoiceId": invoiceId},
+                        ),
+                    padding: const EdgeInsets.all(16),
+                    constraints: const BoxConstraints(),
+                  ),
                 ),
-              ),
             ],
           ),
         ),
@@ -242,7 +248,9 @@ class InvoiceDetailsScreen extends ConsumerWidget {
                             title: Text(item.description),
                             trailing: Text(
                               '${item.amount.toStringAsFixed(0)} Ft',
-                              style: const TextStyle(fontWeight: FontWeight.bold),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         );
@@ -251,7 +259,7 @@ class InvoiceDetailsScreen extends ConsumerWidget {
                     const SizedBox(height: 16),
                   ],
                   const SizedBox(height: 16),
-            
+
                   // Timeline fejléc
                   Align(
                     alignment: Alignment.centerLeft,
@@ -264,9 +272,9 @@ class InvoiceDetailsScreen extends ConsumerWidget {
                       ),
                     ),
                   ),
-            
+
                   const SizedBox(height: 12),
-            
+
                   // Itt jön a lista, Expanded-ben, hogy kitöltse a maradék helyet és scrollozható legyen
                   Column(
                     children: List.generate(timelineEvents.length, (index) {
@@ -280,7 +288,13 @@ class InvoiceDetailsScreen extends ConsumerWidget {
             ),
           );
         },
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading:
+            () => Center(
+              child:
+                  Platform.isIOS
+                      ? const CupertinoActivityIndicator()
+                      : const CircularProgressIndicator(),
+            ),
         error: (error, stack) => Center(child: Text('Hiba történt: $error')),
       ),
     );
