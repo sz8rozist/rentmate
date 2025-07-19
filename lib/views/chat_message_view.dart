@@ -24,9 +24,23 @@ class ChatMessageView extends ConsumerStatefulWidget {
 class _ChatMessageViewState extends ConsumerState<ChatMessageView> {
   final TextEditingController _controller = TextEditingController();
   final ImagePicker _picker = ImagePicker();
-
+  final ScrollController _scrollController = ScrollController();
   final List<File> _imageFiles = [];
 
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToEnd());
+  }
+  void _scrollToEnd() {
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: Duration(milliseconds: 200),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
   void _sendMessage() async {
     final text = _controller.text.trim();
 
@@ -45,6 +59,8 @@ class _ChatMessageViewState extends ConsumerState<ChatMessageView> {
       _controller.clear();
       _imageFiles.clear();
     });
+
+    _scrollToEnd();
   }
 
   Future<void> _pickImage() async {
@@ -147,11 +163,13 @@ class _ChatMessageViewState extends ConsumerState<ChatMessageView> {
           }
           return asyncMessages.when(
             data: (messages) {
+              WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToEnd());
               messages.sort((a, b) => a.createdAt.compareTo(b.createdAt));
               return Column(
                 children: [
                   Expanded(
                     child: ListView.builder(
+                      controller: _scrollController,
                       padding: const EdgeInsets.all(12),
                       itemCount: messages.length,
                       itemBuilder: (context, index) {
