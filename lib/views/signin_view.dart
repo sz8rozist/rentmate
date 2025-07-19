@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rentmate/models/user_model.dart';
+import 'package:rentmate/models/user_role.dart';
 import 'package:rentmate/routing/app_router.dart';
 import 'package:rentmate/widgets/custom_snackbar.dart';
 import 'package:rentmate/widgets/custom_text_form_field.dart';
@@ -40,7 +41,12 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
           if (user != null) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               ref.read(bottomNavIndexProvider.notifier).state = 0;
-              context.goNamed(AppRoute.home.name);
+              if(user.role == UserRole.landlord){
+                context.goNamed(AppRoute.flatSelect.name);
+              }else{
+                //Albérlő mehet a home ra és itt kéne neki be állítani a selectedFlat et szerintem.
+                context.goNamed(AppRoute.home.name);
+              }
             });
           }
         },

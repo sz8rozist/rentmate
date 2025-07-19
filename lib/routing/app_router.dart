@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart'; // kell, ha Riverpodot használsz
 import 'package:go_router/go_router.dart';
-import 'package:rentmate/models/invoice_model.dart';
 import 'package:rentmate/models/user_role.dart';
 import 'package:rentmate/routing/router_notifier.dart';
+import 'package:rentmate/viewmodels/flat_selector_viewmodel.dart';
 import 'package:rentmate/views/add_invoice_view.dart';
 import 'package:rentmate/views/chat_message_view.dart';
-import 'package:rentmate/views/chat_view.dart';
+import 'package:rentmate/views/document_list_page.dart';
+import 'package:rentmate/views/document_upload_page.dart';
 import 'package:rentmate/views/flat_details_view.dart';
 import 'package:rentmate/views/flat_form_view.dart';
+import 'package:rentmate/views/flat_selector_view.dart';
 import 'package:rentmate/views/invoice_details_view.dart';
-import 'package:rentmate/views/lakasaim_view.dart';
 import 'package:rentmate/views/landlord_invoices_view.dart';
 import 'package:rentmate/views/profil_view.dart';
 import 'package:rentmate/views/signin_view.dart';
@@ -20,7 +21,9 @@ import 'package:rentmate/views/tenant_invoices_view.dart';
 import 'package:rentmate/views/welcome_screen.dart';
 import '../viewmodels/auth_viewmodel.dart';
 import '../views/invoice_edit_view.dart';
+import '../views/lease_contract_form_page.dart';
 import '../views/splash_screen.dart';
+import '../widgets/PDFViewPage.dart';
 import '../widgets/shell_scaffold.dart';
 
 // Enum az útvonalakhoz
@@ -30,16 +33,20 @@ enum AppRoute {
   signup,
   home,
   profile,
-  lakasaim,
+  lakasom,
   alberleteim,
   createFlat,
   flatDetail,
-  chat,
   chatMessage,
   invoices,
   newInvoice,
   invoiceDetaul,
-  editInvoice
+  editInvoice,
+  pdfview,
+  documents,
+  uploadDocument,
+  createBerletiSzerzodes,
+  flatSelect,
 }
 
 // Riverpod provider a RouterNotifierhoz
@@ -57,6 +64,39 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     routes: [
       GoRoute(path: '/', builder: (context, state) => SplashScreen()),
       GoRoute(
+        path: '/view-pdf',
+        name: AppRoute.pdfview.name,
+        builder: (context, state) {
+          final filePath = state.uri.queryParameters['filePath'];
+          if (filePath == null) {
+            return const Scaffold(body: Center(child: Text("Hiányzó fájl")));
+          }
+          return PDFViewPage(filePath: filePath);
+        },
+      ),
+      GoRoute(
+        path: '/flats/:flatId/documents',
+        name: AppRoute.documents.name,
+        builder: (context, state) {
+          final flatId = state.pathParameters['flatId']!;
+          return DocumentListPage(flatId: flatId);
+        },
+      ),
+      GoRoute(
+        path: '/flats/documents/add',
+        name: AppRoute.uploadDocument.name,
+        builder: (context, state) {
+          return DocumentUploadPage();
+        },
+      ),
+      GoRoute(
+        path: '/flats/lease-contract',
+        name: AppRoute.createBerletiSzerzodes.name,
+        builder: (context, state) {
+          return LeaseContractFormPage();
+        },
+      ),
+      GoRoute(
         path: '/welcome',
         name: AppRoute.welcome.name,
         pageBuilder: (context, state) => MaterialPage(child: WelcomeScreen()),
@@ -65,6 +105,12 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: '/signin',
         name: AppRoute.signin.name,
         pageBuilder: (context, state) => MaterialPage(child: SignInScreen()),
+      ),
+      GoRoute(
+        path: '/flatSelect',
+        name: AppRoute.flatSelect.name,
+        pageBuilder:
+            (context, state) => MaterialPage(child: ApartmentSelectorScreen()),
       ),
       GoRoute(
         path: '/signup',
@@ -77,27 +123,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => FlatFormView(),
       ),
       GoRoute(
-        path: '/flatDetail/:id',
-        name: AppRoute.flatDetail.name,
-        builder: (context, state) {
-          final flatId = state.pathParameters['id']!;
-          return FlatDetailsView(flatId: flatId);
-        },
-      ),
-      GoRoute(
-        path: '/chatMessage/:flatId',
-        name: AppRoute.chatMessage.name,
-        builder: (context, state) {
-          final flatId = state.pathParameters['flatId']!;
-          return ChatMessageView(flatId: flatId);
-        },
-      ),
-      GoRoute(
-        path: '/createInvoice/:flatId',
+        path: '/createInvoice',
         name: AppRoute.newInvoice.name,
         builder: (context, state) {
-          final flatId = state.pathParameters['flatId']!;
-          return AddInvoiceScreen(flatId: flatId);
+          return AddInvoiceScreen();
         },
       ),
       GoRoute(
@@ -136,19 +165,17 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                     if (user.role?.value == UserRole.tenant.value) {
                       return TenantInvoicesView(tenantUserId: user.id);
                     } else {
-                      return LandlordInvoicesScreen(
-                        landlordUserId: user.id,
-                      );
+                      return LandlordInvoicesScreen(landlordUserId: user.id);
                     }
                   }
                 },
                 loading:
                     () => const Scaffold(
-                  body: Center(child: CircularProgressIndicator()),
-                ),
+                      body: Center(child: CircularProgressIndicator()),
+                    ),
                 error:
                     (err, stack) =>
-                    Scaffold(body: Center(child: Text('Hiba: $err'))),
+                        Scaffold(body: Center(child: Text('Hiba: $err'))),
               );
             },
           );
@@ -178,16 +205,14 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => const Center(child: Text('Home Page')),
           ),
           GoRoute(
-            path: '/flats',
-            name: AppRoute.lakasaim.name,
-            builder: (context, state) => LakasaimView(),
+            path: '/flat',
+            name: AppRoute.lakasom.name,
+            builder: (context, state) => FlatDetailsView(),
           ),
           GoRoute(
             path: '/my-rental',
             name: AppRoute.alberleteim.name,
-            builder:
-                (context, state) =>
-                    TenantFlatScreen(),
+            builder: (context, state) => TenantFlatScreen(),
           ),
           GoRoute(
             path: '/profil',
@@ -195,33 +220,18 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => ProfilView(),
           ),
           GoRoute(
-            path: '/chat',
-            name: AppRoute.chat.name,
+            path: '/chatMessage',
+            name: AppRoute.chatMessage.name,
             builder: (context, state) {
               return Consumer(
                 builder: (context, ref, _) {
-                  final asyncUser = ref.watch(currentUserProvider);
-
-                  return asyncUser.when(
-                    data: (user) {
-                      if (user == null) {
-                        return const Scaffold(
-                          body: Center(
-                            child: Text('Nincs bejelentkezett felhasználó'),
-                          ),
-                        );
-                      } else {
-                        return ChatView(loggedInUser: user);
-                      }
-                    },
-                    loading:
-                        () => const Scaffold(
-                          body: Center(child: CircularProgressIndicator()),
-                        ),
-                    error:
-                        (err, stack) =>
-                            Scaffold(body: Center(child: Text('Hiba: $err'))),
-                  );
+                  final selectedFlat = ref.watch(selectedFlatProvider);
+                  if (selectedFlat == null) {
+                    return const Scaffold(
+                      body: Center(child: Text('Nincs kiválasztott lakás.')),
+                    );
+                  }
+                  return ChatMessageView(flatId: selectedFlat.id as String);
                 },
               );
             },

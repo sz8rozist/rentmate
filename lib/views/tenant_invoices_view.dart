@@ -133,11 +133,11 @@ class TenantInvoicesView extends ConsumerWidget {
                         leading: statusIcon(invoice.status),
                         title: Text('Számla: ${invoice.id ?? 'N/A'}'),
                         subtitle: Text(
-                          'Összeg: ${invoice.totalAmount.toStringAsFixed(2)} Ft\n'
+                          'Összeg: ${invoice.totalAmount.toStringAsFixed(0)} Ft\n'
                           'Lejárat: ${invoice.dueDate.toLocal().toString().split(' ')[0] ?? '-'}',
                         ),
                         onTap: () {
-                          final result = context.pushNamed(
+                          context.pushNamed(
                             AppRoute.invoiceDetaul.name,
                             pathParameters: {
                               "invoiceId": invoice.id as String,

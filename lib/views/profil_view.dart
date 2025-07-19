@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:icons_plus/icons_plus.dart';
+import 'package:rentmate/models/user_role.dart';
 import 'package:rentmate/routing/app_router.dart';
-import 'package:rentmate/widgets/custom_snackbar.dart';
 
 import '../models/snackbar_message.dart';
 import '../viewmodels/auth_viewmodel.dart';
@@ -16,6 +16,7 @@ class ProfilView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authService = ref.watch(authServiceProvider);
     final themeMode = ref.watch(themeModeProvider);
+    final currentUser = ref.watch(currentUserProvider).value;
     final List<_ProfileCardData> items = [
       _ProfileCardData(
         icon: FontAwesome.user,
@@ -32,10 +33,26 @@ class ProfilView extends ConsumerWidget {
         },
       ),
       _ProfileCardData(
+        icon: Icons.brightness_6,
+        title: 'Téma váltás',
+        onTap: () {
+          ref.read(themeModeProvider.notifier).state =
+              themeMode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
+        },
+      ),
+      if (currentUser?.role == UserRole.landlord)
+        _ProfileCardData(
+          icon: FontAwesome.house,
+          title: 'Lakás kiválasztása',
+          onTap: () async {
+            context.goNamed(AppRoute.flatSelect.name);
+          },
+        ),
+      _ProfileCardData(
         icon: FontAwesome.arrow_right_from_bracket,
         title: 'Kijelentkezés',
         onTap: () async {
-          final router = GoRouter.of(context);  // ezt tedd ki előre
+          final router = GoRouter.of(context); // ezt tedd ki előre
           try {
             await authService.signOut();
             router.goNamed(
@@ -53,16 +70,9 @@ class ProfilView extends ConsumerWidget {
           }
         },
       ),
-      _ProfileCardData(
-        icon: Icons.brightness_6,
-        title: 'Téma váltás',
-        onTap: () {
-          ref.read(themeModeProvider.notifier).state =
-          themeMode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;        },
-      ),
     ];
 
-    return  SafeArea(
+    return SafeArea(
       top: false,
       bottom: true,
       child: ListView.builder(
@@ -76,14 +86,20 @@ class ProfilView extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(16),
                 onTap: item.onTap,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 20,
+                  ),
                   child: Row(
                     children: [
                       Icon(item.icon, size: 20),
                       const SizedBox(width: 16),
                       Text(
                         item.title,
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                       const Spacer(),
                       const Icon(Icons.chevron_right, color: Colors.grey),
@@ -96,7 +112,6 @@ class ProfilView extends ConsumerWidget {
         },
       ),
     );
-
   }
 }
 

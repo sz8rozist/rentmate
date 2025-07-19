@@ -125,123 +125,6 @@ class LandlordInvoicesScreen extends ConsumerWidget {
               ],
             ),
           ),
-
-          // Új számla hozzáadása gomb (a szűrő alatt)
-          invoicesAsync.when(
-            data: (data) {
-              if (data.isEmpty) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: ElevatedButton(
-                    onPressed: null,
-                    child: const Text('Nincs lakás'),
-                  ),
-                );
-              }
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    showModalBottomSheet(
-                      context: context,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.vertical(
-                          top: Radius.circular(20),
-                        ),
-                      ),
-                      clipBehavior: Clip.antiAliasWithSaveLayer,
-                      builder: (_) {
-                        final flatsList = data.entries.toList();
-                        return Container(
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 16,
-                            horizontal: 12,
-                          ),
-                          constraints: BoxConstraints(
-                            maxHeight: MediaQuery.of(context).size.height * 0.5,
-                          ),
-                          child: ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: flatsList.length * 2 - 1,
-                            // az elemek és a köztük lévő SizedBox miatt
-                            itemBuilder: (context, index) {
-                              if (index.isOdd) {
-                                // Minden páratlan indexen legyen SizedBox
-                                return const SizedBox(height: 12);
-                              }
-                              final flat = flatsList[index ~/ 2].key;
-                              return InkWell(
-                                borderRadius: BorderRadius.circular(12),
-                                onTap: () async {
-                                  Navigator.pop(context);
-                                  final result = await context.pushNamed(
-                                    AppRoute.newInvoice.name,
-                                    pathParameters: {
-                                      'flatId': flat.id.toString(),
-                                    },
-                                  );
-                                  if (result == true) {
-                                    ref.invalidate(
-                                      landlordInvoicesProvider(landlordUserId),
-                                    );
-                                  }
-                                },
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 14,
-                                    horizontal: 16,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: colorScheme.surface,
-                                    borderRadius: BorderRadius.circular(12),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.05),
-                                        blurRadius: 6,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.home_outlined,
-                                        color: colorScheme.primary,
-                                      ),
-                                      const SizedBox(width: 12),
-                                      Expanded(
-                                        child: Text(
-                                          flat.address,
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w600,
-                                            color: colorScheme.onSurface,
-                                          ),
-                                        ),
-                                      ),
-                                      const Icon(
-                                        Icons.chevron_right,
-                                        color: Colors.grey,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        );
-                      },
-                    );
-                  },
-                  icon: const Icon(Icons.add),
-                  label: const Text('Új számla hozzáadása'),
-                ),
-              );
-            },
-            loading: () => const SizedBox.shrink(),
-            error: (_, __) => const SizedBox.shrink(),
-          ),
-
           // A lista
           Expanded(
             child: SafeArea(
@@ -308,7 +191,7 @@ class LandlordInvoicesScreen extends ConsumerWidget {
                               return InkWell(
                                 borderRadius: BorderRadius.circular(12),
                                 onTap: () {
-                                  final result = context.pushNamed(
+                                   context.pushNamed(
                                     AppRoute.invoiceDetaul.name,
                                     pathParameters: {
                                       "invoiceId": invoice.id as String,

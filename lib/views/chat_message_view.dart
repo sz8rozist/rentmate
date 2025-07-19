@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:rentmate/routing/app_router.dart';
 import 'package:rentmate/viewmodels/chat_view_viewmodel.dart';
 
 import '../viewmodels/auth_viewmodel.dart';
@@ -138,64 +140,6 @@ class _ChatMessageViewState extends ConsumerState<ChatMessageView> {
     final asyncUser = ref.watch(currentUserProvider);
 
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(80 + MediaQuery.of(context).padding.top),
-        child: SizedBox(
-          height: 80 + MediaQuery.of(context).padding.top,
-          width: double.infinity,
-          // A háttér lefedi a státusz sávot is
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              Image.asset('assets/images/header-image.png', fit: BoxFit.cover),
-              Container(
-                color:
-                    ref.watch(themeModeProvider) == ThemeMode.dark
-                        ? Colors.black.withOpacity(0.5)
-                        : Colors.black.withOpacity(0.2),
-              ),
-              // A tartalmat beljebb húzzuk, hogy ne lógjon be a status bar területére
-              Padding(
-                padding: EdgeInsets.fromLTRB(
-                  60,
-                  MediaQuery.of(context).padding.top,
-                  16,
-                  0,
-                ),
-                child: Align(
-                  alignment: Alignment.center,
-                  child: Text(
-                    'Chat szoba',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      shadows: [
-                        Shadow(
-                          color: Colors.black54,
-                          offset: Offset(1, 1),
-                          blurRadius: 3,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 0,
-                top: MediaQuery.of(context).padding.top,
-                bottom: 0,
-                child: IconButton(
-                  icon: const Icon(Icons.arrow_back, color: Colors.white),
-                  onPressed: () => Navigator.of(context).pop(),
-                  padding: const EdgeInsets.all(16),
-                  constraints: const BoxConstraints(),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
       body: asyncUser.when(
         data: (user) {
           if (user == null) {

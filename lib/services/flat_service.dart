@@ -5,18 +5,13 @@ import 'package:rentmate/models/flat_status.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/user_model.dart';
+import 'auth_service.dart';
 
 class FlatService {
   final SupabaseClient _supabase = Supabase.instance.client;
+  final AuthService _authService;
 
-  Future<List<Flat>> getFlats() async {
-    final response = await _supabase
-        .from('flats')
-        .select('*, images:flats_images(*), flats_for_rent(tenant:users(*))');
-    return (response as List)
-        .map((e) => Flat.fromJson(e as Map<String, dynamic>))
-        .toList();
-  }
+  FlatService(this._authService);
 
   Future<void> deleteFlat(String id) async {
     //Képek lekérése
@@ -221,6 +216,34 @@ flats_for_rent:flats_for_rent!inner(tenant:users(*))
     if (response == null) {
       return null;
     }
+    return Flat.fromJson(response);
+  }
+
+  Future<List<Flat>> getFlatsForCurrentLandlord() async {
+    final currentUser = _authService.currentUser;
+    if (currentUser == null) {
+      throw Exception('Nincs bejelentkezett felhasználó');
+    }
+    final response = await _supabase
+        .from('flats')
+        .select('*')
+        .eq('landlord_user_id', currentUser.id);
+    return (response as List)
+        .map((e) => Flat.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  Future<Flat?> getFlatById(String flatId) async {
+    final response = await _supabase
+        .from('flats')
+        .select('''
+      *,
+      images:flats_images(*),
+      flats_for_rent(tenant:users(*))
+    ''')
+        .eq('id', flatId)
+        .single();
+print(response);
     return Flat.fromJson(response);
   }
 }

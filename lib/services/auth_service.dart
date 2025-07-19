@@ -55,8 +55,24 @@ class AuthService {
 
   Future<UserModel> fetchUserModel(String userId) async {
     final response =
-        await _client.from('users').select().eq('id', userId).single();
+    await _client.from('users').select().eq('id', userId).single();
 
-    return UserModel.fromJson(response);
+    final user = UserModel.fromJson(response);
+
+    if (user.role == UserRole.tenant) {
+      final flatsResponse = await _client
+          .from('flats_for_rent')
+          .select('flat_id')
+          .eq('tenant_user_id', userId)
+          .maybeSingle();
+
+      // Ha találunk flat-et, akkor vegyük ki a flat_id-t, különben null
+      final flatId = flatsResponse != null ? flatsResponse['flat_id'] as String? : null;
+
+      return user.copyWith(flatId: flatId);
+    }
+
+    return user;
   }
+
 }

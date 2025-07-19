@@ -5,6 +5,7 @@ import 'package:local_auth/local_auth.dart';
 import 'package:rentmate/routing/app_router.dart';
 import 'package:rentmate/widgets/custom_snackbar.dart';
 import '../models/snackbar_message.dart';
+import '../models/user_role.dart';
 import '../viewmodels/auth_viewmodel.dart';
 import '../widgets/custom_scaffold.dart';
 
@@ -60,7 +61,12 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
         );
 
         if (authenticated && mounted) {
-          context.goNamed(AppRoute.home.name);
+          if(user.role == UserRole.landlord){
+            context.goNamed(AppRoute.flatSelect.name);
+          }else{
+            //Albérlő mehet a home ra és itt kéne neki be állítani a selectedFlat et szerintem.
+            context.goNamed(AppRoute.home.name);
+          }
           return;
         } else {
           attempts++;

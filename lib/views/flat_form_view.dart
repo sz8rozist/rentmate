@@ -6,9 +6,11 @@ import 'package:form_field_validator/form_field_validator.dart';
 import 'package:rentmate/models/flat_status.dart';
 import 'package:rentmate/models/user_model.dart';
 import 'package:rentmate/viewmodels/auth_viewmodel.dart';
+import 'package:rentmate/viewmodels/flat_list_provider.dart';
+import 'package:rentmate/viewmodels/flat_selector_viewmodel.dart';
 import 'package:rentmate/widgets/custom_snackbar.dart';
 import 'package:rentmate/widgets/loading_overlay.dart';
-import '../viewmodels/flat_list_provider.dart';
+import '../models/flat_model.dart';
 import '../viewmodels/theme_provider.dart';
 import '../widgets/custom_text_form_field.dart';
 
@@ -35,10 +37,15 @@ class _FlatFormViewState extends ConsumerState<FlatFormView> {
 
   @override
   Widget build(BuildContext context) {
-    final flatState = ref.watch(flatListProvider);
-    final flatVM = ref.read(flatListProvider.notifier);
     final asyncUser = ref.read(currentUserProvider);
     final user = asyncUser.asData?.value;
+    final selectedFlat = ref.read(selectedFlatProvider);
+
+    final flatState = selectedFlat != null
+        ? ref.watch(flatProvider(selectedFlat.id as String))
+        : AsyncValue<Flat?>.data(null);
+    final flatVM = ref.read(flatProvider(selectedFlat?.id as String).notifier);
+
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(80 + MediaQuery.of(context).padding.top),

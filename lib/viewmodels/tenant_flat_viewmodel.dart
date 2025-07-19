@@ -35,7 +35,8 @@ class TenantFlatViewModel extends StateNotifier<AsyncValue<Flat?>> {
 
 // Provider a SupabaseClient-et használva (feltételezve Supabase inicializálva van máshol)
 final flatServiceProvider = Provider<FlatService>((ref) {
-  return FlatService();
+  final authService = ref.watch(authServiceProvider);
+  return FlatService(authService);
 });
 
 final tenantUserIdProvider = Provider<String>((ref) {

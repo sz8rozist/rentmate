@@ -1,21 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_field_validator/form_field_validator.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:rentmate/models/invoice_item.dart';
+import 'package:rentmate/routing/app_router.dart';
+import 'package:rentmate/viewmodels/flat_selector_viewmodel.dart';
 import 'package:rentmate/widgets/custom_snackbar.dart';
 import 'package:rentmate/widgets/custom_text_form_field.dart';
 import 'package:rentmate/widgets/loading_overlay.dart';
 import '../models/invoice_model.dart';
 import '../models/invoice_status.dart';
+import '../viewmodels/auth_viewmodel.dart';
+import '../viewmodels/flat_list_provider.dart';
 import '../viewmodels/invoice_viewmodel.dart';
 import '../viewmodels/theme_provider.dart';
 import 'package:uuid/uuid.dart';
 
 class AddInvoiceScreen extends ConsumerStatefulWidget {
-  final String flatId;
-
-  const AddInvoiceScreen({required this.flatId, super.key});
+  const AddInvoiceScreen({super.key});
 
   @override
   ConsumerState<AddInvoiceScreen> createState() => _AddInvoiceScreenState();
@@ -146,7 +149,7 @@ class _AddInvoiceScreenState extends ConsumerState<AddInvoiceScreen> {
     );
   }
 
-  Future<void> _saveInvoice() async {
+  Future<void> _saveInvoice(String flatId) async {
     if (!_formKey.currentState!.validate()) return;
     if (_items.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -160,7 +163,6 @@ class _AddInvoiceScreenState extends ConsumerState<AddInvoiceScreen> {
       );
       return;
     }
-
     setState(() => _isLoading = true);
 
     try {
@@ -173,7 +175,7 @@ class _AddInvoiceScreenState extends ConsumerState<AddInvoiceScreen> {
       // Invoice objektum létrehozása
       final invoice = Invoice(
         id: uuid.v4(),
-        flatId: widget.flatId,
+        flatId: flatId,
         year: int.parse(_yearController.text),
         month: int.parse(_monthController.text),
         issueDate: _issueDate,
@@ -187,7 +189,10 @@ class _AddInvoiceScreenState extends ConsumerState<AddInvoiceScreen> {
       await service.addInvoiceWithItems(invoice, _items);
 
       // Ha siker, visszalépés és jelezd, hogy frissítsék a listát
-      if (mounted) Navigator.of(context).pop(true);
+      context.goNamed(AppRoute.home.name);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(CustomSnackBar.success("Sikeres számla feltöltés."));
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(
@@ -253,7 +258,7 @@ class _AddInvoiceScreenState extends ConsumerState<AddInvoiceScreen> {
                 bottom: 0,
                 child: IconButton(
                   icon: const Icon(Icons.arrow_back, color: Colors.white),
-                  onPressed: () => Navigator.of(context).pop(),
+                  onPressed: () => context.goNamed(AppRoute.home.name),
                   padding: const EdgeInsets.all(16),
                   constraints: const BoxConstraints(),
                 ),
@@ -424,7 +429,12 @@ class _AddInvoiceScreenState extends ConsumerState<AddInvoiceScreen> {
                 const SizedBox(height: 24),
 
                 ElevatedButton(
-                  onPressed: _saveInvoice,
+                  onPressed: () {
+                    final flat = ref.read(selectedFlatProvider);
+                    if (flat != null && flat.id != null) {
+                      _saveInvoice(flat.id!);
+                    }
+                  },
                   child: const Text('Mentés'),
                 ),
               ],

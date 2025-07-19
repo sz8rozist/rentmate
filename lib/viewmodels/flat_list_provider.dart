@@ -3,32 +3,31 @@ import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:rentmate/models/flat_image.dart';
-
+import 'package:rentmate/services/auth_service.dart';
 import '../models/flat_model.dart';
 import '../models/flat_status.dart';
 import '../models/user_model.dart';
 import '../services/flat_service.dart';
 
-final flatServiceProvider = Provider((ref) => FlatService());
+final flatServiceProvider = Provider((ref) => FlatService(AuthService()));
 
-final flatListProvider =
-    StateNotifierProvider<FlatListNotifier, AsyncValue<List<Flat>>>((ref) {
-      final service = ref.read(flatServiceProvider);
-      return FlatListNotifier(service);
-    });
+final flatProvider = StateNotifierProvider.family<FlatNotifier, AsyncValue<Flat?>, String>((ref, flatId) {
+  final service = ref.read(flatServiceProvider);
+  return FlatNotifier(service, flatId);
+});
 
-class FlatListNotifier extends StateNotifier<AsyncValue<List<Flat>>> {
+class FlatNotifier extends StateNotifier<AsyncValue<Flat?>> {
   final FlatService service;
+  final String flatId;
 
-  FlatListNotifier(this.service) : super(const AsyncLoading()) {
-    loadFlats();
+  FlatNotifier(this.service, this.flatId) : super(const AsyncLoading()) {
+    _loadFlat();
   }
 
-  Future<void> loadFlats() async {
+  Future<void> _loadFlat() async {
     try {
-      state = AsyncLoading();
-      final flats = await service.getFlats();
-      state = AsyncData(flats);
+      final flat = await service.getFlatById(flatId);
+      state = AsyncData(flat);
     } catch (e, st) {
       state = AsyncError(e, st);
     }
@@ -39,13 +38,12 @@ class FlatListNotifier extends StateNotifier<AsyncValue<List<Flat>>> {
 
     if (picked.isEmpty) return null;
 
-    final allowedImages =
-        picked.where((x) {
-          final path = x.path.toLowerCase();
-          return path.endsWith('.jpg') ||
-              path.endsWith('.jpeg') ||
-              path.endsWith('.png');
-        }).toList();
+    final allowedImages = picked.where((x) {
+      final path = x.path.toLowerCase();
+      return path.endsWith('.jpg') ||
+          path.endsWith('.jpeg') ||
+          path.endsWith('.png');
+    }).toList();
 
     if (allowedImages.length > 6) {
       return allowedImages.sublist(0, 6).map((x) => File(x.path)).toList();
@@ -77,29 +75,23 @@ class FlatListNotifier extends StateNotifier<AsyncValue<List<Flat>>> {
         landlord: landlord,
       );
 
-      await loadFlats(); // Frissítjük az adatokat mentés után
+      await _loadFlat();
     } catch (e, st) {
       state = AsyncError(e, st);
     }
   }
 
-  Future<void> removeFlat(Flat flat) async {
+  Future<void> removeFlat() async {
     try {
-      await service.deleteFlat(flat.id!);
-      // A lista frissítése, eltávolítjuk a törölt elemet
-      state = AsyncData([...state.value!..remove(flat)]);
+      state = const AsyncLoading();
+      await service.deleteFlat(flatId);
+      state = const AsyncData(null);
     } catch (e, st) {
       state = AsyncError(e, st);
     }
-  }
-
-  Future<void> refresh() async {
-    state = const AsyncLoading();
-    await loadFlats();
   }
 
   Future<void> updateFlat({
-    required String flatId,
     required String address,
     required FlatStatus status,
     required String price,
@@ -107,7 +99,6 @@ class FlatListNotifier extends StateNotifier<AsyncValue<List<Flat>>> {
     try {
       state = const AsyncLoading();
 
-      // Meghívjuk a service update metódusát
       await service.updateFlatWithImages(
         id: flatId,
         address: address,
@@ -115,18 +106,15 @@ class FlatListNotifier extends StateNotifier<AsyncValue<List<Flat>>> {
         status: status,
       );
 
-      // Frissítjük a listát a mentés után
-      await loadFlats();
+      await _loadFlat();
     } catch (e, st) {
       state = AsyncError(e, st);
     }
   }
 
   Future<void> updateImage({
-    required String flatId,
-    required List<FlatImage>
-    retainedImageUrls, // a felhasználó által megtartott képek URL-jei
-    List<File>? newImages, // újonnan feltöltendő képek
+    required List<FlatImage> retainedImageUrls,
+    List<File>? newImages,
   }) async {
     try {
       state = const AsyncLoading();
@@ -137,27 +125,27 @@ class FlatListNotifier extends StateNotifier<AsyncValue<List<Flat>>> {
         newImages: newImages,
       );
 
-      await loadFlats();
+      await _loadFlat();
     } catch (e, st) {
       state = AsyncError(e, st);
     }
   }
 
-  Future<void> addTenantToFlat(String flatId, String tenantUserId) async {
+  Future<void> addTenantToFlat(String tenantUserId) async {
     try {
       state = const AsyncLoading();
       await service.addTenantToFlat(flatId, tenantUserId);
-      await loadFlats();
+      await _loadFlat();
     } catch (e, st) {
       state = AsyncError(e, st);
     }
   }
 
-  Future<void> removeTenantFromFlat(String flatId, String tenantUserId) async {
+  Future<void> removeTenantFromFlat(String tenantUserId) async {
     try {
       state = const AsyncLoading();
       await service.removeTenantFromFlat(flatId, tenantUserId);
-      await loadFlats();
+      await _loadFlat();
     } catch (e, st) {
       state = AsyncError(e, st);
     }
