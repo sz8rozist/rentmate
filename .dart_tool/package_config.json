@@ -3,7 +3,7 @@
   "packages": [
     {
       "name": "adaptive_dialog",
-      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/adaptive_dialog-2.4.1",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/adaptive_dialog-2.4.2",
       "packageUri": "lib/",
       "languageVersion": "3.6"
     },
@@ -62,12 +62,6 @@
       "languageVersion": "3.4"
     },
     {
-      "name": "awesome_snackbar_content",
-      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/awesome_snackbar_content-0.1.6",
-      "packageUri": "lib/",
-      "languageVersion": "3.4"
-    },
-    {
       "name": "barcode",
       "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/barcode-2.2.9",
       "packageUri": "lib/",
@@ -105,7 +99,7 @@
     },
     {
       "name": "cross_cache",
-      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/cross_cache-1.0.2",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/cross_cache-1.0.4",
       "packageUri": "lib/",
       "languageVersion": "3.7"
     },
@@ -182,22 +176,10 @@
       "languageVersion": "3.0"
     },
     {
-      "name": "file_selector",
-      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/file_selector-0.9.5",
+      "name": "file_picker",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/file_picker-10.2.0",
       "packageUri": "lib/",
-      "languageVersion": "2.18"
-    },
-    {
-      "name": "file_selector_android",
-      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/file_selector_android-0.5.1+14",
-      "packageUri": "lib/",
-      "languageVersion": "3.6"
-    },
-    {
-      "name": "file_selector_ios",
-      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/file_selector_ios-0.5.3+1",
-      "packageUri": "lib/",
-      "languageVersion": "3.3"
+      "languageVersion": "3.4"
     },
     {
       "name": "file_selector_linux",
@@ -216,12 +198,6 @@
       "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/file_selector_platform_interface-2.6.2",
       "packageUri": "lib/",
       "languageVersion": "3.0"
-    },
-    {
-      "name": "file_selector_web",
-      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/file_selector_web-0.9.4+2",
-      "packageUri": "lib/",
-      "languageVersion": "3.3"
     },
     {
       "name": "file_selector_windows",
@@ -261,7 +237,7 @@
     },
     {
       "name": "flutter_chat_core",
-      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/flutter_chat_core-2.6.1",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/flutter_chat_core-2.7.1",
       "packageUri": "lib/",
       "languageVersion": "3.7"
     },
@@ -273,9 +249,15 @@
     },
     {
       "name": "flutter_chat_ui",
-      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/flutter_chat_ui-2.5.2",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/flutter_chat_ui-2.8.1",
       "packageUri": "lib/",
       "languageVersion": "3.7"
+    },
+    {
+      "name": "flutter_icon_snackbar",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/flutter_icon_snackbar-1.2.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
     },
     {
       "name": "flutter_keyboard_visibility",
@@ -318,12 +300,6 @@
       "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/flutter_lints-5.0.0",
       "packageUri": "lib/",
       "languageVersion": "3.5"
-    },
-    {
-      "name": "flutter_localizations",
-      "rootUri": "file:///Users/rozsaistvan/development/flutter/packages/flutter_localizations",
-      "packageUri": "lib/",
-      "languageVersion": "3.7"
     },
     {
       "name": "flutter_pdfview",
@@ -387,9 +363,9 @@
     },
     {
       "name": "flutter_svg",
-      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/flutter_svg-2.0.9",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/flutter_svg-2.2.0",
       "packageUri": "lib/",
-      "languageVersion": "2.19"
+      "languageVersion": "3.6"
     },
     {
       "name": "flutter_test",
@@ -417,25 +393,25 @@
     },
     {
       "name": "freezed_annotation",
-      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/freezed_annotation-3.0.0",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/freezed_annotation-3.1.0",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
     {
       "name": "functions_client",
-      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/functions_client-2.4.2",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/functions_client-2.4.3",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
     {
       "name": "go_router",
-      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/go_router-15.1.2",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/go_router-15.1.3",
       "packageUri": "lib/",
-      "languageVersion": "3.4"
+      "languageVersion": "3.6"
     },
     {
       "name": "gotrue",
-      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/gotrue-2.12.0",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/gotrue-2.13.0",
       "packageUri": "lib/",
       "languageVersion": "3.3"
     },
@@ -453,15 +429,21 @@
     },
     {
       "name": "http",
-      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/http-0.13.6",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/http-1.4.0",
       "packageUri": "lib/",
-      "languageVersion": "2.19"
+      "languageVersion": "3.4"
     },
     {
       "name": "http_parser",
       "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/http_parser-4.1.2",
       "packageUri": "lib/",
       "languageVersion": "3.4"
+    },
+    {
+      "name": "icon_animated",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/icon_animated-1.2.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
     },
     {
       "name": "icons_plus",
@@ -471,9 +453,9 @@
     },
     {
       "name": "idb_shim",
-      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/idb_shim-2.6.6+2",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/idb_shim-2.6.7",
       "packageUri": "lib/",
-      "languageVersion": "3.7"
+      "languageVersion": "3.8"
     },
     {
       "name": "image",
@@ -489,7 +471,7 @@
     },
     {
       "name": "image_picker_android",
-      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/image_picker_android-0.8.12+23",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/image_picker_android-0.8.12+24",
       "packageUri": "lib/",
       "languageVersion": "3.6"
     },
@@ -591,15 +573,15 @@
     },
     {
       "name": "local_auth_android",
-      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/local_auth_android-1.0.49",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/local_auth_android-1.0.50",
       "packageUri": "lib/",
       "languageVersion": "3.6"
     },
     {
       "name": "local_auth_darwin",
-      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/local_auth_darwin-1.4.3",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/local_auth_darwin-1.5.0",
       "packageUri": "lib/",
-      "languageVersion": "3.4"
+      "languageVersion": "3.6"
     },
     {
       "name": "local_auth_platform_interface",
@@ -621,13 +603,13 @@
     },
     {
       "name": "macos_ui",
-      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/macos_ui-2.1.10",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/macos_ui-2.2.0",
       "packageUri": "lib/",
       "languageVersion": "3.5"
     },
     {
       "name": "macos_window_utils",
-      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/macos_window_utils-1.8.2",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/macos_window_utils-1.8.4",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
@@ -776,42 +758,6 @@
       "languageVersion": "2.18"
     },
     {
-      "name": "permission_handler",
-      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/permission_handler-12.0.1",
-      "packageUri": "lib/",
-      "languageVersion": "3.5"
-    },
-    {
-      "name": "permission_handler_android",
-      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/permission_handler_android-13.0.1",
-      "packageUri": "lib/",
-      "languageVersion": "3.5"
-    },
-    {
-      "name": "permission_handler_apple",
-      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/permission_handler_apple-9.4.7",
-      "packageUri": "lib/",
-      "languageVersion": "2.18"
-    },
-    {
-      "name": "permission_handler_html",
-      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/permission_handler_html-0.1.3+5",
-      "packageUri": "lib/",
-      "languageVersion": "3.3"
-    },
-    {
-      "name": "permission_handler_platform_interface",
-      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/permission_handler_platform_interface-4.3.0",
-      "packageUri": "lib/",
-      "languageVersion": "3.5"
-    },
-    {
-      "name": "permission_handler_windows",
-      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/permission_handler_windows-0.2.1",
-      "packageUri": "lib/",
-      "languageVersion": "2.12"
-    },
-    {
       "name": "petitparser",
       "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/petitparser-6.1.0",
       "packageUri": "lib/",
@@ -885,7 +831,7 @@
     },
     {
       "name": "realtime_client",
-      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/realtime_client-2.5.0",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/realtime_client-2.5.1",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
@@ -962,6 +908,12 @@
       "languageVersion": "3.3"
     },
     {
+      "name": "sidebarx",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/sidebarx-0.17.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.15"
+    },
+    {
       "name": "signature",
       "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/signature-5.5.0",
       "packageUri": "lib/",
@@ -1017,13 +969,13 @@
     },
     {
       "name": "supabase",
-      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/supabase-2.7.0",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/supabase-2.8.0",
       "packageUri": "lib/",
       "languageVersion": "3.3"
     },
     {
       "name": "supabase_flutter",
-      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/supabase_flutter-2.9.0",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/supabase_flutter-2.9.1",
       "packageUri": "lib/",
       "languageVersion": "3.3"
     },
@@ -1035,9 +987,9 @@
     },
     {
       "name": "synchronized",
-      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/synchronized-3.3.1",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/synchronized-3.4.0",
       "packageUri": "lib/",
-      "languageVersion": "3.7"
+      "languageVersion": "3.8"
     },
     {
       "name": "term_glyph",
@@ -1059,9 +1011,9 @@
     },
     {
       "name": "url_launcher",
-      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/url_launcher-6.3.1",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/url_launcher-6.3.2",
       "packageUri": "lib/",
-      "languageVersion": "3.3"
+      "languageVersion": "3.6"
     },
     {
       "name": "url_launcher_android",
@@ -1113,21 +1065,21 @@
     },
     {
       "name": "vector_graphics",
-      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/vector_graphics-1.1.10+1",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/vector_graphics-1.1.19",
       "packageUri": "lib/",
-      "languageVersion": "2.17"
+      "languageVersion": "3.6"
     },
     {
       "name": "vector_graphics_codec",
-      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/vector_graphics_codec-1.1.10+1",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/vector_graphics_codec-1.1.13",
       "packageUri": "lib/",
-      "languageVersion": "2.17"
+      "languageVersion": "3.4"
     },
     {
       "name": "vector_graphics_compiler",
-      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/vector_graphics_compiler-1.1.10+1",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/vector_graphics_compiler-1.1.17",
       "packageUri": "lib/",
-      "languageVersion": "2.19"
+      "languageVersion": "3.6"
     },
     {
       "name": "vector_math",
@@ -1161,9 +1113,9 @@
     },
     {
       "name": "win32",
-      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/win32-5.13.0",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/win32-5.14.0",
       "packageUri": "lib/",
-      "languageVersion": "3.7"
+      "languageVersion": "3.8"
     },
     {
       "name": "xdg_directories",
@@ -1193,6 +1145,6 @@
   "generator": "pub",
   "generatorVersion": "3.8.1",
   "flutterRoot": "file:///Users/rozsaistvan/development/flutter",
-  "flutterVersion": "3.32.4",
+  "flutterVersion": "3.32.7",
   "pubCache": "file:///Users/rozsaistvan/.pub-cache"
 }

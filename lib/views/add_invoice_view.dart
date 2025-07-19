@@ -11,8 +11,6 @@ import 'package:rentmate/widgets/custom_text_form_field.dart';
 import 'package:rentmate/widgets/loading_overlay.dart';
 import '../models/invoice_model.dart';
 import '../models/invoice_status.dart';
-import '../viewmodels/auth_viewmodel.dart';
-import '../viewmodels/flat_list_provider.dart';
 import '../viewmodels/invoice_viewmodel.dart';
 import '../viewmodels/theme_provider.dart';
 import 'package:uuid/uuid.dart';
@@ -152,15 +150,11 @@ class _AddInvoiceScreenState extends ConsumerState<AddInvoiceScreen> {
   Future<void> _saveInvoice(String flatId) async {
     if (!_formKey.currentState!.validate()) return;
     if (_items.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        CustomSnackBar.error("Legalább egy számla tétel szükséges"),
-      );
+      CustomSnackBar.error(context, "Legalább egy számla tétel szükséges");
       return;
     }
     if (_items.any((item) => item.description.isEmpty || item.amount <= 0)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        CustomSnackBar.error("Kérlek töltsd ki az összes tétel adatot"),
-      );
+      CustomSnackBar.error(context, "Kérlek töltsd ki az összes tétel adatot");
       return;
     }
     setState(() => _isLoading = true);
@@ -190,9 +184,7 @@ class _AddInvoiceScreenState extends ConsumerState<AddInvoiceScreen> {
 
       // Ha siker, visszalépés és jelezd, hogy frissítsék a listát
       context.goNamed(AppRoute.home.name);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(CustomSnackBar.success("Sikeres számla feltöltés."));
+      CustomSnackBar.success(context,"Sikeres számla feltöltés.");
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(
@@ -397,10 +389,8 @@ class _AddInvoiceScreenState extends ConsumerState<AddInvoiceScreen> {
                           setState(() {
                             _items.remove(item);
                           });
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            CustomSnackBar.success(
-                              'A(z) ${item.description} tétel törölve lett',
-                            ),
+                          CustomSnackBar.success(
+                            context,'A(z) ${item.description} tétel törölve lett',
                           );
                         },
                         child: Card(

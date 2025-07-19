@@ -157,12 +157,8 @@ class _FlatFormViewState extends ConsumerState<FlatFormView> {
                                       if (filtered.length +
                                               selectedImages.length >
                                           6) {
-                                        ScaffoldMessenger.of(
-                                          context,
-                                        ).showSnackBar(
-                                          CustomSnackBar.error(
-                                            "Legfeljebb 6 képet tölthetsz fel.",
-                                          ),
+                                        CustomSnackBar.error(
+                                          context,"Legfeljebb 6 képet tölthetsz fel.",
                                         );
                                         return;
                                       }
@@ -184,23 +180,15 @@ class _FlatFormViewState extends ConsumerState<FlatFormView> {
                                       if (!(ext.endsWith('.jpg') ||
                                           ext.endsWith('.jpeg') ||
                                           ext.endsWith('.png'))) {
-                                        ScaffoldMessenger.of(
-                                          context,
-                                        ).showSnackBar(
-                                          CustomSnackBar.error(
-                                            "Csak JPG vagy PNG képek engedélyezettek.",
-                                          ),
+                                        CustomSnackBar.error(
+                                          context,"Csak JPG vagy PNG képek engedélyezettek.",
                                         );
                                         return;
                                       }
 
                                       if (selectedImages.length >= 6) {
-                                        ScaffoldMessenger.of(
-                                          context,
-                                        ).showSnackBar(
-                                          CustomSnackBar.error(
-                                            "Legfeljebb 6 képet tölthetsz fel.",
-                                          ),
+                                        CustomSnackBar.error(
+                                          context,"Legfeljebb 6 képet tölthetsz fel.",
                                         );
                                         return;
                                       }
@@ -268,9 +256,7 @@ class _FlatFormViewState extends ConsumerState<FlatFormView> {
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
                       if (selectedImages.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          CustomSnackBar.error("Legalább egy képet válassz!"),
-                        );
+                        CustomSnackBar.error(context,"Legalább egy képet válassz!");
                         return;
                       }
 

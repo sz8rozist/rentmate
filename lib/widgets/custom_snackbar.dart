@@ -1,56 +1,46 @@
 import 'package:flutter/material.dart';
-import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'package:flutter_icon_snackbar/flutter_icon_snackbar.dart';
 
 class CustomSnackBar {
-  static SnackBar success(String message, {String title = 'Sikeres művelet'}) {
-    return SnackBar(
-      elevation: 0,
-      behavior: SnackBarBehavior.floating,
-      backgroundColor: Colors.transparent,
-      content: AwesomeSnackbarContent(
-        title: title,
-        message: message,
-        contentType: ContentType.success,
-      ),
+  // Sikeres művelet SnackBar-je
+  static void success(
+    BuildContext context,
+    String message, {
+    String title = 'Sikeres művelet',
+  }) {
+    IconSnackBar.show(
+      context,
+      snackBarType: SnackBarType.success,
+      label: message,
+      duration: const Duration(seconds: 3),
     );
   }
 
-  static SnackBar error(String message, {String title = 'Hiba történt'}) {
-    return SnackBar(
-      elevation: 0,
-      behavior: SnackBarBehavior.floating,
-      backgroundColor: Colors.transparent,
-      content: AwesomeSnackbarContent(
-        title: title,
-        message: message,
-        contentType: ContentType.failure,
-      ),
+  // Hiba SnackBar-je
+  static void error(
+    BuildContext context,
+    String message, {
+    String title = 'Hiba történt',
+  }) {
+    IconSnackBar.show(
+      context,
+      snackBarType: SnackBarType.fail, // Fail típus hibákhoz
+      label: message,
+      duration: const Duration(seconds: 4),
     );
   }
 
-  static SnackBar info(String message, {String title = 'Információ'}) {
-    return SnackBar(
-      elevation: 0,
-      behavior: SnackBarBehavior.floating,
-      backgroundColor: Colors.transparent,
-      content: AwesomeSnackbarContent(
-        title: title,
-        message: message,
-        contentType: ContentType.help,
-      ),
-    );
-  }
-
-  static SnackBar warning(String message, {String title = 'Figyelem'}) {
-    return SnackBar(
-      elevation: 0,
-      behavior: SnackBarBehavior.floating,
-      backgroundColor: Colors.transparent,
-      content: AwesomeSnackbarContent(
-        title: title,
-        message: message,
-        contentType: ContentType.warning,
-      ),
+  // Figyelmeztetés SnackBar-je
+  static void warning(
+    BuildContext context,
+    String message, {
+    String title = 'Figyelem',
+  }) {
+    IconSnackBar.show(
+      context,
+      snackBarType: SnackBarType.alert, // Warning típus
+      label: message,
+      duration: const Duration(seconds: 4),
     );
   }
 }

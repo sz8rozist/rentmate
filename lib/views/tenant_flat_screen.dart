@@ -141,11 +141,7 @@ class TenantFlatScreen extends ConsumerWidget {
                                     onPressed: () async {
                                       context.pop();
                                       // await vm.sendExitRequest();
-                                      ScaffoldMessenger.of(
-                                        context,
-                                      ).showSnackBar(
-                                          CustomSnackBar.success("Kilépési szándék jelzése elküldve")
-                                      );
+                                      CustomSnackBar.success(context,"Kilépési szándék jelzése elküldve");
                                     },
                                     child: const Text('Igen, jelzem'),
                                   );

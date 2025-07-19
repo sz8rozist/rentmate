@@ -25,11 +25,9 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
     final extra = GoRouterState.of(context).extra;
     if (extra != null && extra is SnackBarMessage) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          extra.isError
-              ? CustomSnackBar.error(extra.message)
-              : CustomSnackBar.success(extra.message),
-        );
+        extra.isError
+            ? CustomSnackBar.error(context,extra.message)
+            : CustomSnackBar.success(context,extra.message);
       });
     }
   }
@@ -73,9 +71,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
         }
       } catch (e) {
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-            CustomSnackBar.error("Túl sok sikertelen próbálkozás!")
-        );
+        CustomSnackBar.error(context,"Túl sok sikertelen próbálkozás!");
         break;
       }
     }

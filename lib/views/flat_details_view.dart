@@ -145,12 +145,11 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView>
   /// Handles the save action for flat details.
   Future<void> _onSave(String flatId) async {
     if (!_formKey.currentState!.validate()) {
-      _showSnackBar(
-          CustomSnackBar.error("Kérlek töltsd ki helyesen a mezőket!"));
+      CustomSnackBar.error(context,"Kérlek töltsd ki helyesen a mezőket!");
       return;
     }
     if (_selectedFlatStatus == null) {
-      _showSnackBar(CustomSnackBar.error("Válassz státuszt!"));
+      CustomSnackBar.error(context,"Válassz státuszt!");
       return;
     }
 
@@ -162,13 +161,8 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView>
     // It's generally better to pop after a successful operation is confirmed by the provider.
     if (mounted) {
       context.pop();
-      _showSnackBar(CustomSnackBar.success("Sikeres mentés!"));
+      CustomSnackBar.success(context,"Sikeres mentés!");
     }
-  }
-
-  /// Displays a custom SnackBar.
-  void _showSnackBar(SnackBar snackBar) {
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   /// Opens a swipeable image gallery with all images.

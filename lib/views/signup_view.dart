@@ -1,4 +1,3 @@
-import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -40,19 +39,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     if (_formSignupKey.currentState!.validate() && agreePersonalData) {
       final role = ref.read(roleProvider);
       if (role == null) {
-        final snackBar = SnackBar(
-          elevation: 0,
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: Colors.transparent,
-          content: AwesomeSnackbarContent(
-            title: 'Figyelmeztetés',
-            message: 'Kérlek válassz szerepkört.',
-            contentType: ContentType.warning,
-          ),
-        );
-        ScaffoldMessenger.of(context).showSnackBar(
-         snackBar
-        );
+        CustomSnackBar.warning(context, "Kérlek válassz szerepkört!");
         return;
       }
       final authViewModel = ref.read(authViewModelProvider.notifier);
@@ -67,21 +54,17 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
       final state = ref.read(authViewModelProvider);
       state.when(
         data: (_) {
-          CustomSnackBar.success("Sikeres regisztráció!");
+          CustomSnackBar.success(context,"Sikeres regisztráció!");
           context.goNamed(AppRoute.signin.name);
         },
         loading: () {},
         error: (e, _) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(CustomSnackBar.error(e.toString()));
+          CustomSnackBar.error(context,e.toString());
           print(e);
         },
       );
     } else if (!agreePersonalData) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        CustomSnackBar.info('Kérlet fogadd el az adatkezelési feltételeket.')
-      );
+      CustomSnackBar.warning(context,'Kérlet fogadd el az adatkezelési feltételeket.');
     }
   }
 

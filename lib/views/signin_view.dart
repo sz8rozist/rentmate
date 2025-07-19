@@ -53,9 +53,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
         loading: () {},
         error: (err, _) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(CustomSnackBar.error(err.toString()));
+            CustomSnackBar.error(context,err.toString());
           });
         },
       );

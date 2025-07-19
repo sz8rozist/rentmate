@@ -184,7 +184,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ShellRoute(
         builder: (context, state, child) {
           // Például a flats (lakasaim) oldalon gomb kell:
-          List<Widget>? actions;
+         /* List<Widget>? actions;
           if (state.matchedLocation == '/flats') {
             actions = [
               IconButton(
@@ -195,8 +195,8 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                 },
               ),
             ];
-          }
-          return ShellScaffold(actions: actions, child: child);
+          }*/
+          return ShellScaffold(child: child);
         },
         routes: [
           GoRoute(
