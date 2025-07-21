@@ -226,7 +226,7 @@ flats_for_rent:flats_for_rent!inner(tenant:users(*))
     }
     final response = await _supabase
         .from('flats')
-        .select('*')
+        .select('*, flats_for_rent(tenant:users(*))')
         .eq('landlord_user_id', currentUser.id);
     return (response as List)
         .map((e) => Flat.fromJson(e as Map<String, dynamic>))
@@ -243,7 +243,6 @@ flats_for_rent:flats_for_rent!inner(tenant:users(*))
     ''')
         .eq('id', flatId)
         .single();
-print(response);
     return Flat.fromJson(response);
   }
 }
