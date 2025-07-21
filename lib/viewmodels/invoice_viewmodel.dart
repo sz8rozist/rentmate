@@ -79,10 +79,7 @@ class InvoiceEditViewModel extends FamilyAsyncNotifier<Invoice, String> {
 
   void addItem({String description = '', double amount = 0}) {
     state = state.whenData((invoice) {
-      final updated =
-          invoice.items!.map<InvoiceItem>((item) {
-            return item.copyWith(description: '...');
-          }).toList();
+      final updated = [...?invoice.items, InvoiceItem(description: description, amount: amount)];
       return invoice.copyWith(items: updated);
     });
   }
@@ -103,13 +100,11 @@ class InvoiceEditViewModel extends FamilyAsyncNotifier<Invoice, String> {
 
   void addPayment({double amount = 0, required DateTime date}) {
     state = state.whenData((invoice) {
-      final updated =
-      invoice.payments!.map<Payment>((item) {
-        return Payment(amount: amount, paymentDate: date);
-      }).toList();
+      final updated = [...?invoice.payments, Payment(amount: amount, paymentDate: date)];
       return invoice.copyWith(payments: updated);
     });
   }
+
 
   // Befizetés törlése
   void removePayment(int index) {

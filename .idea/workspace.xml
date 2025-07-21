@@ -9,13 +9,8 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f7c025f7-f5d1-49bb-9496-3d397e9e2c84" name="Changes" comment="Dokumentumok feltöltése, bérleti szerződés generálás">
-      <change afterPath="$PROJECT_DIR$/lib/widgets/signature_pad.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/services/flat_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/services/flat_service.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/viewmodels/lease_contract_viewmodel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/viewmodels/lease_contract_viewmodel.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/views/lease_contract_form_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/lease_contract_form_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/widgets/signature_page.dart" beforeDir="false" />
+    <list default="true" id="f7c025f7-f5d1-49bb-9496-3d397e9e2c84" name="Changes" comment="Bérleti szerződés létrehozás stepper">
+      <change beforePath="$PROJECT_DIR$/lib/views/invoice_edit_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/invoice_edit_view.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -383,7 +378,15 @@
       <option name="project" value="LOCAL" />
       <updated>1753101249309</updated>
     </task>
-    <option name="localTasksCounter" value="36" />
+    <task id="LOCAL-00036" summary="Bérleti szerződés létrehozás stepper">
+      <option name="closed" value="true" />
+      <created>1753127467748</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1753127467748</updated>
+    </task>
+    <option name="localTasksCounter" value="37" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -398,7 +401,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Home page" />
     <MESSAGE value="curved navigation bar" />
     <MESSAGE value="bejelentkezés javítás, kijelentkezés, profil oldal" />
     <MESSAGE value="Lakásaim menü, bejelentkezés role alapján, regisztráció role alapján" />
@@ -423,6 +425,7 @@
     <MESSAGE value="sidebar navigáció, snackbar" />
     <MESSAGE value="Chat szoba scroll to bottom" />
     <MESSAGE value="Dokumentumok feltöltése, bérleti szerződés generálás" />
-    <option name="LAST_COMMIT_MESSAGE" value="Dokumentumok feltöltése, bérleti szerződés generálás" />
+    <MESSAGE value="Bérleti szerződés létrehozás stepper" />
+    <option name="LAST_COMMIT_MESSAGE" value="Bérleti szerződés létrehozás stepper" />
   </component>
 </project>
