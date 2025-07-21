@@ -12,6 +12,7 @@ import 'package:rentmate/views/flat_details_view.dart';
 import 'package:rentmate/views/flat_form_view.dart';
 import 'package:rentmate/views/flat_selector_view.dart';
 import 'package:rentmate/views/invoice_details_view.dart';
+import 'package:rentmate/views/landlord_home_view.dart';
 import 'package:rentmate/views/landlord_invoices_view.dart';
 import 'package:rentmate/views/profil_view.dart';
 import 'package:rentmate/views/signin_view.dart';
@@ -19,6 +20,7 @@ import 'package:rentmate/views/signup_view.dart';
 import 'package:rentmate/views/tenant_flat_screen.dart';
 import 'package:rentmate/views/tenant_invoices_view.dart';
 import 'package:rentmate/views/welcome_screen.dart';
+import '../models/user_model.dart';
 import '../viewmodels/auth_viewmodel.dart';
 import '../views/invoice_edit_view.dart';
 import '../views/lease_contract_form_page.dart';
@@ -32,9 +34,9 @@ enum AppRoute {
   signin,
   signup,
   home,
-  profile,
-  lakasom,
-  alberleteim,
+  profil,
+  flat,
+  myRental,
   createFlat,
   flatDetail,
   chatMessage,
@@ -47,6 +49,49 @@ enum AppRoute {
   uploadDocument,
   createBerletiSzerzodes,
   flatSelect,
+  notFound;
+
+  String title(UserModel user) {
+    switch (this) {
+      case AppRoute.home:
+        return 'Kezdőlap';
+      case AppRoute.chatMessage:
+        return 'Chat';
+      case AppRoute.flat:
+      case AppRoute.myRental:
+        return user.role == UserRole.landlord ? 'Lakásom' : 'Albérletem';
+      case AppRoute.profil:
+        return 'Profil';
+      case AppRoute.createFlat:
+        return "Lakás hozzáadása";
+      case AppRoute.flatDetail:
+        return "Lakás adatai";
+      case AppRoute.invoices:
+        return "Számlák";
+      case AppRoute.newInvoice:
+        return "Számla hozzáadása";
+      case AppRoute.invoiceDetaul:
+        return "Számla részletei";
+      case AppRoute.editInvoice:
+        return "Számla szerkesztése";
+      case AppRoute.pdfview:
+        return "Fájl megtekintés";
+      case AppRoute.documents:
+        return "Dokumentumok";
+      case AppRoute.uploadDocument:
+        return "Dokumentumok feltöltése";
+      case AppRoute.createBerletiSzerzodes:
+        return "Bérleti szerződés generálás";
+      case AppRoute.flatSelect:
+        return "Lakás kiválasztás";
+      case AppRoute.notFound:
+        return "Ismeretlen oldal";
+      case AppRoute.welcome:
+      case AppRoute.signin:
+      case AppRoute.signup:
+        return "";
+    }
+  }
 }
 
 // Riverpod provider a RouterNotifierhoz
@@ -202,21 +247,52 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/home',
             name: AppRoute.home.name,
-            builder: (context, state) => const Center(child: Text('Home Page')),
+            builder: (context, state) {
+              return Consumer(
+                builder: (context, ref, _) {
+                  final asyncUser = ref.watch(currentUserProvider);
+
+                  return asyncUser.when(
+                    data: (user) {
+                      if (user == null) {
+                        return const Scaffold(
+                          body: Center(
+                            child: Text('Nincs bejelentkezett felhasználó'),
+                          ),
+                        );
+                      } else {
+                        if (user.role?.value == UserRole.tenant.value) {
+                          return Text("Home");
+                        } else {
+                          return LandlordHomeView();
+                        }
+                      }
+                    },
+                    loading:
+                        () => const Scaffold(
+                      body: Center(child: CircularProgressIndicator()),
+                    ),
+                    error:
+                        (err, stack) =>
+                        Scaffold(body: Center(child: Text('Hiba: $err'))),
+                  );
+                },
+              );
+            },
           ),
           GoRoute(
             path: '/flat',
-            name: AppRoute.lakasom.name,
+            name: AppRoute.flat.name,
             builder: (context, state) => FlatDetailsView(),
           ),
           GoRoute(
-            path: '/my-rental',
-            name: AppRoute.alberleteim.name,
+            path: '/myRental',
+            name: AppRoute.myRental.name,
             builder: (context, state) => TenantFlatScreen(),
           ),
           GoRoute(
             path: '/profil',
-            name: AppRoute.profile.name,
+            name: AppRoute.profil.name,
             builder: (context, state) => ProfilView(),
           ),
           GoRoute(

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_field_validator/form_field_validator.dart';
+import 'package:go_router/go_router.dart';
 import 'package:rentmate/models/flat_status.dart';
 import 'package:rentmate/models/user_model.dart';
 import 'package:rentmate/viewmodels/auth_viewmodel.dart';
@@ -11,6 +12,7 @@ import 'package:rentmate/viewmodels/flat_selector_viewmodel.dart';
 import 'package:rentmate/widgets/custom_snackbar.dart';
 import 'package:rentmate/widgets/loading_overlay.dart';
 import '../models/flat_model.dart';
+import '../routing/app_router.dart';
 import '../viewmodels/theme_provider.dart';
 import '../widgets/custom_text_form_field.dart';
 
@@ -87,7 +89,7 @@ class _FlatFormViewState extends ConsumerState<FlatFormView> {
                 bottom: 0,
                 child: IconButton(
                   icon: const Icon(Icons.arrow_back, color: Colors.white),
-                  onPressed: () => Navigator.of(context).pop(),
+                  onPressed: () => context.goNamed(AppRoute.home.name),
                   padding: const EdgeInsets.all(16),
                   constraints: const BoxConstraints(),
                 ),

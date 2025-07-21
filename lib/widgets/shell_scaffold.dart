@@ -38,22 +38,17 @@ class _ShellScaffoldState extends ConsumerState<ShellScaffold> {
     super.dispose();
   }
 
-  String _getTitleByIndex(int index, UserModel currentUser) {
-    switch (index) {
-      case 0:
-        return 'Kezdőlap';
-      case 1:
-        return 'Chat';
-      case 2:
-        if (currentUser.role == UserRole.landlord) {
-          return 'Lakásom';
-        } else if (currentUser.role == UserRole.tenant) {
-          return 'Albérletem';
-        }
-        return '';
-      default:
-        return 'Not found page';
-    }
+  String getTitleFromState(BuildContext context, UserModel user) {
+    final location = GoRouter.of(context).state.matchedLocation;
+    final routeNameString = location.split('/').where((e) => e.isNotEmpty).firstOrNull ?? 'notFound';
+print(location);
+print(routeNameString);
+    final route = AppRoute.values.firstWhere(
+          (r) => r.name == routeNameString,
+      orElse: () => AppRoute.notFound,
+    );
+    print(route);
+    return route.title(user);
   }
 
   // SidebarX téma beállítások
@@ -166,64 +161,7 @@ class _ShellScaffoldState extends ConsumerState<ShellScaffold> {
           icon: FontAwesome.house_user,
           label: 'Lakásom',
           onTap: () {
-            context.goNamed(AppRoute.lakasom.name);
-            if (_scaffoldKey.currentState != null && _scaffoldKey.currentState!.isDrawerOpen) {
-              _scaffoldKey.currentState!.closeDrawer();
-            }
-          },
-        ),
-
-        // Számlák szekció
-        SidebarXItem(
-          icon: Icons.payments,
-          label: 'Számlák listája',
-          onTap: () {
-            context.goNamed(AppRoute.invoices.name);
-            if (_scaffoldKey.currentState != null && _scaffoldKey.currentState!.isDrawerOpen) {
-              _scaffoldKey.currentState!.closeDrawer();
-            }
-          },
-        ),
-        SidebarXItem(
-          icon: Icons.payment,
-          label: 'Számla készítés',
-          onTap: () {
-            context.goNamed(AppRoute.newInvoice.name);
-            if (_scaffoldKey.currentState != null && _scaffoldKey.currentState!.isDrawerOpen) {
-              _scaffoldKey.currentState!.closeDrawer();
-            }
-          },
-        ),
-
-        // Dokumentumok szekció
-        SidebarXItem(
-          icon: Icons.folder,
-          label: 'Dokumentumok',
-          onTap: () {
-            context.goNamed(
-              AppRoute.documents.name,
-              pathParameters: {"flatId": flatId},
-            );
-            if (_scaffoldKey.currentState != null && _scaffoldKey.currentState!.isDrawerOpen) {
-              _scaffoldKey.currentState!.closeDrawer();
-            }
-          },
-        ),
-        SidebarXItem(
-          icon: Icons.upload_file,
-          label: 'Dokumentum feltöltés',
-          onTap: () {
-            context.goNamed(AppRoute.uploadDocument.name);
-            if (_scaffoldKey.currentState != null && _scaffoldKey.currentState!.isDrawerOpen) {
-              _scaffoldKey.currentState!.closeDrawer();
-            }
-          },
-        ),
-        SidebarXItem(
-          icon: Icons.description,
-          label: 'Bérleti szerződés\nkészítés', // Megtöröm a szöveget
-          onTap: () {
-            context.goNamed(AppRoute.createBerletiSzerzodes.name);
+            context.goNamed(AppRoute.flat.name);
             if (_scaffoldKey.currentState != null && _scaffoldKey.currentState!.isDrawerOpen) {
               _scaffoldKey.currentState!.closeDrawer();
             }
@@ -233,6 +171,16 @@ class _ShellScaffoldState extends ConsumerState<ShellScaffold> {
     } else {
       // tenant vagy más szerep
       items.addAll([
+        SidebarXItem(
+          icon: Icons.house,
+          label: 'Albérletem',
+          onTap: () {
+            context.goNamed(AppRoute.myRental.name);
+            if (_scaffoldKey.currentState != null && _scaffoldKey.currentState!.isDrawerOpen) {
+              _scaffoldKey.currentState!.closeDrawer();
+            }
+          },
+        ),
         SidebarXItem(
           icon: Icons.payments,
           label: 'Számlák',
@@ -260,22 +208,12 @@ class _ShellScaffoldState extends ConsumerState<ShellScaffold> {
     }
     items.addAll([
       SidebarXItem(
-        icon: Icons.folder,
+        icon: Icons.account_box,
         label: 'Profil',
         onTap: () {
           context.goNamed(
-            AppRoute.profile.name,
+            AppRoute.profil.name,
           );
-          if (_scaffoldKey.currentState != null && _scaffoldKey.currentState!.isDrawerOpen) {
-            _scaffoldKey.currentState!.closeDrawer();
-          }
-        },
-      ),
-      SidebarXItem(
-        icon: Icons.logout,
-        label: 'Kijelentkezés',
-        onTap: () async {
-          // Logout logika
           if (_scaffoldKey.currentState != null && _scaffoldKey.currentState!.isDrawerOpen) {
             _scaffoldKey.currentState!.closeDrawer();
           }
@@ -343,8 +281,8 @@ class _ShellScaffoldState extends ConsumerState<ShellScaffold> {
                         ),
                         Expanded(
                           child: Text(
-                            _getTitleByIndex(
-                              _sidebarXController.selectedIndex,
+                            getTitleFromState(
+                              context,
                               currentUser,
                             ),
                             style: const TextStyle(
@@ -454,8 +392,8 @@ class _ShellScaffoldState extends ConsumerState<ShellScaffold> {
                         children: [
                           Expanded(
                             child: Text(
-                              _getTitleByIndex(
-                                _sidebarXController.selectedIndex,
+                              getTitleFromState(
+                                context,
                                 currentUser,
                               ),
                               style: const TextStyle(

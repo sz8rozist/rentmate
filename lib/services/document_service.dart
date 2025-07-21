@@ -1,7 +1,9 @@
 import 'dart:io';
 import 'dart:typed_data';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
+
 import '../models/document_model.dart';
 
 class DocumentService {
@@ -9,37 +11,67 @@ class DocumentService {
   final _uuid = const Uuid();
 
   Future<String> uploadFile(File file) async {
-    final fileName = "${_uuid.v4()}-${file.path.split('/').last}";
-    await _client.storage.from('documents').upload(fileName, file);
-    return _client.storage.from('documents').getPublicUrl(fileName);
+    final originalName = file.path.split('/').last;
+    if (originalName.trim().isEmpty || !originalName.contains('.')) {
+      throw Exception('Érvénytelen fájlnév: $originalName');
+    }
+    final ext = _getExtension(originalName);
+    final uuidName = _uuid.v4();
+    final storageKey = '$uuidName.$ext';
+
+    await _client.storage.from('documents').upload(storageKey, file);
+
+    return storageKey;
   }
 
-  Future<String> uploadBytes(Uint8List bytes, String name) async {
-    final fileName = "${_uuid.v4()}-$name";
-    await _client.storage.from('documents').uploadBinary(fileName, bytes);
-    return _client.storage.from('documents').getPublicUrl(fileName);
+  Future<String> uploadBytes(Uint8List bytes, String originalName) async {
+    final ext = _getExtension(originalName);
+    final uuidName = _uuid.v4();
+    final storageKey = '$uuidName.$ext';
+
+    await _client.storage.from('documents').uploadBinary(storageKey, bytes);
+
+    return storageKey;
   }
 
-  Future<void> saveMetadata(String name, String url, String category, String flatId) async {
+  Future<void> saveMetadata({
+    required String originalName,
+    required String storageKey,
+    required String category,
+    required String flatId,
+  }) async {
+    final ext = _getExtension(originalName);
+    final url = _client.storage.from('documents').getPublicUrl(storageKey);
+
     await _client.from('documents').insert({
       'id': _uuid.v4(),
-      'name': name,
+      'name': originalName,
       'url': url,
+      'type': ext,
       'category': category,
+      'file_path': storageKey,
       'flat_id': flatId,
       'uploaded_at': DateTime.now().toIso8601String(),
     });
   }
 
+  String _getExtension(String name) {
+    if (!name.contains('.')) return 'unknown';
+    final ext = name.split('.').last.trim().toLowerCase();
+    return ext.isEmpty ? 'unknown' : ext;
+  }
 
   Future<List<Document>> getDocuments(String flatId) async {
-    final res = await _client.from('documents').select().eq("flat_id", flatId).order('uploaded_at', ascending: false);
+    final res = await _client
+        .from('documents')
+        .select()
+        .eq("flat_id", flatId)
+        .order('uploaded_at', ascending: false);
     return (res as List).map((e) => Document.fromMap(e)).toList();
   }
 
   Future<void> deleteDocument(Document doc) async {
-    final fileName = Uri.parse(doc.url).pathSegments.last;
-    await _client.storage.from('documents').remove([fileName]);
+    await _client.storage.from('documents').remove([doc.filePath]);
     await _client.from('documents').delete().eq('id', doc.id);
   }
 }

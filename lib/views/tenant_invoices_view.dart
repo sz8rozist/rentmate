@@ -42,10 +42,9 @@ class TenantInvoicesView extends ConsumerWidget {
             children: [
               Image.asset('assets/images/header-image.png', fit: BoxFit.cover),
               Container(
-                color:
-                    ref.watch(themeModeProvider) == ThemeMode.dark
-                        ? Colors.black.withOpacity(0.5)
-                        : Colors.black.withOpacity(0.2),
+                color: ref.watch(themeModeProvider) == ThemeMode.dark
+                    ? Colors.black.withOpacity(0.5)
+                    : Colors.black.withOpacity(0.2),
               ),
               Padding(
                 padding: EdgeInsets.fromLTRB(
@@ -79,7 +78,7 @@ class TenantInvoicesView extends ConsumerWidget {
                 bottom: 0,
                 child: IconButton(
                   icon: const Icon(Icons.arrow_back, color: Colors.white),
-                  onPressed: () => context.goNamed(AppRoute.alberleteim.name),
+                  onPressed: () => context.goNamed(AppRoute.myRental.name),
                   padding: const EdgeInsets.all(16),
                   constraints: const BoxConstraints(),
                 ),
@@ -90,29 +89,35 @@ class TenantInvoicesView extends ConsumerWidget {
       ),
       body: Column(
         children: [
-          // Status szűrő dropdown
+          // Status szűrő ChoiceChip-ekkel
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
-            child: DropdownButton<String?>(
-              isExpanded: true,
-              value: statusFilter,
-              hint: const Text('Számla státusz szűrése'),
-              underline: Container(
-                height: 2,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              items: [
-                const DropdownMenuItem(value: null, child: Text('Összes')),
-                ...InvoiceStatus.values.map(
-                  (status) => DropdownMenuItem(
-                    value: status.name,
-                    child: Text(status.label),
+            padding: const EdgeInsets.all(8.0),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  ChoiceChip(
+                    label: const Text("Összes"),
+                    selected: statusFilter == null,
+                    onSelected: (_) =>
+                    ref.read(invoiceStatusFilterProvider.notifier).state = null,
                   ),
-                ),
-              ],
-              onChanged: (value) {
-                ref.read(invoiceStatusFilterProvider.notifier).state = value;
-              },
+                  const SizedBox(width: 8),
+                  ...InvoiceStatus.values.map((status) {
+                    final isSelected = statusFilter == status.name;
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                      child: ChoiceChip(
+                        label: Text(status.label),
+                        selected: isSelected,
+                        onSelected: (_) {
+                          ref.read(invoiceStatusFilterProvider.notifier).state = status.name;
+                        },
+                      ),
+                    );
+                  }).toList(),
+                ],
+              ),
             ),
           ),
 
@@ -120,45 +125,55 @@ class TenantInvoicesView extends ConsumerWidget {
           Expanded(
             child: invoicesAsync.when(
               data: (invoices) {
-                if (invoices.isEmpty) {
-                  return const Center(child: Text('Nincs számla'));
+                final filtered = statusFilter == null
+                    ? invoices
+                    : invoices
+                    .where((i) => i.status.name == statusFilter)
+                    .toList();
+
+                if (filtered.isEmpty) {
+                  return const Center(child: Text('Nincs számla ebben a státuszban.'));
                 }
 
-                return ListView.builder(
-                  itemCount: invoices.length,
-                  itemBuilder: (context, index) {
-                    final invoice = invoices[index];
-                    return Card(
-                      child: ListTile(
-                        leading: statusIcon(invoice.status),
-                        title: Text('Számla: ${invoice.id ?? 'N/A'}'),
-                        subtitle: Text(
-                          'Összeg: ${invoice.totalAmount.toStringAsFixed(0)} Ft\n'
-                          'Lejárat: ${invoice.dueDate.toLocal().toString().split(' ')[0] ?? '-'}',
-                        ),
-                        onTap: () {
-                          context.pushNamed(
-                            AppRoute.invoiceDetaul.name,
-                            pathParameters: {
-                              "invoiceId": invoice.id as String,
-                            },
-                          );
-                        },
-                      ),
-                    );
+                return RefreshIndicator(
+                  onRefresh: () async {
+                    ref.invalidate(tenantInvoicesProvider(tenantUserId));
                   },
+                  child: ListView.builder(
+                    itemCount: filtered.length,
+                    itemBuilder: (context, index) {
+                      final invoice = filtered[index];
+                      return Card(
+                        margin:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        child: ListTile(
+                          leading: statusIcon(invoice.status),
+                          title: Text('Számla: ${invoice.id ?? 'N/A'}'),
+                          subtitle: Text(
+                            'Összeg: ${invoice.totalAmount.toStringAsFixed(0)} Ft\n'
+                                'Lejárat: ${invoice.dueDate.toLocal().toString().split(' ')[0] ?? '-'}',
+                          ),
+                          onTap: () {
+                            context.pushNamed(
+                              AppRoute.invoiceDetaul.name,
+                              pathParameters: {
+                                "invoiceId": invoice.id as String,
+                              },
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  ),
                 );
               },
-              loading:
-                  () => Center(
-                    child:
-                        Platform.isIOS
-                            ? const CupertinoActivityIndicator()
-                            : const CircularProgressIndicator(),
-                  ),
-              error:
-                  (error, _) =>
-                      Center(child: Text('Hiba történt: ${error.toString()}')),
+              loading: () => Center(
+                child: Platform.isIOS
+                    ? const CupertinoActivityIndicator()
+                    : const CircularProgressIndicator(),
+              ),
+              error: (error, _) =>
+                  Center(child: Text('Hiba történt: ${error.toString()}')),
             ),
           ),
         ],

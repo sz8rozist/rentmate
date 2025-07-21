@@ -40,14 +40,6 @@ class ProfilView extends ConsumerWidget {
               themeMode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
         },
       ),
-      if (currentUser?.role == UserRole.landlord)
-        _ProfileCardData(
-          icon: FontAwesome.house,
-          title: 'Lakás kiválasztása',
-          onTap: () async {
-            context.goNamed(AppRoute.flatSelect.name);
-          },
-        ),
       _ProfileCardData(
         icon: FontAwesome.arrow_right_from_bracket,
         title: 'Kijelentkezés',

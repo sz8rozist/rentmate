@@ -26,19 +26,25 @@ class DocumentViewModel extends ChangeNotifier {
   }
 
   Future<void> uploadFile(File file, String category) async {
-    final url = await _service.uploadFile(file);
+    final originalName = file.path.split('/').last;
+    final storageKey = await _service.uploadFile(file);
     await _service.saveMetadata(
-      file.path.split('/').last,
-      url,
-      category,
-      flatId,
+      originalName: originalName,
+      storageKey: storageKey,
+      category: category,
+      flatId: flatId,
     );
     await loadDocuments();
   }
 
   Future<void> uploadBytes(Uint8List bytes, String name, String category) async {
-    final url = await _service.uploadBytes(bytes, name);
-    await _service.saveMetadata(name, url, category, flatId);
+    final storageKey = await _service.uploadBytes(bytes, name);
+    await _service.saveMetadata(
+      originalName: name,
+      storageKey: storageKey,
+      category: category,
+      flatId: flatId,
+    );
     await loadDocuments();
   }
 

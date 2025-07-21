@@ -2,7 +2,9 @@ class Document {
   final String id;
   final String name;
   final String url;
+  final String type;
   final String category;
+  final String filePath;
   final String flatId;
   final DateTime uploadedAt;
 
@@ -10,7 +12,9 @@ class Document {
     required this.id,
     required this.name,
     required this.url,
+    required this.type,
     required this.category,
+    required this.filePath,
     required this.flatId,
     required this.uploadedAt,
   });
@@ -20,8 +24,10 @@ class Document {
       id: map['id'],
       name: map['name'],
       url: map['url'],
+      type: map['type'],
       category: map['category'],
-      flatId: map['flatId'],
+      filePath: map['file_path'],
+      flatId: map['flat_id'],
       uploadedAt: DateTime.parse(map['uploaded_at']),
     );
   }
@@ -30,8 +36,10 @@ class Document {
     'id': id,
     'name': name,
     'url': url,
+    'type': type,
     'category': category,
-    'flatId': flatId,
+    'file_path': filePath,
+    'flat_id': flatId,
     'uploaded_at': uploadedAt.toIso8601String(),
   };
 }
