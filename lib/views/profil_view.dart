@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:icons_plus/icons_plus.dart';
-import 'package:rentmate/models/user_role.dart';
 import 'package:rentmate/routing/app_router.dart';
 
 import '../models/snackbar_message.dart';
@@ -16,7 +15,6 @@ class ProfilView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authService = ref.watch(authServiceProvider);
     final themeMode = ref.watch(themeModeProvider);
-    final currentUser = ref.watch(currentUserProvider).value;
     final List<_ProfileCardData> items = [
       _ProfileCardData(
         icon: FontAwesome.user,
@@ -46,7 +44,7 @@ class ProfilView extends ConsumerWidget {
         onTap: () async {
           final router = GoRouter.of(context); // ezt tedd ki előre
           try {
-            await authService.signOut();
+            await authService.logout();
             router.goNamed(
               AppRoute.welcome.name,
               extra: SnackBarMessage(message: 'Sikeres kijelentkezés'),

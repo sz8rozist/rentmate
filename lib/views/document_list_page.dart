@@ -155,7 +155,8 @@ class _DocumentListPageState extends ConsumerState<DocumentListPage> {
   @override
   Widget build(BuildContext context) {
     final vm = ref.watch(documentViewModelProvider(widget.flatId));
-    final currentUser = ref.watch(currentUserProvider).asData?.value;
+    final authState = ref.read(authViewModelProvider);
+    final payload = authState.asData?.value.payload;
     final filteredDocs =
         selectedCategory == "Mind"
             ? vm.documents
@@ -288,7 +289,7 @@ class _DocumentListPageState extends ConsumerState<DocumentListPage> {
                                       Icons.visibility,
                                       color: Colors.blue,
                                     ),
-                                  if (currentUser?.role == UserRole.landlord)
+                                  if (payload?.role == UserRole.landlord)
                                     IconButton(
                                       icon: const Icon(Icons.delete),
                                       color: Colors.red,

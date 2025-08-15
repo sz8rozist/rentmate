@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rentmate/models/flat_status.dart';
-import 'package:rentmate/routing/app_router.dart';
 import 'package:rentmate/widgets/custom_snackbar.dart';
 import '../viewmodels/tenant_flat_viewmodel.dart';
 import '../widgets/swipe_image_galery.dart';
@@ -34,7 +33,7 @@ class TenantFlatScreen extends ConsumerWidget {
 
           final imageProviders =
           flat.images
-              .map((img) => NetworkImage(img.imageUrl) as ImageProvider)
+              ?.map((img) => NetworkImage(img.url) as ImageProvider)
               .toList();
 
           return SafeArea(
@@ -61,15 +60,15 @@ class TenantFlatScreen extends ConsumerWidget {
                           height: 220,
                           child: ListView.separated(
                             scrollDirection: Axis.horizontal,
-                            itemCount: flat.images.length,
+                            itemCount: flat.images!.length,
                             separatorBuilder: (_, __) => const SizedBox(width: 8),
                             itemBuilder: (context, index) {
-                              final img = flat.images[index];
+                              final img = flat.images![index];
                               return GestureDetector(
                                 onTap: () {
                                   showSwipeImageGallery(
                                     context,
-                                    children: imageProviders,
+                                    children: imageProviders!,
                                     initialIndex: index,
                                     swipeDismissible: true,
                                   );
@@ -77,7 +76,7 @@ class TenantFlatScreen extends ConsumerWidget {
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(16),
                                   child: Image.network(
-                                    img.imageUrl,
+                                    img.url,
                                     width: 300,
                                     fit: BoxFit.cover,
                                   ),

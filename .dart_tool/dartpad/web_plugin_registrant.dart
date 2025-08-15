@@ -7,6 +7,7 @@
 // ignore_for_file: type=lint
 
 import 'package:app_links_web/app_links_web.dart';
+import 'package:connectivity_plus/src/connectivity_plus_web.dart';
 import 'package:file_picker/_internal/file_picker_web.dart';
 import 'package:file_saver/file_saver_web.dart';
 import 'package:flutter_keyboard_visibility_web/flutter_keyboard_visibility_web.dart';
@@ -23,6 +24,7 @@ import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 void registerPlugins([final Registrar? pluginRegistrar]) {
   final Registrar registrar = pluginRegistrar ?? webPluginRegistrar;
   AppLinksPluginWeb.registerWith(registrar);
+  ConnectivityPlusWebPlugin.registerWith(registrar);
   FilePickerWeb.registerWith(registrar);
   FileSaverWeb.registerWith(registrar);
   FlutterKeyboardVisibilityPlugin.registerWith(registrar);

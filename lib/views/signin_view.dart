@@ -1,12 +1,17 @@
+import 'dart:io';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:go_router/go_router.dart';
+import 'package:rentmate/GraphQLConfig.dart';
 import 'package:rentmate/models/user_model.dart';
 import 'package:rentmate/models/user_role.dart';
 import 'package:rentmate/routing/app_router.dart';
 import 'package:rentmate/widgets/custom_snackbar.dart';
 import 'package:rentmate/widgets/custom_text_form_field.dart';
+import '../models/auth_state.dart';
 import '../viewmodels/navigation_viewmodel.dart';
 import '../widgets/custom_scaffold.dart';
 import '../viewmodels/auth_viewmodel.dart';
@@ -35,29 +40,40 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     final authState = ref.watch(authViewModelProvider);
 
     // Figyeld az állapotváltozást, és navigálj vagy mutass hibát
-    ref.listen<AsyncValue<UserModel?>>(authViewModelProvider, (previous, next) {
+    ref.listen<AsyncValue<AuthState>>(authViewModelProvider, (previous, next) {
       next.when(
-        data: (user) {
-          if (user != null) {
+        data: (authState) {
+          print(authState.payload?.role?.value);
+          final payload = authState.payload;
+          if (payload != null) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               ref.read(bottomNavIndexProvider.notifier).state = 0;
-              if(user.role == UserRole.landlord){
+
+              if (payload.role == UserRole.landlord) {
                 context.goNamed(AppRoute.flatSelect.name);
-              }else{
-                //Albérlő mehet a home ra és itt kéne neki be állítani a selectedFlat et szerintem.
+              } else {
                 context.goNamed(AppRoute.home.name);
               }
             });
           }
         },
-        loading: () {},
+        loading: () {
+          return Center(
+            child:
+                Platform.isIOS
+                    ? const CupertinoActivityIndicator()
+                    : const CircularProgressIndicator(),
+          );
+        },
         error: (err, _) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            CustomSnackBar.error(context,err.toString());
+            print(err);
+            CustomSnackBar.error(context, err.toString());
           });
         },
       );
     });
+
     return LoadingOverlay(
       isLoading: authState.isLoading,
       child: CustomScaffold(
@@ -135,9 +151,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                             GestureDetector(
                               child: Text(
                                 'Elfelejtett jelszó?',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                             ),
                           ],
@@ -156,10 +170,9 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                                             .read(
                                               authViewModelProvider.notifier,
                                             )
-                                            .signIn(
-                                              email: _emailController.text,
-                                              password:
-                                                  _passwordController.text,
+                                            .login(
+                                              _emailController.text,
+                                              _passwordController.text,
                                             );
                                       }
                                     },
@@ -180,9 +193,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                               },
                               child: Text(
                                 'Regisztrálj',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                             ),
                           ],

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:rentmate/GraphQLConfig.dart';
 import 'package:rentmate/routing/app_router.dart';
 import 'package:rentmate/theme.dart';
 import 'package:rentmate/viewmodels/theme_provider.dart';
@@ -12,6 +14,7 @@ void main() async {
     anonKey:
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4amJ6bWJ1Y3JyaHBxa3B1c2piIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgyMzk0MzUsImV4cCI6MjA2MzgxNTQzNX0.0pvOd0CHoT54Q77FdE0gBW9g0apTJ3wkL5toEbsGoIs',
   );
+  await initHiveForFlutter(); // tároláshoz szükséges
   runApp(ProviderScope(child: MyApp()));
 }
 
@@ -25,13 +28,17 @@ class MyApp extends ConsumerWidget {
     final isDarkMode = ref.watch(
       themeModeProvider,
     ); // Riverpod state provider (lásd lentebb)
-    return MaterialApp.router(
-      debugShowCheckedModeBanner: false,
-      title: 'RentMate',
-      theme: realEstateTheme,
-      darkTheme: realEstateDarkTheme,
-      themeMode: isDarkMode,
-      routerConfig: router,
+    final graphQLClient = ref.watch(graphQLClientProvider);
+    return GraphQLProvider(
+      client: graphQLClient,
+      child: MaterialApp.router(
+        debugShowCheckedModeBanner: false,
+        title: 'RentMate',
+        theme: realEstateTheme,
+        darkTheme: realEstateDarkTheme,
+        themeMode: isDarkMode,
+        routerConfig: router,
+      ),
     );
   }
 }

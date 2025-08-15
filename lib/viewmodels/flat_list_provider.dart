@@ -2,48 +2,40 @@ import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:rentmate/models/flat_image.dart';
-import 'package:rentmate/services/auth_service.dart';
+import 'package:rentmate/services/flat_service.dart';
+
+import '../GraphQLConfig.dart';
 import '../models/flat_model.dart';
-import '../models/flat_status.dart';
-import '../models/user_model.dart';
-import '../services/flat_service.dart';
 
-final flatServiceProvider = Provider((ref) => FlatService(AuthService()));
+/// -----------------
+/// Egy lakás ViewModel
+/// -----------------
+class FlatViewModel extends StateNotifier<AsyncValue<Flat?>> {
+  final FlatService _service;
 
-final flatProvider = StateNotifierProvider.family<FlatNotifier, AsyncValue<Flat?>, String>((ref, flatId) {
-  final service = ref.read(flatServiceProvider);
-  return FlatNotifier(service, flatId);
-});
+  FlatViewModel(this._service) : super(AsyncData(null));
 
-class FlatNotifier extends StateNotifier<AsyncValue<Flat?>> {
-  final FlatService service;
-  final String flatId;
-
-  FlatNotifier(this.service, this.flatId) : super(const AsyncLoading()) {
-    _loadFlat();
-  }
-
-  Future<void> _loadFlat() async {
+  /*Future<void> loadFlat(int id) async {
     try {
-      final flat = await service.getFlatById(flatId);
-      state = AsyncData(flat);
-    } catch (e, st) {
-      state = AsyncError(e, st);
+      final flat = await _service.getFlatById(id);
+      state = flat;
+    } catch (_) {
+      state = null;
     }
-  }
+  }*/
 
   Future<List<File>?> pickImages() async {
     final picked = await ImagePicker().pickMultiImage();
 
     if (picked.isEmpty) return null;
 
-    final allowedImages = picked.where((x) {
-      final path = x.path.toLowerCase();
-      return path.endsWith('.jpg') ||
-          path.endsWith('.jpeg') ||
-          path.endsWith('.png');
-    }).toList();
+    final allowedImages =
+        picked.where((x) {
+          final path = x.path.toLowerCase();
+          return path.endsWith('.jpg') ||
+              path.endsWith('.jpeg') ||
+              path.endsWith('.png');
+        }).toList();
 
     if (allowedImages.length > 6) {
       return allowedImages.sublist(0, 6).map((x) => File(x.path)).toList();
@@ -57,97 +49,118 @@ class FlatNotifier extends StateNotifier<AsyncValue<Flat?>> {
     return picked != null ? File(picked.path) : null;
   }
 
-  Future<void> saveFlat({
-    required String address,
-    required String price,
-    required List<File> images,
-    required FlatStatus flatStatus,
-    required UserModel landlord,
-  }) async {
+  Future<Flat?> addFlat(String address, int price, int? userId) async {
+    state = AsyncValue.loading();
     try {
-      state = const AsyncLoading();
-
-      await service.saveFlatWithImages(
-        address: address,
-        price: price,
-        images: images,
-        status: flatStatus,
-        landlord: landlord,
-      );
-
-      await _loadFlat();
+      final flat = await _service.addFlat(address, price, userId);
+      state = AsyncValue.data(flat); // ha Riverpod state-et használsz
+      return flat;
     } catch (e, st) {
-      state = AsyncError(e, st);
+      state = AsyncValue.error(e, st);
+      print(e);
     }
   }
 
-  Future<void> removeFlat() async {
+  Future<void> updateFlat(int id, Flat flat) async {
+    state = AsyncValue.loading();
     try {
-      state = const AsyncLoading();
-      await service.deleteFlat(flatId);
-      state = const AsyncData(null);
+      final updatedFlat = await _service.updateFlat(id, flat);
+      state = AsyncValue.data(updatedFlat);
     } catch (e, st) {
-      state = AsyncError(e, st);
+      state = AsyncValue.error(e, st);
     }
   }
 
-  Future<void> updateFlat({
-    required String address,
-    required FlatStatus status,
-    required String price,
-  }) async {
+  Future<void> deleteFlat(int id) async {
+    state = AsyncValue.loading();
     try {
-      state = const AsyncLoading();
-
-      await service.updateFlatWithImages(
-        id: flatId,
-        address: address,
-        price: price,
-        status: status,
-      );
-
-      await _loadFlat();
+      await _service.deleteFlat(id);
+      state = AsyncValue.data(null);
     } catch (e, st) {
-      state = AsyncError(e, st);
+      state = AsyncValue.error(e, st);
     }
   }
 
-  Future<void> updateImage({
-    required List<FlatImage> retainedImageUrls,
-    List<File>? newImages,
-  }) async {
+  /// Több kép feltöltése párhuzamosan
+  Future<void> uploadImages(int flatId, List<String> filePaths) async {
+    if (filePaths.isEmpty) return;
+
+    state = AsyncValue.loading();
+
     try {
-      state = const AsyncLoading();
+      // Több kép feltöltése párhuzamosan
+      final allUploaded = await _service.uploadFlatImages(flatId, filePaths);
 
-      await service.updateImages(
-        id: flatId,
-        retainedImageUrls: retainedImageUrls,
-        newImages: newImages,
-      );
-
-      await _loadFlat();
+      if (allUploaded) {
+        final flat = await _service.getFlatById(flatId);
+        state = AsyncValue.data(flat);
+      } else {
+        throw Exception('Nem sikerült minden képet feltölteni.');
+      }
     } catch (e, st) {
-      state = AsyncError(e, st);
+      state = AsyncValue.error(e, st);
     }
   }
 
-  Future<void> addTenantToFlat(String tenantUserId) async {
+  /// Kép törlés
+  Future<void> deleteImage(int flatId, int imageId) async {
+    state = AsyncValue.loading();
     try {
-      state = const AsyncLoading();
-      await service.addTenantToFlat(flatId, tenantUserId);
-      await _loadFlat();
+      final updatedFlat = await _service.deleteFlatImage(imageId);
+      if (updatedFlat) {
+        Flat? flat = await _service.getFlatById(flatId);
+        state = AsyncValue.data(flat);
+      }
     } catch (e, st) {
-      state = AsyncError(e, st);
+      state = AsyncValue.error(e, st);
     }
   }
 
-  Future<void> removeTenantFromFlat(String tenantUserId) async {
+  /// Tenant hozzáadás
+  Future<void> addTenant(int flatId, int tenantId) async {
+    state = AsyncValue.loading();
     try {
-      state = const AsyncLoading();
-      await service.removeTenantFromFlat(flatId, tenantUserId);
-      await _loadFlat();
+      final addFlat = await _service.addTenantToFlat(flatId, tenantId);
+      if (addFlat) {
+        Flat? flat = await _service.getFlatById(flatId);
+        state = AsyncValue.data(flat);
+      }
     } catch (e, st) {
-      state = AsyncError(e, st);
+      state = AsyncValue.error(e, st);
     }
   }
+
+  /// Tenant törlés
+  Future<void> removeTenant(int flatId, int tenantId) async {
+    state = AsyncValue.loading();
+    try {
+      final updatedFlat = await _service.removeTenantFromFlat(tenantId);
+      if (updatedFlat) {
+        Flat? flat = await _service.getFlatById(flatId);
+        state = AsyncValue.data(flat);
+      }
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
+
+  void clear() => state = AsyncValue.data(null);
 }
+
+/// -----------------
+/// Service Provider
+/// -----------------
+final flatServiceProvider = Provider<FlatService>((ref) {
+  final client = ref.watch(graphQLClientProvider);
+  return FlatService(client.value);
+});
+
+/// -----------------
+/// ViewModel Providerek
+/// -----------------
+final flatViewModelProvider = StateNotifierProvider<FlatViewModel, AsyncValue<Flat?>>((
+  ref,
+) {
+  return FlatViewModel(ref.watch(flatServiceProvider));
+});
+

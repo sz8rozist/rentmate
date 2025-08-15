@@ -1,28 +1,28 @@
-enum FlatStatus { active, inactive }
+enum FlatStatus { available, rented }
 
 extension FlatStatusExtension on FlatStatus {
   String get label {
     switch (this) {
-      case FlatStatus.active:
+      case FlatStatus.available:
         return 'Szabad';
-      case FlatStatus.inactive:
+      case FlatStatus.rented:
         return 'Kiadva';
     }
   }
 
   String get value {
     switch (this) {
-      case FlatStatus.active:
-        return 'szabad';
-      case FlatStatus.inactive:
-        return 'kiadva';
+      case FlatStatus.available:
+        return 'available';
+      case FlatStatus.rented:
+        return 'rented';
     }
   }
 
   static FlatStatus? fromValue(String value) {
     return FlatStatus.values.firstWhere(
       (e) => e.value == value,
-      orElse: () => FlatStatus.active,
+      orElse: () => FlatStatus.available,
     );
   }
 }

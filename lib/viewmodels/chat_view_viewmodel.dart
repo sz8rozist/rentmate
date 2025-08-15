@@ -17,7 +17,7 @@ final flatsProvider = FutureProvider.family<List<Flat>, UserModel>((
   return service.getFlatsForCurrentUser(loggedInUser);
 });
 
-final messagesProvider = StreamProvider.family<List<MessageModel>, String>((
+final messagesProvider = StreamProvider.family<List<MessageModel>, int>((
   ref,
   flatId,
 ) {
@@ -27,10 +27,10 @@ final messagesProvider = StreamProvider.family<List<MessageModel>, String>((
 
 final sendMessageProvider = Provider<SendMessage>((ref) {
   final service = ref.watch(chatServiceProvider);
-  return (String flatId, String senderUserId, String content, List<File>? file) {
+  return (int flatId, int senderUserId, String content, List<File>? file) {
     return service.sendMessage(flatId, senderUserId, content, file);
   };
 });
 
 // Egy típusdefiníció a könnyebb használathoz
-typedef SendMessage = Future<void> Function(String flatId, String senderUserId, String content, List<File>? file);
+typedef SendMessage = Future<void> Function(int flatId, int senderUserId, String content, List<File>? file);

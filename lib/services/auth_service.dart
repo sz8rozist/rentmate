@@ -1,78 +1,86 @@
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:rentmate/GraphQLConfig.dart';
 import 'package:rentmate/models/user_model.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:rentmate/models/user_role.dart';
 
-import '../models/user_role.dart';
+import '../graphql_error.dart';
 
 class AuthService {
-  final SupabaseClient _client = Supabase.instance.client;
+  final GraphQLClient client;
+  final FlutterSecureStorage storage;
 
-  Future<void> registerUser({
-    required String email,
-    required String password,
-    required String name,
-    required UserRole role,
-  }) async {
-    final result = await _client.auth.signUp(email: email, password: password);
-    final userId = result.user?.id;
+  AuthService({required this.client, required this.storage});
 
-    if (userId == null) {
-      throw Exception('Nem sikerült regisztrálni a felhasználót.');
-    }
+  Future<String> login(String email, String password) async {
+    const mutation = r'''
+      mutation Login($email: String!, $password: String!) {
+        login(email: $email, password: $password)
+      }
+    ''';
 
-    final user = UserModel(id: userId, email: email, name: name, role: role);
-    await _client.from('users').insert(user.toJson());
-  }
-
-  Future<UserModel> signIn({
-    required String email,
-    required String password,
-  }) async {
-    final result = await _client.auth.signInWithPassword(
-      email: email,
-      password: password,
+    final result = await client.mutate(
+      MutationOptions(
+        document: gql(mutation),
+        variables: {'email': email, 'password': password},
+      ),
     );
 
-    final userId = result.user?.id;
-    if (userId == null) {
-      throw Exception('Hibás e-mail vagy jelszó.');
+    if (result.hasException) {
+      print(result);
+      throw parseGraphQLErrors(result.exception);
     }
-    // Felhasználó lekérése a saját users táblából
-    final response =
-        await _client.from('users').select().eq('id', userId).single();
+    final token = result.data?['login'];
+    if (token == null) throw Exception('Login failed');
 
-    return UserModel.fromJson(response);
+    await storage.write(key: 'access_token', value: token);
+    return token;
   }
 
-  Future<void> signOut() async {
-    try {
-      await _client.auth.signOut();
-    } catch (e) {
-      throw Exception('Kijelentkezés sikertelen: $e');
+  Future<UserModel> register(String email, String password, String name, UserRole role) async {
+    const mutation = r'''
+    mutation Register($data: RegisterInput!) {
+      register(data: $data) {
+        id
+        email
+        name
+        role
+      }
     }
+  ''';
+
+    final result = await client.mutate(
+      MutationOptions(
+        document: gql(mutation),
+        variables: {
+          'data': {
+            'email': email,
+            'role': role.value,
+            'password': password,
+            'name': name,
+          },
+        },
+      ),
+    );
+
+    if (result.hasException) {
+      print("GraphQL Exception: ${result.exception.toString()}");
+      print("Full Exception Details: ${result.exception!.graphqlErrors}");
+      throw parseGraphQLErrors(result.exception);
+    }
+
+
+    return UserModel.fromJson(result.data?['register']);
   }
 
-  User? get currentUser => _client.auth.currentUser;
+  Future<String?> getToken() async {
+    return await storage.read(key: 'access_token');
+  }
 
-  Future<UserModel> fetchUserModel(String userId) async {
-    final response =
-    await _client.from('users').select().eq('id', userId).single();
-
-    final user = UserModel.fromJson(response);
-
-    if (user.role == UserRole.tenant) {
-      final flatsResponse = await _client
-          .from('flats_for_rent')
-          .select('flat_id')
-          .eq('tenant_user_id', userId)
-          .maybeSingle();
-
-      // Ha találunk flat-et, akkor vegyük ki a flat_id-t, különben null
-      final flatId = flatsResponse != null ? flatsResponse['flat_id'] as String? : null;
-
-      return user.copyWith(flatId: flatId);
-    }
-
-    return user;
+  Future<void> logout() async {
+    await storage.delete(key: 'access_token');
   }
 
 }
+
+

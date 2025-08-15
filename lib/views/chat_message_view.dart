@@ -5,15 +5,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:rentmate/models/acces_token.dart';
 import 'package:rentmate/routing/app_router.dart';
 import 'package:rentmate/viewmodels/chat_view_viewmodel.dart';
 
 import '../viewmodels/auth_viewmodel.dart';
 import '../viewmodels/theme_provider.dart';
+import '../widgets/custom_snackbar.dart';
 import '../widgets/swipe_image_galery.dart';
 
 class ChatMessageView extends ConsumerStatefulWidget {
-  final String flatId;
+  final int flatId;
 
   const ChatMessageView({super.key, required this.flatId});
 
@@ -47,11 +49,20 @@ class _ChatMessageViewState extends ConsumerState<ChatMessageView> {
     // Ha sem kép, sem szöveg nincs, nem küldünk
     if (text.isEmpty && _imageFiles.isEmpty) return;
 
-    final user = ref.read(currentUserProvider).asData?.value;
-    if (user == null) return;
+    // Szinkron lekérés a payloadból
+    final authState = ref.read(authViewModelProvider);
+    final payload = authState.asData?.value.payload;
+
+    if (payload == null) {
+      // Ha nincs token, nem tudunk üzenetet küldeni
+      CustomSnackBar.error(context, 'Hiba: felhasználó azonosító nem elérhető');
+      return;
+    }
+
+    final userId = payload.userId;
 
     final sendMessage = ref.read(sendMessageProvider);
-    await sendMessage(widget.flatId, user.id, text, _imageFiles);
+    await sendMessage(widget.flatId, userId, text, _imageFiles);
 
     FocusScope.of(context).unfocus();
 
@@ -153,7 +164,7 @@ class _ChatMessageViewState extends ConsumerState<ChatMessageView> {
   @override
   Widget build(BuildContext context) {
     final asyncMessages = ref.watch(messagesProvider(widget.flatId));
-    final asyncUser = ref.watch(currentUserProvider);
+    final asyncUser = ref.watch(authViewModelProvider);
 
     return Scaffold(
       body: asyncUser.when(
@@ -174,7 +185,9 @@ class _ChatMessageViewState extends ConsumerState<ChatMessageView> {
                       itemCount: messages.length,
                       itemBuilder: (context, index) {
                         final message = messages[index];
-                        final isMe = message.senderUser.id == user.id;
+                        final authState = ref.read(authViewModelProvider);
+                        final payload = authState.asData?.value.payload;
+                        final isMe = message.senderUser.id == payload?.userId;
 
                         Widget messageContent;
                         final hasText = message.content.trim().isNotEmpty;

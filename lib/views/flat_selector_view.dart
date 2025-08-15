@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rentmate/routing/app_router.dart';
 
+import '../viewmodels/auth_viewmodel.dart';
 import '../viewmodels/flat_selector_viewmodel.dart';
 import '../viewmodels/theme_provider.dart';
 
@@ -11,8 +12,13 @@ class ApartmentSelectorScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final flatsAsync = ref.watch(apartmentSelectorViewModelProvider);
+    final payload = ref.read(authViewModelProvider).asData?.value.payload;
+    final userId = payload?.userId;
 
+// Biztonságos konverzió int-re
+    final intUserId = int.tryParse(userId?.toString() ?? '') ?? 0;
+
+    final flatsState = ref.watch(apartmentSelectorViewModelProvider(intUserId));
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(80 + MediaQuery.of(context).padding.top),
@@ -71,7 +77,7 @@ class ApartmentSelectorScreen extends ConsumerWidget {
           ),
         ),
       ),
-      body: flatsAsync.when(
+      body: flatsState.when(
         data: (flats) {
           if (flats.isEmpty) {
             return Center(

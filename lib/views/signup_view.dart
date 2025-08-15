@@ -25,6 +25,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _usernameController = TextEditingController();
   bool agreePersonalData = true;
 
   @override
@@ -32,6 +33,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _usernameController.dispose();
     super.dispose();
   }
 
@@ -45,26 +47,29 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
       final authViewModel = ref.read(authViewModelProvider.notifier);
 
       await authViewModel.register(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-        name: _nameController.text.trim(),
-        role: role
+        _emailController.text.trim(),
+        role,
+        _passwordController.text.trim(),
+        _nameController.text.trim(),
       );
 
       final state = ref.read(authViewModelProvider);
       state.when(
         data: (_) {
-          CustomSnackBar.success(context,"Sikeres regisztráció!");
+          CustomSnackBar.success(context, "Sikeres regisztráció!");
           context.goNamed(AppRoute.signin.name);
         },
         loading: () {},
         error: (e, _) {
-          CustomSnackBar.error(context,e.toString());
+          CustomSnackBar.error(context, e.toString());
           print(e);
         },
       );
     } else if (!agreePersonalData) {
-      CustomSnackBar.warning(context,'Kérlet fogadd el az adatkezelési feltételeket.');
+      CustomSnackBar.warning(
+        context,
+        'Kérlet fogadd el az adatkezelési feltételeket.',
+      );
     }
   }
 
@@ -98,7 +103,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                           'Kezdjük',
                           style: TextStyle(
                             fontSize: 30.0,
-                            fontWeight: FontWeight.w900
+                            fontWeight: FontWeight.w900,
                           ),
                         ),
                         const SizedBox(height: 40.0),
@@ -131,7 +136,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                         CustomTextFormField(
                           controller: _passwordController,
                           obscureText: true,
-                         validator:
+                          validator:
                               MultiValidator([
                                 RequiredValidator(
                                   errorText: 'Jelszó megadása kötelező.',
@@ -142,7 +147,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                       'A jelszónak legalább 6 karakter hosszúnak kell lennie.',
                                 ),
                               ]).call,
-                         labelText: "Jelszó",
+                          labelText: "Jelszó",
                         ),
                         const SizedBox(height: 25.0),
                         const SizedBox(height: 16),
@@ -193,7 +198,8 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                 text: TextSpan(
                                   children: [
                                     const TextSpan(
-                                      text: 'Elfogadom a személyes adatok kezelését',
+                                      text:
+                                          'Elfogadom a személyes adatok kezelését',
                                       style: TextStyle(color: Colors.black45),
                                     ),
                                   ],
@@ -230,9 +236,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                   () => context.goNamed(AppRoute.signin.name),
                               child: Text(
                                 'Jelentkezz be',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                             ),
                           ],

@@ -13,7 +13,7 @@ class ChatService {
   final SupabaseClient _client = Supabase.instance.client;
 
   Future<List<Flat>> getFlatsForCurrentUser(UserModel currentUser) async {
-    if (currentUser.role?.value == "landlord") {
+   /* if (currentUser.role?.value == "landlord") {
       final response = await _client
           .from('flats')
           .select(
@@ -34,12 +34,12 @@ class ChatService {
         final flatJson = e['flat'] as Map<String, dynamic>;
         return Flat.fromJson(flatJson);
       }).toList();
-    }
+    }*/
 
     return List.empty();
   }
 
-  Stream<List<MessageModel>> subscribeToMessages(String flatId) async* {
+  Stream<List<MessageModel>> subscribeToMessages(int flatId) async* {
     // 1. Először figyeld a messages táblát realtime-ban
     await for (final data in _client
         .from('messages')
@@ -107,8 +107,8 @@ class ChatService {
 
   // Üzenet küldés
   Future<void> sendMessage(
-    String flatId,
-    String senderUserId,
+    int flatId,
+    int senderUserId,
     String content,
     List<File>? files,
   ) async {

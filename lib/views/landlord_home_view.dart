@@ -50,16 +50,21 @@ class _LandlordHomeViewState extends ConsumerState<LandlordHomeView> {
           paramValue: selectedFlat.id.toString(),
         ),
       ],
-      'Számlázás': [
+      'Pénzügyek': [
         MenuItem(
-          'Számlák megtekintése',
+          'Tranzakciók',
           Icons.receipt_long,
           AppRoute.invoices,
         ),
         MenuItem(
-          'Számla készítés',
-          Icons.note_add,
-          AppRoute.newInvoice,
+          'Kaució kezelése',
+          Icons.receipt_long,
+          AppRoute.invoices,
+        ),
+        MenuItem(
+          'Javítási/Karbantartási költségek kezelése',
+          Icons.receipt_long,
+          AppRoute.invoices,
         ),
       ],
     };

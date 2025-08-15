@@ -1,17 +1,15 @@
 class FlatImage {
-  final String? id;
-  final String? flatId;
-  final String imageUrl;
-  final String imagePath;
+  final int? id;
+  final int? flatId;
+  final String url;
 
-  FlatImage({this.id, this.flatId, required this.imageUrl, required this.imagePath});
+  FlatImage({this.id, this.flatId, required this.url});
 
   factory FlatImage.fromJson(Map<String, dynamic> json) {
     return FlatImage(
-      id: json['id'] as String,
-      flatId: json['flat_id'] as String,
-      imageUrl: json['image_url'] as String,
-      imagePath: json['image_path'] as String
+      id: json['id'],
+      flatId: json['flat_id'],
+      url: json['url'] as String,
     );
   }
 
@@ -19,8 +17,7 @@ class FlatImage {
     return {
       'id': id,
       'flat_id': flatId,
-      'image_url': imageUrl,
-      'image_path': imagePath
+      'url': url,
     };
   }
 }

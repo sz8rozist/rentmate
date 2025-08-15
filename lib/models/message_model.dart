@@ -30,6 +30,17 @@ class MessageModel {
     );
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'flat_id': flatId,
+      'sender_user': senderUser.toJson(),
+      'content': content,
+      'created_at': createdAt.toIso8601String(),
+      'image_urls': jsonEncode(imageUrls),
+    };
+  }
+
   List<String> get imageUrls {
     if (imageUrl == null || imageUrl!.isEmpty) {
       return [];

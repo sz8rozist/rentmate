@@ -38,7 +38,7 @@ class _ShellScaffoldState extends ConsumerState<ShellScaffold> {
     super.dispose();
   }
 
-  String getTitleFromState(BuildContext context, UserModel user) {
+  String getTitleFromState(BuildContext context, UserRole role) {
     final location = GoRouter.of(context).state.matchedLocation;
     final routeNameString = location.split('/').where((e) => e.isNotEmpty).firstOrNull ?? 'notFound';
 print(location);
@@ -48,7 +48,7 @@ print(routeNameString);
       orElse: () => AppRoute.notFound,
     );
     print(route);
-    return route.title(user);
+    return route.title(role);
   }
 
   // SidebarX téma beállítások
@@ -130,7 +130,7 @@ print(routeNameString);
     );
   }
 
-  List<SidebarXItem> _getSidebarXItems(UserModel currentUser, String flatId) {
+  List<SidebarXItem> _getSidebarXItems(UserRole role, String flatId) {
     final List<SidebarXItem> items = [
       SidebarXItem(
         icon: FontAwesome.house,
@@ -155,7 +155,7 @@ print(routeNameString);
       ),
     ];
 
-    if (currentUser.role == UserRole.landlord) {
+    if (role == UserRole.landlord) {
       items.addAll([
         SidebarXItem(
           icon: FontAwesome.house_user,
@@ -227,16 +227,13 @@ print(routeNameString);
 
   @override
   Widget build(BuildContext context) {
-    final currentUser = ref.watch(currentUserProvider).value;
+    final authState = ref.read(authViewModelProvider);
+    final payload = authState.asData?.value.payload;
     final selectedFlat = ref.watch(selectedFlatProvider);
     if(selectedFlat == null){
       return const SizedBox();
     }
     final flatId = selectedFlat.id;
-    if (currentUser == null) {
-      return const SizedBox(); // Vagy egy loading indicator
-    }
-
     final isSmallScreen =
         MediaQuery.of(context).size.width <
         768; // Definiáljuk a reszponzivitáshoz
@@ -283,7 +280,7 @@ print(routeNameString);
                           child: Text(
                             getTitleFromState(
                               context,
-                              currentUser,
+                              payload?.role as UserRole,
                             ),
                             style: const TextStyle(
                               color: Colors.white,
@@ -335,7 +332,7 @@ print(routeNameString);
                   );
                 },
                 footerDivider: const Divider(),
-                items: _getSidebarXItems(currentUser, flatId as String),
+                items: _getSidebarXItems(payload?.role as UserRole, flatId.toString()),
               )
               : null, // Nagy képernyőn nincs Drawer
 
@@ -361,7 +358,7 @@ print(routeNameString);
                 );
               },
               footerDivider: const Divider(),
-              items: _getSidebarXItems(currentUser, flatId as String),
+              items: _getSidebarXItems(payload?.role as UserRole, flatId.toString()),
             ),
           Expanded(
             child: Column(
@@ -394,7 +391,7 @@ print(routeNameString);
                             child: Text(
                               getTitleFromState(
                                 context,
-                                currentUser,
+                                payload?.role as UserRole,
                               ),
                               style: const TextStyle(
                                 color: Colors.white,

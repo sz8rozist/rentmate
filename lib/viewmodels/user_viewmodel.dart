@@ -15,7 +15,7 @@ final tenantListProvider =
 class TenantListNotifier extends StateNotifier<AsyncValue<List<UserModel>>> {
   final UserService service;
   List<UserModel> _allTenants = [];
-  List<String> excludedTenantIds = [];
+  List<int> excludedTenantIds = [];
 
   TenantListNotifier(this.service) : super(const AsyncLoading()) {
     loadTenants();
@@ -36,12 +36,12 @@ class TenantListNotifier extends StateNotifier<AsyncValue<List<UserModel>>> {
     state = AsyncData(filtered);
   }
 
-  void excludeTenant(String tenantId) {
+  void excludeTenant(int tenantId) {
     excludedTenantIds.add(tenantId);
     _filterAndEmit();
   }
 
-  void includeTenant(String tenantId) {
+  void includeTenant(int tenantId) {
     excludedTenantIds.remove(tenantId);
     _filterAndEmit();
   }

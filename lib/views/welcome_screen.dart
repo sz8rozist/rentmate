@@ -42,8 +42,8 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
       return;
     }
 
-    final user = await ref.read(currentUserProvider.future);
-    if (user == null) return;
+    final authState = ref.read(authViewModelProvider);
+    final payload = authState.asData?.value.payload;
 
     int attempts = 0;
     const int maxAttempts = 3;
@@ -59,7 +59,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
         );
 
         if (authenticated && mounted) {
-          if(user.role == UserRole.landlord){
+          if(payload?.role == UserRole.landlord){
             context.goNamed(AppRoute.flatSelect.name);
           }else{
             //Albérlő mehet a home ra és itt kéne neki be állítani a selectedFlat et szerintem.

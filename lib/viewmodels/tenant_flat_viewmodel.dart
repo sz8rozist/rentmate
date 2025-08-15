@@ -1,20 +1,18 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
+import '../GraphQLConfig.dart';
 import '../models/flat_model.dart';
 import '../services/flat_service.dart';
-import 'auth_viewmodel.dart';
 
 class TenantFlatViewModel extends StateNotifier<AsyncValue<Flat?>> {
   final FlatService _service;
-  final String tenantUserId;
 
-  TenantFlatViewModel(this._service, this.tenantUserId)
-    : super(const AsyncValue.loading()) {
-    _fetchFlat();
-  }
+  TenantFlatViewModel(this._service)
+    : super(const AsyncValue.data(null));
 
-  Future<void> _fetchFlat() async {
+  Future<void> _fetchFlat(int id) async {
     try {
-      final flat = await _service.fetchFlatForTenant(tenantUserId);
+      final flat = await _service.getFlatForTenant(id);
       state = AsyncValue.data(flat);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -33,20 +31,14 @@ class TenantFlatViewModel extends StateNotifier<AsyncValue<Flat?>> {
   }*/
 }
 
-// Provider a SupabaseClient-et használva (feltételezve Supabase inicializálva van máshol)
 final flatServiceProvider = Provider<FlatService>((ref) {
-  final authService = ref.watch(authServiceProvider);
-  return FlatService(authService);
+  final client = ref.watch(graphQLClientProvider);
+  return FlatService(client.value);
 });
 
-final tenantUserIdProvider = Provider<String>((ref) {
-  final currentUser = ref.watch(currentUserProvider).value;
-  return currentUser?.id as String;
-});
 
 final tenantFlatViewModelProvider =
     StateNotifierProvider<TenantFlatViewModel, AsyncValue<Flat?>>((ref) {
       final service = ref.watch(flatServiceProvider);
-      final userId = ref.watch(tenantUserIdProvider);
-      return TenantFlatViewModel(service, userId);
+      return TenantFlatViewModel(service);
     });

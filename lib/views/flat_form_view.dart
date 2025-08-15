@@ -39,14 +39,13 @@ class _FlatFormViewState extends ConsumerState<FlatFormView> {
 
   @override
   Widget build(BuildContext context) {
-    final asyncUser = ref.read(currentUserProvider);
-    final user = asyncUser.asData?.value;
     final selectedFlat = ref.read(selectedFlatProvider);
 
-    final flatState = selectedFlat != null
-        ? ref.watch(flatProvider(selectedFlat.id as String))
-        : AsyncValue<Flat?>.data(null);
-    final flatVM = ref.read(flatProvider(selectedFlat?.id as String).notifier);
+    final flatState =
+        selectedFlat != null
+            ? ref.watch(flatViewModelProvider)
+            : AsyncValue<Flat?>.data(null);
+    final flatVM = ref.read(flatViewModelProvider.notifier);
 
     return Scaffold(
       appBar: PreferredSize(
@@ -59,11 +58,20 @@ class _FlatFormViewState extends ConsumerState<FlatFormView> {
             fit: StackFit.expand,
             children: [
               Image.asset('assets/images/header-image.png', fit: BoxFit.cover),
-              Container(color: ref.watch(themeModeProvider) == ThemeMode.dark ? Colors.black.withOpacity(0.5) : Colors.black.withOpacity(0.2),
+              Container(
+                color:
+                    ref.watch(themeModeProvider) == ThemeMode.dark
+                        ? Colors.black.withOpacity(0.5)
+                        : Colors.black.withOpacity(0.2),
               ),
               // A tartalmat beljebb húzzuk, hogy ne lógjon be a status bar területére
               Padding(
-                padding: EdgeInsets.fromLTRB(60, MediaQuery.of(context).padding.top, 16, 0),
+                padding: EdgeInsets.fromLTRB(
+                  60,
+                  MediaQuery.of(context).padding.top,
+                  16,
+                  0,
+                ),
                 child: Align(
                   alignment: Alignment.center,
                   child: Text(
@@ -89,7 +97,7 @@ class _FlatFormViewState extends ConsumerState<FlatFormView> {
                 bottom: 0,
                 child: IconButton(
                   icon: const Icon(Icons.arrow_back, color: Colors.white),
-                  onPressed: () => context.goNamed(AppRoute.home.name),
+                  onPressed: () => context.goNamed(AppRoute.flatSelect.name),
                   padding: const EdgeInsets.all(16),
                   constraints: const BoxConstraints(),
                 ),
@@ -99,7 +107,7 @@ class _FlatFormViewState extends ConsumerState<FlatFormView> {
         ),
       ),
       body: LoadingOverlay(
-        isLoading: flatState.isLoading || user == null,
+        isLoading: flatState.isLoading,
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Form(
@@ -160,7 +168,8 @@ class _FlatFormViewState extends ConsumerState<FlatFormView> {
                                               selectedImages.length >
                                           6) {
                                         CustomSnackBar.error(
-                                          context,"Legfeljebb 6 képet tölthetsz fel.",
+                                          context,
+                                          "Legfeljebb 6 képet tölthetsz fel.",
                                         );
                                         return;
                                       }
@@ -183,14 +192,16 @@ class _FlatFormViewState extends ConsumerState<FlatFormView> {
                                           ext.endsWith('.jpeg') ||
                                           ext.endsWith('.png'))) {
                                         CustomSnackBar.error(
-                                          context,"Csak JPG vagy PNG képek engedélyezettek.",
+                                          context,
+                                          "Csak JPG vagy PNG képek engedélyezettek.",
                                         );
                                         return;
                                       }
 
                                       if (selectedImages.length >= 6) {
                                         CustomSnackBar.error(
-                                          context,"Legfeljebb 6 képet tölthetsz fel.",
+                                          context,
+                                          "Legfeljebb 6 képet tölthetsz fel.",
                                         );
                                         return;
                                       }
@@ -258,18 +269,37 @@ class _FlatFormViewState extends ConsumerState<FlatFormView> {
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
                       if (selectedImages.isEmpty) {
-                        CustomSnackBar.error(context,"Legalább egy képet válassz!");
+                        CustomSnackBar.error(
+                          context,
+                          "Legalább egy képet válassz!",
+                        );
                         return;
                       }
+                      final authState = ref.read(authViewModelProvider);
+                      final payload = authState.asData?.value.payload;
 
-                      await flatVM.saveFlat(
-                        address: _addressController.text.trim(),
-                        price: _priceController.text.trim(),
-                        images: selectedImages,
-                        flatStatus: FlatStatus.active,
-                        landlord: user as UserModel,
+                      final addedFlat = await flatVM.addFlat(
+                        _addressController.text.trim(),
+                        int.parse(_priceController.text.trim()),
+                        payload?.userId,
                       );
-                      Navigator.pop(context);
+
+                      print(addedFlat);
+                      if (addedFlat != null) {
+                        final flatId = addedFlat.id;
+                        await flatVM.uploadImages(
+                          flatId as int,
+                          selectedImages.map((file) => file.path).toList(),
+                        );
+                      } else {
+                        CustomSnackBar.error(
+                          context,
+                          "Hiba történt a lakás hozzáadásakor.",
+                        );
+                      }
+
+                      // Visszairányítás
+                      context.goNamed(AppRoute.flatSelect.name);
                     }
                   },
                   child: const Text('Mentés'),
