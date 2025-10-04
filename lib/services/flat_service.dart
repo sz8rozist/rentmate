@@ -1,20 +1,17 @@
+import 'dart:io';
+
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:http/http.dart';
 import 'package:rentmate/models/flat_model.dart';
 
 import '../graphql_error.dart';
-import '../models/flat_status.dart';
 
 class FlatService {
   final GraphQLClient client;
 
   FlatService(this.client);
 
-  Future<Flat?> addFlat(
-    String address,
-    int price,
-    int? landlordId,
-  ) async {
+  Future<Flat> addFlat(String address, int price, int? landlordId) async {
     const mutation = r'''
       mutation AddFlat($data: FlatRequestInput!) {
   addFlat(data: $data) {
@@ -25,7 +22,7 @@ class FlatService {
     images {
       id
       url
-      path
+      filename
     }
   }
 }
@@ -49,41 +46,40 @@ class FlatService {
       throw parseGraphQLErrors(result.exception);
     }
 
-    return result.data?['addFlat'] != null
-        ? Flat.fromJson(result.data!['addFlat'])
-        : null;
+    return Flat.fromJson(result.data!['addFlat']);
   }
 
-  Future<bool> uploadFlatImages(int flatId, List<String> filePaths) async {
-    if (filePaths.isEmpty) return false;
-
+  Future<bool> uploadSingleImage(int flatId, String filePath) async {
     const mutation = r'''
-      mutation UploadFlatImages($flatId: Int!, $images: [Upload!]!) {
-        uploadFlatImages(flatId: $flatId, images: $images)
-      }
-    ''';
+    mutation UploadFlatImage($flatId: Int!, $image: Upload!) {
+      uploadFlatImage(flatId: $flatId, image: $image)
+    }
+  ''';
+    final fileExists = await File(filePath).exists();
+    if (!fileExists) {
+      print("Fájl nem található: $filePath");
+      return false;
+    }
 
-    // MultipartFile objektumok listája
-    final files = await Future.wait(filePaths.map((path) async {
-      return await MultipartFile.fromPath(
-        'images', // Fontos: a GraphQL paraméter neve
-        path,
-        filename: path.split('/').last,
-      );
-    }));
+    final file = await MultipartFile.fromPath(
+      'image', // Fontos: a GraphQL paraméter neve
+      filePath,
+      filename: filePath.split('/').last,
+    );
 
     final result = await client.mutate(
       MutationOptions(
         document: gql(mutation),
-        variables: {'flatId': flatId, 'images': files},
-      ),
-    );
+        variables: {'flatId': flatId, 'image': file},
+        ),
+      );
 
     if (result.hasException) {
+      print(result.exception);
       throw parseGraphQLErrors(result.exception);
     }
 
-    return result.data?['uploadFlatImages'] ?? false;
+    return result.data?['uploadFlatImage'] ?? false;
   }
 
   Future<bool> deleteFlatImage(int imageId) async {
@@ -98,7 +94,7 @@ class FlatService {
     return result.data?['deleteFlatImage'] ?? false;
   }
 
-  Future<Flat?> updateFlat(int flatId, Flat flat) async {
+  Future<Flat> updateFlat(int flatId, Flat flat) async {
     const mutation = r'''
       mutation UpdateFlat($flatId: Int!, $data: FlatRequestInput!) {
         updateFlat(flatId: $flatId, data: $data) {
@@ -122,12 +118,10 @@ class FlatService {
 
     if (result.hasException) {
       print(result.exception.toString());
-      return null;
+      throw parseGraphQLErrors(result.exception);
     }
 
-    return result.data?['updateFlat'] != null
-        ? Flat.fromJson(result.data!['updateFlat'])
-        : null;
+    return Flat.fromJson(result.data!['updateFlat']);
   }
 
   Future<bool> deleteFlat(int flatId) async {
@@ -172,7 +166,7 @@ class FlatService {
     return result.data?['removeTenantFromFlat'] ?? false;
   }
 
-  Future<Flat?> getFlatById(int id) async {
+  Future<Flat> getFlatById(int id) async {
     const query = r'''
       query FlatById($id: Int!) {
         flatById(id: $id) {
@@ -204,7 +198,6 @@ class FlatService {
     }
 
     final data = result.data?['flatById'];
-    if (data == null) return null;
     return Flat.fromJson(data);
   }
 

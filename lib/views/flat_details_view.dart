@@ -13,6 +13,7 @@ import '../models/flat_image.dart';
 import '../models/flat_model.dart';
 import '../models/flat_status.dart';
 import '../models/user_model.dart';
+import '../viewmodels/auth_viewmodel.dart';
 import '../viewmodels/flat_list_provider.dart';
 import '../viewmodels/flat_selector_viewmodel.dart';
 import '../viewmodels/user_viewmodel.dart';
@@ -163,8 +164,11 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView>
       price: _priceController.text as int,
       status: _selectedFlatStatus!,
     );
+    final authState = ref.read(authViewModelProvider);
+    final payload = authState.asData?.value.payload;
+
     await ref
-        .read(flatViewModelProvider.notifier)
+        .read(flatSelectorViewModelProvider(payload?.userId).notifier)
         .updateFlat(flatId as int, flat);
     // It's generally better to pop after a successful operation is confirmed by the provider.
     if (mounted) {

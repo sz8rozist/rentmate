@@ -7,18 +7,31 @@ import '../viewmodels/auth_viewmodel.dart';
 import '../viewmodels/flat_selector_viewmodel.dart';
 import '../viewmodels/theme_provider.dart';
 
-class ApartmentSelectorScreen extends ConsumerWidget {
+class ApartmentSelectorScreen extends ConsumerStatefulWidget {
   const ApartmentSelectorScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final payload = ref.read(authViewModelProvider).asData?.value.payload;
-    final userId = payload?.userId;
+  ConsumerState<ApartmentSelectorScreen> createState() =>
+      _ApartmentSelectorScreenState();
+}
 
-// Biztonságos konverzió int-re
-    final intUserId = int.tryParse(userId?.toString() ?? '') ?? 0;
+class _ApartmentSelectorScreenState
+    extends ConsumerState<ApartmentSelectorScreen> {
+  @override
+  void initState() {
+    super.initState();
+  }
 
-    final flatsState = ref.watch(apartmentSelectorViewModelProvider(intUserId));
+  @override
+  Widget build(BuildContext context) {
+    final authState = ref.read(authViewModelProvider);
+    final payload = authState.asData?.value.payload;
+    final flatsState = ref.watch(
+      flatSelectorViewModelProvider(payload?.userId),
+    );
+
+    print(flatsState.value?.length);
+
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(80 + MediaQuery.of(context).padding.top),
@@ -32,9 +45,9 @@ class ApartmentSelectorScreen extends ConsumerWidget {
               Image.asset('assets/images/header-image.png', fit: BoxFit.cover),
               Container(
                 color:
-                ref.watch(themeModeProvider) == ThemeMode.dark
-                    ? Colors.black.withOpacity(0.5)
-                    : Colors.black.withOpacity(0.2),
+                    ref.watch(themeModeProvider) == ThemeMode.dark
+                        ? Colors.black.withOpacity(0.5)
+                        : Colors.black.withOpacity(0.2),
               ),
               Padding(
                 padding: EdgeInsets.fromLTRB(
@@ -62,23 +75,13 @@ class ApartmentSelectorScreen extends ConsumerWidget {
                   ),
                 ),
               ),
-              /*Positioned(
-                left: 0,
-                top: MediaQuery.of(context).padding.top,
-                bottom: 0,
-                child: IconButton(
-                  icon: const Icon(Icons.arrow_back, color: Colors.white),
-                  onPressed: () => context.goNamed(AppRoute.invoices.name),
-                  padding: const EdgeInsets.all(16),
-                  constraints: const BoxConstraints(),
-                ),
-              )*/
             ],
           ),
         ),
       ),
       body: flatsState.when(
         data: (flats) {
+          print("UI flats count: ${flats.length}");
           if (flats.isEmpty) {
             return Center(
               child: Column(

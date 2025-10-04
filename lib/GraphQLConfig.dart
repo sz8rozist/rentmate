@@ -1,12 +1,16 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
+String get host => Platform.isAndroid ? '10.0.2.2' : 'localhost';
+
 final tokenProvider = StateProvider<String?>((ref) => null);
 final graphQLClientProvider = Provider<ValueNotifier<GraphQLClient>>((ref) {
   final token = ref.watch(tokenProvider);
+  final httpLink = HttpLink('http://$host:3000/graphql');
 
-  final httpLink = HttpLink('http://localhost:3000/graphql');
   Link link = httpLink;
 
   if (token != null && token.isNotEmpty) {

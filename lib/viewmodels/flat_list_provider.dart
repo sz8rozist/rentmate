@@ -49,59 +49,6 @@ class FlatViewModel extends StateNotifier<AsyncValue<Flat?>> {
     return picked != null ? File(picked.path) : null;
   }
 
-  Future<Flat?> addFlat(String address, int price, int? userId) async {
-    state = AsyncValue.loading();
-    try {
-      final flat = await _service.addFlat(address, price, userId);
-      state = AsyncValue.data(flat); // ha Riverpod state-et használsz
-      return flat;
-    } catch (e, st) {
-      state = AsyncValue.error(e, st);
-      print(e);
-    }
-  }
-
-  Future<void> updateFlat(int id, Flat flat) async {
-    state = AsyncValue.loading();
-    try {
-      final updatedFlat = await _service.updateFlat(id, flat);
-      state = AsyncValue.data(updatedFlat);
-    } catch (e, st) {
-      state = AsyncValue.error(e, st);
-    }
-  }
-
-  Future<void> deleteFlat(int id) async {
-    state = AsyncValue.loading();
-    try {
-      await _service.deleteFlat(id);
-      state = AsyncValue.data(null);
-    } catch (e, st) {
-      state = AsyncValue.error(e, st);
-    }
-  }
-
-  /// Több kép feltöltése párhuzamosan
-  Future<void> uploadImages(int flatId, List<String> filePaths) async {
-    if (filePaths.isEmpty) return;
-
-    state = AsyncValue.loading();
-
-    try {
-      // Több kép feltöltése párhuzamosan
-      final allUploaded = await _service.uploadFlatImages(flatId, filePaths);
-
-      if (allUploaded) {
-        final flat = await _service.getFlatById(flatId);
-        state = AsyncValue.data(flat);
-      } else {
-        throw Exception('Nem sikerült minden képet feltölteni.');
-      }
-    } catch (e, st) {
-      state = AsyncValue.error(e, st);
-    }
-  }
-
   /// Kép törlés
   Future<void> deleteImage(int flatId, int imageId) async {
     state = AsyncValue.loading();

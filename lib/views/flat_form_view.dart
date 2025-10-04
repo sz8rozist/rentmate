@@ -97,7 +97,9 @@ class _FlatFormViewState extends ConsumerState<FlatFormView> {
                 bottom: 0,
                 child: IconButton(
                   icon: const Icon(Icons.arrow_back, color: Colors.white),
-                  onPressed: () => context.goNamed(AppRoute.flatSelect.name),
+                  onPressed: () => {
+                    context.goNamed(AppRoute.flatSelect.name),
+                  },
                   padding: const EdgeInsets.all(16),
                   constraints: const BoxConstraints(),
                 ),
@@ -278,7 +280,7 @@ class _FlatFormViewState extends ConsumerState<FlatFormView> {
                       final authState = ref.read(authViewModelProvider);
                       final payload = authState.asData?.value.payload;
 
-                      final addedFlat = await flatVM.addFlat(
+                      final addedFlat = await ref.read(flatSelectorViewModelProvider(payload?.userId).notifier).addFlat(
                         _addressController.text.trim(),
                         int.parse(_priceController.text.trim()),
                         payload?.userId,
@@ -287,7 +289,7 @@ class _FlatFormViewState extends ConsumerState<FlatFormView> {
                       print(addedFlat);
                       if (addedFlat != null) {
                         final flatId = addedFlat.id;
-                        await flatVM.uploadImages(
+                        await ref.read(flatSelectorViewModelProvider(payload?.userId).notifier).uploadImages(
                           flatId as int,
                           selectedImages.map((file) => file.path).toList(),
                         );
