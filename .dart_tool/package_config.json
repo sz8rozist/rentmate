@@ -387,7 +387,7 @@
     },
     {
       "name": "flutter_slidable",
-      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/flutter_slidable-4.0.1",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/flutter_slidable-4.0.3",
       "packageUri": "lib/",
       "languageVersion": "3.6"
     },
@@ -675,9 +675,9 @@
     },
     {
       "name": "local_auth_platform_interface",
-      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/local_auth_platform_interface-1.0.10",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/local_auth_platform_interface-1.1.0",
       "packageUri": "lib/",
-      "languageVersion": "3.0"
+      "languageVersion": "3.7"
     },
     {
       "name": "local_auth_windows",
@@ -945,7 +945,7 @@
     },
     {
       "name": "postgrest",
-      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/postgrest-2.4.2",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/postgrest-2.5.0",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
@@ -969,7 +969,7 @@
     },
     {
       "name": "realtime_client",
-      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/realtime_client-2.5.2",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/realtime_client-2.5.3",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
@@ -1011,9 +1011,9 @@
     },
     {
       "name": "shared_preferences_android",
-      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/shared_preferences_android-2.4.13",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/shared_preferences_android-2.4.14",
       "packageUri": "lib/",
-      "languageVersion": "3.7"
+      "languageVersion": "3.9"
     },
     {
       "name": "shared_preferences_foundation",
@@ -1107,13 +1107,13 @@
     },
     {
       "name": "supabase",
-      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/supabase-2.9.1",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/supabase-2.9.2",
       "packageUri": "lib/",
       "languageVersion": "3.3"
     },
     {
       "name": "supabase_flutter",
-      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/supabase_flutter-2.10.1",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/supabase_flutter-2.10.2",
       "packageUri": "lib/",
       "languageVersion": "3.3"
     },
@@ -1155,7 +1155,7 @@
     },
     {
       "name": "url_launcher_android",
-      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/url_launcher_android-6.3.22",
+      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/url_launcher_android-6.3.23",
       "packageUri": "lib/",
       "languageVersion": "3.9"
     },

@@ -1,36 +1,56 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:rentmate/models/user_model.dart';
-import 'package:rentmate/services/chat_service.dart';
-
-import '../models/flat_model.dart';
+import '../GraphQLConfig.dart';
 import '../models/message_model.dart';
+import '../services/chat_service.dart';
 
-final chatServiceProvider = Provider((ref) => ChatService());
-
-final flatsProvider = FutureProvider.family<List<Flat>, UserModel>((
-  ref,
-  loggedInUser,
-) {
-  final service = ref.watch(chatServiceProvider);
-  return service.getFlatsForCurrentUser(loggedInUser);
+final chatViewModelProvider =
+    StateNotifierProvider.family<ChatViewModel, List<MessageModel>, int>((
+      ref,
+      flatId,
+    ) {
+      final service = ref.watch(chatServiceProvider);
+      return ChatViewModel(service, flatId);
+    });
+final chatServiceProvider = Provider<ChatService>((ref) {
+  final client = ref.watch(graphQLClientProvider);
+  return ChatService(client.value);
 });
 
-final messagesProvider = StreamProvider.family<List<MessageModel>, int>((
-  ref,
-  flatId,
-) {
-  final service = ref.watch(chatServiceProvider);
-  return service.subscribeToMessages(flatId);
-});
+class ChatViewModel extends StateNotifier<List<MessageModel>> {
+  final ChatService _service;
+  final int flatId;
+  StreamSubscription<MessageModel>? _subscription;
 
-final sendMessageProvider = Provider<SendMessage>((ref) {
-  final service = ref.watch(chatServiceProvider);
-  return (int flatId, int senderUserId, String content, List<File>? file) {
-    return service.sendMessage(flatId, senderUserId, content, file);
-  };
-});
+  ChatViewModel(this._service, this.flatId) : super([]) {
+    _init();
+  }
 
-// Egy típusdefiníció a könnyebb használathoz
-typedef SendMessage = Future<void> Function(int flatId, int senderUserId, String content, List<File>? file);
+  Future<void> _init() async {
+    //Betöltjük a teljes listát
+    final initialMessages = await _service.fetchInitialMessages(flatId);
+    state = initialMessages;
+
+    //Elindítjuk a Subscription-t a valós idejű üzenetekhez
+    _subscription = _service.subscribeToMessages(flatId).listen((newMessage) {
+      state = [...state, newMessage]; // hozzáadjuk az új üzenetet
+    });
+  }
+
+  //Üzenet küldés
+  Future<void> sendMessage(
+    int senderUserId,
+    String content,
+    List<File>? files,
+  ) async {
+    await _service.sendMessage(flatId, senderUserId, content, files);
+  }
+
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    super.dispose();
+  }
+}
