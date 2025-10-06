@@ -1,16 +1,11 @@
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:rentmate/models/acces_token.dart';
-import 'package:rentmate/routing/app_router.dart';
 import 'package:rentmate/viewmodels/chat_view_viewmodel.dart';
 
 import '../viewmodels/auth_viewmodel.dart';
-import '../viewmodels/theme_provider.dart';
 import '../widgets/custom_snackbar.dart';
 import '../widgets/swipe_image_galery.dart';
 

@@ -9,13 +9,11 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f7c025f7-f5d1-49bb-9496-3d397e9e2c84" name="Changes" comment="Javítások">
-      <change beforePath="$PROJECT_DIR$/.dart_tool/package_config.json" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/package_config.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.flutter-plugins-dependencies" beforeDir="false" afterPath="$PROJECT_DIR$/.flutter-plugins-dependencies" afterDir="false" />
+    <list default="true" id="f7c025f7-f5d1-49bb-9496-3d397e9e2c84" name="Changes" comment="Chat funkció nest js backendel">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/services/chat_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/services/chat_service.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/viewmodels/chat_view_viewmodel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/viewmodels/chat_view_viewmodel.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/services/user_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/services/user_service.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/viewmodels/tenant_flat_viewmodel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/viewmodels/tenant_flat_viewmodel.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/viewmodels/user_viewmodel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/viewmodels/user_viewmodel.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -418,7 +416,15 @@
       <option name="project" value="LOCAL" />
       <updated>1759607938665</updated>
     </task>
-    <option name="localTasksCounter" value="40" />
+    <task id="LOCAL-00040" summary="Chat funkció nest js backendel">
+      <option name="closed" value="true" />
+      <created>1759779617114</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1759779617114</updated>
+    </task>
+    <option name="localTasksCounter" value="41" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -433,7 +439,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Lakásaim menü, bejelentkezés role alapján, regisztráció role alapján" />
     <MESSAGE value="Kamera használat, kép galéria használat, Új lakás hozzáadás megkezdése" />
     <MESSAGE value="Lakás hozzáadás db-be, lakások listázása db ből" />
     <MESSAGE value="Lakás részletek oldal" />
@@ -458,6 +463,7 @@
     <MESSAGE value="Számla részletek javítás" />
     <MESSAGE value="graphql és nest js backend bevezetés" />
     <MESSAGE value="Javítások" />
-    <option name="LAST_COMMIT_MESSAGE" value="Javítások" />
+    <MESSAGE value="Chat funkció nest js backendel" />
+    <option name="LAST_COMMIT_MESSAGE" value="Chat funkció nest js backendel" />
   </component>
 </project>

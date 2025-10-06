@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rentmate/models/flat_status.dart';
 import 'package:rentmate/widgets/custom_snackbar.dart';
+import '../viewmodels/auth_viewmodel.dart';
 import '../viewmodels/tenant_flat_viewmodel.dart';
 import '../widgets/swipe_image_galery.dart';
 
@@ -14,8 +15,11 @@ class TenantFlatScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final flatAsync = ref.watch(tenantFlatViewModelProvider);
-
+    final authState = ref.read(authViewModelProvider);
+    final payload = authState.asData?.value.payload;
+    final flatAsync = ref.watch(
+      tenantFlatViewModelProvider(payload?.userId),
+    );
     return Scaffold(
       body: flatAsync.when(
         loading: () => Center(child: Platform.isIOS
@@ -134,7 +138,7 @@ class TenantFlatScreen extends ConsumerWidget {
                               Consumer(
                                 builder: (context, ref, _) {
                                   final vm = ref.read(
-                                    tenantFlatViewModelProvider.notifier,
+                                    tenantFlatViewModelProvider(payload?.userId).notifier,
                                   );
                                   return ElevatedButton(
                                     onPressed: () async {

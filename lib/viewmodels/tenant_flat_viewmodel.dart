@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:graphql_flutter/graphql_flutter.dart';
 import '../GraphQLConfig.dart';
 import '../models/flat_model.dart';
 import '../services/flat_service.dart';
@@ -7,11 +6,17 @@ import '../services/flat_service.dart';
 class TenantFlatViewModel extends StateNotifier<AsyncValue<Flat?>> {
   final FlatService _service;
 
-  TenantFlatViewModel(this._service)
-    : super(const AsyncValue.data(null));
+  TenantFlatViewModel(this._service, int? tenantId)
+    : super(const AsyncValue.data(null)) {
+    _fetchFlat(tenantId);
+  }
 
-  Future<void> _fetchFlat(int id) async {
+  Future<void> _fetchFlat(int? id) async {
     try {
+      if (id == null) {
+        state = AsyncValue.data(null);
+        return;
+      }
       final flat = await _service.getFlatForTenant(id);
       state = AsyncValue.data(flat);
     } catch (e, st) {
@@ -36,9 +41,11 @@ final flatServiceProvider = Provider<FlatService>((ref) {
   return FlatService(client.value);
 });
 
-
 final tenantFlatViewModelProvider =
-    StateNotifierProvider<TenantFlatViewModel, AsyncValue<Flat?>>((ref) {
+    StateNotifierProvider.family<TenantFlatViewModel, AsyncValue<Flat?>, int?>((
+      ref,
+      tenantId,
+    ) {
       final service = ref.watch(flatServiceProvider);
-      return TenantFlatViewModel(service);
+      return TenantFlatViewModel(service, tenantId);
     });

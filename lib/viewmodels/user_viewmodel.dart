@@ -1,8 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:rentmate/services/user_service.dart';
+import '../GraphQLConfig.dart';
+import '../services/user_service.dart';
 import '../models/user_model.dart';
 
-final userServiceProvider = Provider((ref) => UserService());
+final userServiceProvider = Provider<UserService>((ref) {
+  final client = ref.watch(graphQLClientProvider);
+  return UserService(client.value);
+});
 
 final tenantListProvider =
     StateNotifierProvider<TenantListNotifier, AsyncValue<List<UserModel>>>((
@@ -32,7 +36,8 @@ class TenantListNotifier extends StateNotifier<AsyncValue<List<UserModel>>> {
   }
 
   void _filterAndEmit() {
-    final filtered = _allTenants.where((t) => !excludedTenantIds.contains(t.id)).toList();
+    final filtered =
+        _allTenants.where((t) => !excludedTenantIds.contains(t.id)).toList();
     state = AsyncData(filtered);
   }
 
@@ -51,4 +56,3 @@ class TenantListNotifier extends StateNotifier<AsyncValue<List<UserModel>>> {
     await loadTenants();
   }
 }
-

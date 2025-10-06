@@ -1,29 +1,43 @@
-import 'package:rentmate/models/user_model.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:rentmate/graphql_error.dart';
+import '../models/user_model.dart';
 
 class UserService {
-  final SupabaseClient _client = Supabase.instance.client;
+  final GraphQLClient client;
+
+  UserService(this.client);
 
   Future<List<UserModel>> getTenant(String name) async {
-    print(name);
-    if (name.isEmpty) {
-      final response = await _client.from('available_tenants').select();
-      return (response as List<dynamic>)
-          .map((e) => UserModel.fromJson(e as Map<String, dynamic>))
-          .toList();
-    }else{
-      final response = await _client
-          .from('available_tenants')
-          .select()
-          .ilike('name', '%$name%');
-
-      if (response.isEmpty) {
-        return [];
+    const query = r'''
+      query GetTenants($input: GetTenantsInput) {
+        tenants(input: $input) {
+          id
+          name
+          email
+        }
       }
+    ''';
 
-      return (response as List)
-          .map((e) => UserModel.fromJson(e as Map<String, dynamic>))
-          .toList();
+    final variables = {
+      'input': name.isEmpty ? null : {'name': name}
+    };
+
+    final result = await client.query(
+      QueryOptions(
+        document: gql(query),
+        variables: variables,
+        fetchPolicy: FetchPolicy.networkOnly,
+      ),
+    );
+
+    if (result.hasException) {
+      print(result.exception);
+      throw parseGraphQLErrors(result.exception);
     }
+
+    final data = result.data!['tenants'] as List<dynamic>;
+    return data
+        .map((e) => UserModel.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 }
