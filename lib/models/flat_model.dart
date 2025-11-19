@@ -79,7 +79,6 @@ class Flat {
       'status': status.value,
       'landlord': landlord?.toJson(),
       'messages': messages?.map((msg) => msg.toJson()).toList(),
-      // lista JSON-izálása
       'tenants': tenants?.map((tenant) => tenant.toJson()).toList(),
     };
   }
