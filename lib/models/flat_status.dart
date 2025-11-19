@@ -19,7 +19,7 @@ extension FlatStatusExtension on FlatStatus {
     }
   }
 
-  static FlatStatus? fromValue(String value) {
+  static FlatStatus fromValue(String value) {
     return FlatStatus.values.firstWhere(
       (e) => e.value == value,
       orElse: () => FlatStatus.available,

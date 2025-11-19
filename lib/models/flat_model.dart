@@ -24,63 +24,38 @@ class Flat {
     this.tenants,
   });
 
-  factory Flat.fromJson(Map<String, dynamic> json) {
-    return Flat(
-      id:
-          json['id'] is int
-              ? json['id']
-              : int.tryParse(json['id'].toString()) ?? 0,
-      price:
-          json['price'] is int
-              ? json['price']
-              : int.tryParse(json['price'].toString()) ?? 0,
-      address: json['address'] as String,
-      images:
-          (json['images'] as List<dynamic>?)
-              ?.map((item) => FlatImage.fromJson(item as Map<String, dynamic>))
-              .toList() ??
-          [],
-      status:
-          FlatStatusExtension.fromValue(json['status'] as String) ??
-          FlatStatus.available,
-      landlord:
-          (json['landlord'] != null && json['landlord'] is Map<String, dynamic>)
-              ? UserModel.fromJson(json['landlord'] as Map<String, dynamic>)
-              : null,
-      messages:
-          (json['messages'] as List<dynamic>?)
-              ?.map(
-                (item) => MessageModel.fromJson(
-                  (item as Map<String, dynamic>)['message']
-                      as Map<String, dynamic>,
-                ),
-              )
-              .toList() ??
-          [],
-      tenants:
-          (json['tenants'] as List<dynamic>?)
-              ?.map(
-                (item) => UserModel.fromJson(
-                  (item as Map<String, dynamic>)['tenant']
-                      as Map<String, dynamic>,
-                ),
-              )
-              .toList() ??
-          [],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toMap() {
     return {
       'id': id,
       'address': address,
-      'images': images?.map((img) => img.toJson()).toList(),
+      'images': images?.map((e) => e.toMap()).toList(),
       'price': price,
-      'status': status.value,
+      'status': status.name,        // enum --> string
       'landlord': landlord?.toJson(),
-      'messages': messages?.map((msg) => msg.toJson()).toList(),
-      'tenants': tenants?.map((tenant) => tenant.toJson()).toList(),
+      'tenants': tenants?.map((e) => e.toJson()).toList(),
+      'messages': messages?.map((e) => e.toJson()).toList(),
     };
+  }
+
+  factory Flat.fromJson(Map<String, dynamic> json) {
+    return Flat(
+      id: int.tryParse(json['id']),
+      address: json['address'] as String,
+      images: (json['images'] as List<dynamic>?)
+          ?.map((e) => FlatImage.fromJson(e))
+          .toList(),
+      price: int.tryParse(json['price'].toString()) ?? 0,
+      status: FlatStatusExtension.fromValue(json['status']),
+      landlord: json['landlord'] != null
+          ? UserModel.fromJson(json['landlord'])
+          : null,
+      tenants: (json['tenants'] as List<dynamic>?)
+          ?.map((e) => UserModel.fromJson(e))
+          .toList(),
+      messages: (json['messages'] as List<dynamic>?)
+          ?.map((e) => MessageModel.fromJson(e))
+          .toList(),
+    );
   }
 
   Flat copyWith({

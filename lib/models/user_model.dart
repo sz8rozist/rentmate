@@ -36,7 +36,7 @@ class UserModel {
   }
 
   Map<String, dynamic> toJson() {
-    return {'id': id, 'email': email, 'name': name, 'role': role?.value, 'tenantFlat': tenantFlat?.toJson()};
+    return {'id': id, 'email': email, 'name': name, 'role': role?.value, 'tenantFlat': tenantFlat?.toMap()};
   }
 
   UserModel copyWith({Flat? tenantFlat}) {

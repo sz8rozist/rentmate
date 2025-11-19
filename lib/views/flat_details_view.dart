@@ -523,7 +523,7 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView>
     _addressController.text = selectedFlat.address;
     _priceController.text = selectedFlat.price.toString();
     _selectedFlatStatus = selectedFlat.status;
-    _retainedImages = selectedFlat.images!; // Update retained images from flat data
+    _retainedImages = selectedFlat.images ?? [];
 
     final List<Widget> dataCards = [
       _buildDataCard('Cím', selectedFlat.address),

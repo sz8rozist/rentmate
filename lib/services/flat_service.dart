@@ -112,7 +112,7 @@ class FlatService {
     final result = await client.mutate(
       MutationOptions(
         document: gql(mutation),
-        variables: {'flatId': flatId, 'data': flat.toJson()},
+        variables: {'flatId': flatId, 'data': flat.toMap()},
       ),
     );
 
@@ -173,6 +173,7 @@ class FlatService {
           id
           address
           price
+          status
           landlord {
             id
             name
@@ -183,6 +184,8 @@ class FlatService {
           }
           images {
             id
+            url
+            filename
             url
           }
         }
@@ -239,6 +242,7 @@ class FlatService {
           price
           status
           landlord { id name email role }
+          images { id url filename flatId }
         }
       }
     ''';
