@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:rentmate/models/message_attachment.dart';
 import '../models/message_model.dart';
 import '../viewmodels/auth_viewmodel.dart';
 import '../viewmodels/chat_view_viewmodel.dart';
@@ -11,6 +12,7 @@ import '../widgets/swipe_image_galery.dart';
 
 class ChatMessageView extends ConsumerStatefulWidget {
   final int flatId;
+
   const ChatMessageView({super.key, required this.flatId});
 
   @override
@@ -35,9 +37,7 @@ class _ChatMessageViewState extends ConsumerState<ChatMessageView> {
 
   void _scrollToEnd() {
     if (_scrollController.hasClients) {
-      _scrollController.jumpTo(
-        _scrollController.position.maxScrollExtent,
-      );
+      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
     }
   }
 
@@ -57,7 +57,12 @@ class _ChatMessageViewState extends ConsumerState<ChatMessageView> {
     final notifier = ref.read(messagesProvider.notifier);
 
     // Üzenet küldése a ChatNotifier-en keresztül
-    notifier.sendMessage(widget.flatId, userId, text);
+    final messageId = await notifier.sendMessage(widget.flatId, userId, text);
+    if (messageId != null) {
+      for (final file in _imageFiles) {
+        notifier.sendAttachment(messageId, file.path);
+      }
+    }
 
     _controller.clear();
     _imageFiles.clear();
@@ -75,7 +80,10 @@ class _ChatMessageViewState extends ConsumerState<ChatMessageView> {
   }
 
   Future<void> _pickImageFromCamera() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.camera, imageQuality: 70);
+    final pickedFile = await _picker.pickImage(
+      source: ImageSource.camera,
+      imageQuality: 70,
+    );
     if (pickedFile != null) {
       setState(() {
         _imageFiles.add(File(pickedFile.path));
@@ -83,8 +91,8 @@ class _ChatMessageViewState extends ConsumerState<ChatMessageView> {
     }
   }
 
-  Widget _buildImagesGrid(List<String> images) {
-    if (images.isEmpty) return const SizedBox.shrink();
+  Widget _buildImagesGrid(List<MessageAttachment>? images) {
+    if (images == null || images.isEmpty) return const SizedBox.shrink();
 
     return GridView.builder(
       shrinkWrap: true,
@@ -96,18 +104,29 @@ class _ChatMessageViewState extends ConsumerState<ChatMessageView> {
       ),
       itemCount: images.length,
       itemBuilder: (context, index) {
-        final base64Str = images[index];
-        final bytes = base64Decode(base64Str);
+        final image = images[index];
+        final imageUrl = image.url; // itt már URL-t használunk
+
         return GestureDetector(
-          onTap: () =>
-              showSwipeImageGallery(
+          onTap:
+              () => showSwipeImageGallery(
                 context,
-                children: [MemoryImage(bytes)],
+                children: [NetworkImage(imageUrl)],
                 swipeDismissible: true,
               ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(8),
-            child: Image.memory(bytes, fit: BoxFit.cover),
+            child: Image.network(
+              imageUrl,
+              fit: BoxFit.cover,
+              loadingBuilder: (context, child, loadingProgress) {
+                if (loadingProgress == null) return child;
+                return const Center(child: CircularProgressIndicator());
+              },
+              errorBuilder: (context, error, stackTrace) {
+                return const Center(child: Icon(Icons.broken_image));
+              },
+            ),
           ),
         );
       },
@@ -119,6 +138,7 @@ class _ChatMessageViewState extends ConsumerState<ChatMessageView> {
     final messages = ref.watch(messagesProvider);
     messages.sort((a, b) => a.createdAt.compareTo(b.createdAt));
 
+    print(messages);
     ref.listen<List<MessageModel>>(messagesProvider, (previous, next) {
       if (previous?.length != next.length) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -142,40 +162,61 @@ class _ChatMessageViewState extends ConsumerState<ChatMessageView> {
                 final isMe = message.senderUser.id == payload?.userId;
 
                 final hasText = message.content.trim().isNotEmpty;
-                final hasImages = message.imageUrls.isNotEmpty;
+                var hasImages = false;
+
+                final messageAttachments = message.messageAttachments;
+                if (messageAttachments != null) {
+                  hasImages = messageAttachments.isNotEmpty;
+                }
 
                 Widget messageContent;
                 if (hasText && hasImages) {
                   messageContent = Column(
-                    crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                    crossAxisAlignment:
+                        isMe
+                            ? CrossAxisAlignment.end
+                            : CrossAxisAlignment.start,
                     children: [
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: isMe ? Colors.blueAccent.shade200 : Colors.lightBlueAccent.shade400,
+                          color:
+                              isMe
+                                  ? Colors.blueAccent.shade200
+                                  : Colors.lightBlueAccent.shade400,
                           borderRadius: BorderRadius.circular(16),
                         ),
-                        child: Text(message.content, style: const TextStyle(color: Colors.white)),
+                        child: Text(
+                          message.content,
+                          style: const TextStyle(color: Colors.white),
+                        ),
                       ),
                       const SizedBox(height: 8),
-                      _buildImagesGrid(message.imageUrls),
+                      _buildImagesGrid(message.messageAttachments),
                     ],
                   );
                 } else if (hasImages) {
-                  messageContent = _buildImagesGrid(message.imageUrls);
+                  messageContent = _buildImagesGrid(message.messageAttachments);
                 } else {
                   messageContent = Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: isMe ? Colors.blueAccent.shade200 : Colors.lightBlueAccent.shade400,
+                      color:
+                          isMe
+                              ? Colors.blueAccent.shade200
+                              : Colors.lightBlueAccent.shade400,
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    child: Text(message.content, style: const TextStyle(color: Colors.white)),
+                    child: Text(
+                      message.content,
+                      style: const TextStyle(color: Colors.white),
+                    ),
                   );
                 }
 
                 return Align(
-                  alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+                  alignment:
+                      isMe ? Alignment.centerRight : Alignment.centerLeft,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 4),
                     child: messageContent,
@@ -188,16 +229,27 @@ class _ChatMessageViewState extends ConsumerState<ChatMessageView> {
           SafeArea(
             child: Row(
               children: [
-                IconButton(icon: const Icon(Icons.camera_alt), onPressed: _pickImageFromCamera),
-                IconButton(icon: const Icon(Icons.photo), onPressed: _pickImage),
+                IconButton(
+                  icon: const Icon(Icons.camera_alt),
+                  onPressed: _pickImageFromCamera,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.photo),
+                  onPressed: _pickImage,
+                ),
                 Expanded(
                   child: TextFormField(
                     controller: _controller,
-                    decoration: const InputDecoration(hintText: 'Írj üzenetet...'),
+                    decoration: const InputDecoration(
+                      hintText: 'Írj üzenetet...',
+                    ),
                     onFieldSubmitted: (_) => _sendMessage(),
                   ),
                 ),
-                IconButton(icon: const Icon(Icons.send), onPressed: _sendMessage),
+                IconButton(
+                  icon: const Icon(Icons.send),
+                  onPressed: _sendMessage,
+                ),
               ],
             ),
           ),

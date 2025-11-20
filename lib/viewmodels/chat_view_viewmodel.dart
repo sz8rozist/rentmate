@@ -1,22 +1,25 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:rentmate/GraphQLConfig.dart';
 import '../models/message_model.dart';
 import '../services/chat_service.dart';
 
 // ChatService provider
 final chatServiceProvider = Provider<ChatService>((ref) {
-  final service = ChatService('http://localhost:3000');
+  final client = ref.watch(graphQLClientProvider);
+  final service = ChatService('http://$host:3000', client.value);
   ref.onDispose(() => service.dispose());
   return service;
 });
 
 // Messages stream provider
 final messagesProvider =
-StateNotifierProvider<ChatNotifier, List<MessageModel>>((ref) {
-  final chatService = ref.watch(chatServiceProvider);
-  return ChatNotifier(chatService);
-});
+    StateNotifierProvider<ChatNotifier, List<MessageModel>>((ref) {
+      final chatService = ref.watch(chatServiceProvider);
+      return ChatNotifier(chatService);
+    });
 
 // ChatNotifier
 class ChatNotifier extends StateNotifier<List<MessageModel>> {
@@ -34,11 +37,11 @@ class ChatNotifier extends StateNotifier<List<MessageModel>> {
     chatService.fetchInitialMessages(flatId);
   }
 
-  void sendMessage(int flatId, int senderId, String content) {
-    chatService.sendMessage(
+  Future<int?> sendMessage(int flatId, int senderId, String content) {
+    return chatService.sendMessage(
       flatId: flatId,
       senderId: senderId,
-      content: content
+      content: content,
     );
   }
 
@@ -46,5 +49,12 @@ class ChatNotifier extends StateNotifier<List<MessageModel>> {
   void dispose() {
     _sub.cancel();
     super.dispose();
+  }
+
+  void sendAttachment(int messageId, String filePath) {
+    chatService.sendAttachment(
+      messageId: messageId,
+      filePath: filePath,
+    );
   }
 }
