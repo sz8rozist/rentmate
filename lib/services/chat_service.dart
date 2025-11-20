@@ -45,12 +45,11 @@ class ChatService {
     socket.emit('joinRoom', {'flatId': flatId});
   }
 
-  // Üzenet küldés
-  void sendMessage({
+  Future<void> sendMessage({
     required int flatId,
     required int senderId,
     required String content,
-  }) {
+  }) async {
     socket.emit('sendMessage', {
       'flatId': flatId,
       'senderId': senderId,

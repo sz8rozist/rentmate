@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -74,7 +75,7 @@ class _ChatMessageViewState extends ConsumerState<ChatMessageView> {
   }
 
   Future<void> _pickImageFromCamera() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.camera, imageQuality: 80);
+    final pickedFile = await _picker.pickImage(source: ImageSource.camera, imageQuality: 70);
     if (pickedFile != null) {
       setState(() {
         _imageFiles.add(File(pickedFile.path));
@@ -82,54 +83,34 @@ class _ChatMessageViewState extends ConsumerState<ChatMessageView> {
     }
   }
 
-  Widget _buildImagesGrid(List<String> imageUrls) {
-    if (imageUrls.isEmpty) return const SizedBox.shrink();
-    if (imageUrls.length == 1) {
-      return GestureDetector(
-        onTap: () => showSwipeImageGallery(
-          context,
-          children: [NetworkImage(imageUrls.first)],
-          swipeDismissible: true,
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: Image.network(imageUrls.first, width: 150, height: 150, fit: BoxFit.cover),
-        ),
-      );
-    }
+  Widget _buildImagesGrid(List<String> images) {
+    if (images.isEmpty) return const SizedBox.shrink();
 
-    final crossAxisCount = 3;
-    final imageSize = 150.0;
-    final spacing = 8.0;
-    final rowCount = (imageUrls.length / crossAxisCount).ceil();
-
-    return SizedBox(
-      height: rowCount * imageSize + (rowCount - 1) * spacing,
-      child: GridView.builder(
-        physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: crossAxisCount,
-          crossAxisSpacing: spacing,
-          mainAxisSpacing: spacing,
-          childAspectRatio: 1,
-        ),
-        itemCount: imageUrls.length,
-        itemBuilder: (context, index) {
-          final url = imageUrls[index];
-          return GestureDetector(
-            onTap: () => showSwipeImageGallery(
-              context,
-              initialIndex: index,
-              children: imageUrls.map((u) => NetworkImage(u)).toList(),
-              swipeDismissible: true,
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.network(url, fit: BoxFit.cover),
-            ),
-          );
-        },
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        crossAxisSpacing: 8,
+        mainAxisSpacing: 8,
       ),
+      itemCount: images.length,
+      itemBuilder: (context, index) {
+        final base64Str = images[index];
+        final bytes = base64Decode(base64Str);
+        return GestureDetector(
+          onTap: () =>
+              showSwipeImageGallery(
+                context,
+                children: [MemoryImage(bytes)],
+                swipeDismissible: true,
+              ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Image.memory(bytes, fit: BoxFit.cover),
+          ),
+        );
+      },
     );
   }
 

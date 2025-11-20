@@ -38,7 +38,7 @@ class ChatNotifier extends StateNotifier<List<MessageModel>> {
     chatService.sendMessage(
       flatId: flatId,
       senderId: senderId,
-      content: content,
+      content: content
     );
   }
 

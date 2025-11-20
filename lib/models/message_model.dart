@@ -8,7 +8,7 @@ class MessageModel {
   final UserModel senderUser;
   final String content;
   final DateTime createdAt;
-  final String? imageUrl;
+  final List<String> imageUrls;
 
   MessageModel({
     required this.id,
@@ -16,17 +16,32 @@ class MessageModel {
     required this.senderUser,
     required this.content,
     required this.createdAt,
-    this.imageUrl,
+    required this.imageUrls,
   });
 
   factory MessageModel.fromJson(Map<String, dynamic> json) {
+    // Ha a backend null-t küld, vagy üres stringet, mindig üres listára alakítjuk
+    List<String> images = [];
+    if (json['imageUrls'] != null) {
+      try {
+        if (json['imageUrls'] is String) {
+          // Ha JSON string jön
+          images = List<String>.from(jsonDecode(json['imageUrls']));
+        } else if (json['imageUrls'] is List) {
+          // Ha már lista jön
+          images = List<String>.from(json['imageUrls']);
+        }
+      } catch (e) {
+        images = [];
+      }
+    }
     return MessageModel(
       id: int.tryParse(json['id'].toString()),
       flatId: int.parse(json['flatId'].toString()),
       senderUser: UserModel.fromJson(json['sender'] as Map<String, dynamic>),
       content: json['content'],
       createdAt: DateTime.parse(json['createdAt']),
-      imageUrl: json['imageUrls'],
+      imageUrls: images,
     );
   }
 
@@ -41,15 +56,4 @@ class MessageModel {
     };
   }
 
-  List<String> get imageUrls {
-    if (imageUrl == null || imageUrl!.isEmpty) {
-      return [];
-    }
-    try {
-      final List<dynamic> list = jsonDecode(imageUrl!);
-      return list.map((e) => e.toString()).toList();
-    } catch (e) {
-      return [];
-    }
-  }
 }
