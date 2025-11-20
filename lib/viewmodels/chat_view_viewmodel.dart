@@ -31,6 +31,7 @@ class ChatNotifier extends StateNotifier<List<MessageModel>> {
 
   void joinRoom(int flatId) {
     chatService.joinRoom(flatId);
+    chatService.fetchInitialMessages(flatId);
   }
 
   void sendMessage(int flatId, int senderId, String content) {

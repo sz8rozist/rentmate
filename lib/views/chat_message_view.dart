@@ -29,14 +29,13 @@ class _ChatMessageViewState extends ConsumerState<ChatMessageView> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(messagesProvider.notifier).joinRoom(widget.flatId);
     });
+    _scrollToEnd();
   }
 
   void _scrollToEnd() {
     if (_scrollController.hasClients) {
-      _scrollController.animateTo(
+      _scrollController.jumpTo(
         _scrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeInOut,
       );
     }
   }
@@ -139,10 +138,11 @@ class _ChatMessageViewState extends ConsumerState<ChatMessageView> {
     final messages = ref.watch(messagesProvider);
     messages.sort((a, b) => a.createdAt.compareTo(b.createdAt));
 
-    // Új üzenet érkezésére scrollozás
     ref.listen<List<MessageModel>>(messagesProvider, (previous, next) {
       if (previous?.length != next.length) {
-        _scrollToEnd();
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _scrollToEnd();
+        });
       }
     });
 

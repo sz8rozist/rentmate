@@ -26,6 +26,16 @@ class ChatService {
       final message = MessageModel.fromJson(data);
       _messageController.add(message);
     });
+
+    // Teljes chat történet lekérése
+    socket.on('messages', (data) {
+      if (data is List) {
+        for (var msgJson in data) {
+          final msg = MessageModel.fromJson(msgJson);
+          _messageController.add(msg);
+        }
+      }
+    });
   }
 
   Stream<MessageModel> get messageStream => _messageController.stream;
@@ -48,10 +58,26 @@ class ChatService {
     });
   }
 
-  // Lekérhetjük a chat történetet a backendről (opcionális)
-  Future<List<MessageModel>> fetchInitialMessages(int flatId) async {
-    // Ezt maradhat GraphQL-lel, vagy csinálhatsz REST endpointot
-    return [];
+  /// Teljes chat történet lekérése
+  Future<void> fetchInitialMessages(int flatId) async {
+    final completer = Completer<void>();
+
+    // Egyszeri listener a válaszra
+    void handler(dynamic data) {
+      if (data is List) {
+        for (var msgJson in data) {
+          final msg = MessageModel.fromJson(msgJson);
+          _messageController.add(msg);
+        }
+      }
+      completer.complete();
+      socket.off('messages', handler);
+    }
+
+    socket.on('messages', handler);
+    socket.emit('getMessages', {'flatId': flatId});
+
+    return completer.future;
   }
 
   void dispose() {
