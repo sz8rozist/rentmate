@@ -70,6 +70,7 @@ dependencies:
   graphql_flutter: ^5.2.0
   graphql: ^5.2.2
   crystal_navigation_bar: ^1.0.4
+  socket_io_client: ^3.1.2
 
 dev_dependencies:
   flutter_test:

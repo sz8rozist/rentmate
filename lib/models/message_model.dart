@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:rentmate/models/user_model.dart';
 
 class MessageModel {
-  final String id;
-  final String flatId;
+  final int? id;
+  final int flatId;
   final UserModel senderUser;
   final String content;
   final DateTime createdAt;
@@ -21,23 +21,23 @@ class MessageModel {
 
   factory MessageModel.fromJson(Map<String, dynamic> json) {
     return MessageModel(
-      id: json['id'],
-      flatId: json['flat_id'],
-      senderUser: UserModel.fromJson(json['sender_user']),
+      id: int.tryParse(json['id'].toString()),
+      flatId: int.parse(json['flatId'].toString()),
+      senderUser: UserModel.fromJson(json['sender'] as Map<String, dynamic>),
       content: json['content'],
-      createdAt: DateTime.parse(json['created_at']),
-      imageUrl: json['image_urls'],
+      createdAt: DateTime.parse(json['createdAt']),
+      imageUrl: json['imageUrls'],
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'flat_id': flatId,
-      'sender_user': senderUser.toJson(),
+      'flatId': flatId,
+      'senderUser': senderUser.toJson(),
       'content': content,
-      'created_at': createdAt.toIso8601String(),
-      'image_urls': jsonEncode(imageUrls),
+      'createdAt': createdAt.toIso8601String(),
+      'imageUrls': jsonEncode(imageUrls),
     };
   }
 

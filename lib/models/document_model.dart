@@ -1,5 +1,5 @@
 class Document {
-  final String id;
+  final int? id;
   final String name;
   final String url;
   final String type;
@@ -21,7 +21,7 @@ class Document {
 
   factory Document.fromMap(Map<String, dynamic> map) {
     return Document(
-      id: map['id'],
+      id: int.tryParse(map['id']),
       name: map['name'],
       url: map['url'],
       type: map['type'],

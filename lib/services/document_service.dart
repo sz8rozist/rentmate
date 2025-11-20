@@ -71,7 +71,7 @@ class DocumentService {
   }
 
   Future<void> deleteDocument(Document doc) async {
-    await _client.storage.from('documents').remove([doc.filePath]);
-    await _client.from('documents').delete().eq('id', doc.id);
+    //await _client.storage.from('documents').remove([doc.filePath]);
+    //await _client.from('documents').delete().eq('id', doc.id);
   }
 }

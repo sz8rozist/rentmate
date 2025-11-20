@@ -9,14 +9,17 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f7c025f7-f5d1-49bb-9496-3d397e9e2c84" name="Changes" comment="bottom navigáció, fájl feltöltés">
+    <list default="true" id="f7c025f7-f5d1-49bb-9496-3d397e9e2c84" name="Changes" comment="flat hozzáadás javítások">
+      <change beforePath="$PROJECT_DIR$/.dart_tool/package_config.json" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/package_config.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/models/flat_image.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/models/flat_image.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/models/flat_model.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/models/flat_model.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/models/flat_status.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/models/flat_status.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/models/user_model.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/models/user_model.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/services/flat_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/services/flat_service.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/views/flat_details_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/flat_details_view.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/models/document_model.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/models/document_model.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/models/message_model.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/models/message_model.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/services/chat_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/services/chat_service.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/services/document_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/services/document_service.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/viewmodels/chat_view_viewmodel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/viewmodels/chat_view_viewmodel.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/views/chat_message_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/chat_message_view.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -443,7 +446,15 @@
       <option name="project" value="LOCAL" />
       <updated>1763564350503</updated>
     </task>
-    <option name="localTasksCounter" value="43" />
+    <task id="LOCAL-00043" summary="flat hozzáadás javítások">
+      <option name="closed" value="true" />
+      <created>1763587449475</created>
+      <option name="number" value="00043" />
+      <option name="presentableId" value="LOCAL-00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1763587449475</updated>
+    </task>
+    <option name="localTasksCounter" value="44" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -458,7 +469,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Lakás részletek oldal" />
     <MESSAGE value="Javítások, bérlő keresés db ből." />
     <MESSAGE value="Biometrikus azonosítás" />
     <MESSAGE value="javítások" />
@@ -483,6 +493,7 @@
     <MESSAGE value="Chat funkció nest js backendel" />
     <MESSAGE value="tenant flat adatok lekérése nest js ből" />
     <MESSAGE value="bottom navigáció, fájl feltöltés" />
-    <option name="LAST_COMMIT_MESSAGE" value="bottom navigáció, fájl feltöltés" />
+    <MESSAGE value="flat hozzáadás javítások" />
+    <option name="LAST_COMMIT_MESSAGE" value="flat hozzáadás javítások" />
   </component>
 </project>

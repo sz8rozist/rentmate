@@ -1,17 +1,15 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:rentmate/viewmodels/chat_view_viewmodel.dart';
-
+import '../models/message_model.dart';
 import '../viewmodels/auth_viewmodel.dart';
+import '../viewmodels/chat_view_viewmodel.dart';
 import '../widgets/custom_snackbar.dart';
 import '../widgets/swipe_image_galery.dart';
 
 class ChatMessageView extends ConsumerStatefulWidget {
   final int flatId;
-
   const ChatMessageView({super.key, required this.flatId});
 
   @override
@@ -27,7 +25,10 @@ class _ChatMessageViewState extends ConsumerState<ChatMessageView> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToEnd());
+    // Szoba csatlakozás a notifier-en keresztül
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(messagesProvider.notifier).joinRoom(widget.flatId);
+    });
   }
 
   void _scrollToEnd() {
@@ -53,9 +54,10 @@ class _ChatMessageViewState extends ConsumerState<ChatMessageView> {
     }
 
     final userId = payload.userId;
-    final viewModel = ref.read(chatViewModelProvider(widget.flatId).notifier);
+    final notifier = ref.read(messagesProvider.notifier);
 
-    await viewModel.sendMessage(userId, text, _imageFiles.isNotEmpty ? _imageFiles : null);
+    // Üzenet küldése a ChatNotifier-en keresztül
+    notifier.sendMessage(widget.flatId, userId, text);
 
     _controller.clear();
     _imageFiles.clear();
@@ -65,7 +67,7 @@ class _ChatMessageViewState extends ConsumerState<ChatMessageView> {
 
   Future<void> _pickImage() async {
     final pickedFiles = await _picker.pickMultiImage();
-    if (pickedFiles.isNotEmpty) {
+    if (pickedFiles != null && pickedFiles.isNotEmpty) {
       setState(() {
         _imageFiles.addAll(pickedFiles.map((x) => File(x.path)));
       });
@@ -96,6 +98,7 @@ class _ChatMessageViewState extends ConsumerState<ChatMessageView> {
         ),
       );
     }
+
     final crossAxisCount = 3;
     final imageSize = 150.0;
     final spacing = 8.0;
@@ -133,10 +136,15 @@ class _ChatMessageViewState extends ConsumerState<ChatMessageView> {
 
   @override
   Widget build(BuildContext context) {
-    final messages = ref.watch(chatViewModelProvider(widget.flatId));
-
-    WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToEnd());
+    final messages = ref.watch(messagesProvider);
     messages.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+
+    // Új üzenet érkezésére scrollozás
+    ref.listen<List<MessageModel>>(messagesProvider, (previous, next) {
+      if (previous?.length != next.length) {
+        _scrollToEnd();
+      }
+    });
 
     return Scaffold(
       body: Column(
@@ -158,15 +166,12 @@ class _ChatMessageViewState extends ConsumerState<ChatMessageView> {
                 Widget messageContent;
                 if (hasText && hasImages) {
                   messageContent = Column(
-                    crossAxisAlignment:
-                    isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                    crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                     children: [
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: isMe
-                              ? Colors.blueAccent.shade200
-                              : Colors.lightBlueAccent.shade400,
+                          color: isMe ? Colors.blueAccent.shade200 : Colors.lightBlueAccent.shade400,
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Text(message.content, style: const TextStyle(color: Colors.white)),
@@ -181,9 +186,7 @@ class _ChatMessageViewState extends ConsumerState<ChatMessageView> {
                   messageContent = Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: isMe
-                          ? Colors.blueAccent.shade200
-                          : Colors.lightBlueAccent.shade400,
+                      color: isMe ? Colors.blueAccent.shade200 : Colors.lightBlueAccent.shade400,
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Text(message.content, style: const TextStyle(color: Colors.white)),
