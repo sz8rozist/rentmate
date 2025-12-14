@@ -1,15 +1,15 @@
-import 'dart:io';
 
 import 'package:graphql_flutter/graphql_flutter.dart';
-import 'package:http/http.dart';
 import 'package:rentmate/models/flat_model.dart';
+import 'package:rentmate/services/file_upload_service.dart';
 
 import '../graphql_error.dart';
 
 class FlatService {
   final GraphQLClient client;
+  final FileUploadService fileUploadService;
 
-  FlatService(this.client);
+  FlatService(this.client, this.fileUploadService);
 
   Future<Flat> addFlat(String address, int price, int? landlordId) async {
     const mutation = r'''
@@ -55,31 +55,14 @@ class FlatService {
       uploadFlatImage(flatId: $flatId, image: $image)
     }
   ''';
-    final fileExists = await File(filePath).exists();
-    if (!fileExists) {
-      print("Fájl nem található: $filePath");
-      return false;
-    }
-
-    final file = await MultipartFile.fromPath(
-      'image', // Fontos: a GraphQL paraméter neve
-      filePath,
-      filename: filePath.split('/').last,
+    final success = await fileUploadService.uploadSingleFile(
+      mutation: mutation,
+      variables: {'flatId': flatId},
+      filePath: filePath,
+      fileVariableName: 'image', // GraphQL paraméter neve
     );
 
-    final result = await client.mutate(
-      MutationOptions(
-        document: gql(mutation),
-        variables: {'flatId': flatId, 'image': file},
-        ),
-      );
-
-    if (result.hasException) {
-      print(result.exception);
-      throw parseGraphQLErrors(result.exception);
-    }
-
-    return result.data?['uploadFlatImage'] ?? false;
+    return success;
   }
 
   Future<bool> deleteFlatImage(int imageId) async {

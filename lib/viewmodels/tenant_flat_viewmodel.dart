@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../GraphQLConfig.dart';
 import '../models/flat_model.dart';
+import '../services/file_upload_service.dart';
 import '../services/flat_service.dart';
 
 class TenantFlatViewModel extends StateNotifier<AsyncValue<Flat?>> {
@@ -38,7 +39,8 @@ class TenantFlatViewModel extends StateNotifier<AsyncValue<Flat?>> {
 
 final flatServiceProvider = Provider<FlatService>((ref) {
   final client = ref.watch(graphQLClientProvider);
-  return FlatService(client.value);
+  final fileUploadService = ref.watch(fileUploadServiceProvider);
+  return FlatService(client.value, fileUploadService);
 });
 
 final tenantFlatViewModelProvider =

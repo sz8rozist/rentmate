@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:rentmate/services/file_upload_service.dart';
 import 'package:rentmate/services/flat_service.dart';
 
 import '../GraphQLConfig.dart';
@@ -99,7 +100,8 @@ class FlatViewModel extends StateNotifier<AsyncValue<Flat?>> {
 /// -----------------
 final flatServiceProvider = Provider<FlatService>((ref) {
   final client = ref.watch(graphQLClientProvider);
-  return FlatService(client.value);
+  final fileUploadService = ref.watch(fileUploadServiceProvider);
+  return FlatService(client.value, fileUploadService);
 });
 
 /// -----------------

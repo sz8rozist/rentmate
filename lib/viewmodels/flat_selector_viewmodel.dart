@@ -3,6 +3,7 @@ import 'package:rentmate/services/flat_service.dart';
 
 import '../GraphQLConfig.dart';
 import '../models/flat_model.dart';
+import '../services/file_upload_service.dart';
 
 final flatSelectorViewModelProvider = StateNotifierProvider.family<
   FlatSelectorViewmodel,
@@ -15,7 +16,8 @@ final flatSelectorViewModelProvider = StateNotifierProvider.family<
 });
 final flatServiceProvider = Provider<FlatService>((ref) {
   final client = ref.watch(graphQLClientProvider);
-  return FlatService(client.value);
+  final fileUploadService = ref.watch(fileUploadServiceProvider);
+  return FlatService(client.value, fileUploadService);
 });
 
 final selectedFlatProvider = StateProvider<Flat?>((ref) => null);
