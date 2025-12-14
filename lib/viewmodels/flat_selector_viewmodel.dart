@@ -93,7 +93,9 @@ class FlatSelectorViewmodel extends StateNotifier<AsyncValue<List<Flat>>> {
   Future<void> uploadImages(int flatId, List<String> filePaths) async {
     if (filePaths.isEmpty) return;
 
-    // Loading állapot a UI-nak
+    final previousFlats = state.value ?? [];
+
+    // Loading állapot, de a régi adat megmarad
     state = const AsyncValue.loading();
 
     try {
@@ -114,9 +116,8 @@ class FlatSelectorViewmodel extends StateNotifier<AsyncValue<List<Flat>>> {
       // Frissítjük a flat-et
       final updatedFlat = await _flatService.getFlatById(flatId);
 
-      final previous = state.value ?? [];
       final updatedList =
-          previous.map((f) => f.id == flatId ? updatedFlat : f).toList();
+          previousFlats.map((f) => f.id == flatId ? updatedFlat : f).toList();
       state = AsyncValue.data(updatedList);
 
       if (!allUploaded) {

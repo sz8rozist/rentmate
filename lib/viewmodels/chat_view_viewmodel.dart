@@ -1,15 +1,16 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rentmate/GraphQLConfig.dart';
+import 'package:rentmate/services/file_upload_service.dart';
 import '../models/message_model.dart';
 import '../services/chat_service.dart';
 
 // ChatService provider
 final chatServiceProvider = Provider<ChatService>((ref) {
   final client = ref.watch(graphQLClientProvider);
-  final service = ChatService('http://$host:3000', client.value);
+  final fileUploadService = FileUploadService(ref);
+  final service = ChatService('http://$host:3000',fileUploadService, client.value);
   ref.onDispose(() => service.dispose());
   return service;
 });
@@ -28,11 +29,18 @@ class ChatNotifier extends StateNotifier<List<MessageModel>> {
 
   ChatNotifier(this.chatService) : super([]) {
     _sub = chatService.messageStream.listen((message) {
-      state = [...state, message]; // új üzenet hozzáadása
+      final exists = state.any((m) => m.id == message.id);
+      if (!exists) {
+        state = [...state, message]..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+      } else {
+        // ha létezik, frissíthetjük a csatolmányokat vagy content-et
+        state = state.map((m) => m.id == message.id ? message : m).toList();
+      }
     });
   }
 
   void joinRoom(int flatId) {
+    state = [];
     chatService.joinRoom(flatId);
     chatService.fetchInitialMessages(flatId);
   }

@@ -1,21 +1,18 @@
 import 'dart:async';
-import 'dart:ffi';
-import 'dart:io';
 
 import 'package:graphql/client.dart';
-import 'package:http/http.dart';
+import 'package:rentmate/services/file_upload_service.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
-import '../graphql_error.dart';
 import '../models/message_model.dart';
 
 class ChatService {
   final IO.Socket socket;
   final _messageController = StreamController<MessageModel>.broadcast();
-
+  final FileUploadService fileUploadService;
   final GraphQLClient client;
 
-  ChatService(String serverUrl, this.client)
+  ChatService(String serverUrl, this.fileUploadService, this.client)
       : socket = IO.io(
     serverUrl,
     IO.OptionBuilder()
@@ -68,12 +65,17 @@ class ChatService {
   /// Teljes chat történet lekérése
   Future<void> fetchInitialMessages(int flatId) async {
     final completer = Completer<void>();
-
     // Egyszeri listener a válaszra
     void handler(dynamic data) {
       if (data is List) {
-        for (var msgJson in data) {
-          final msg = MessageModel.fromJson(msgJson);
+        final messages = data
+            .map((msgJson) => MessageModel.fromJson(msgJson))
+            .toList();
+
+        // sort createdAt szerint
+        messages.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+
+        for (var msg in messages) {
           _messageController.add(msg);
         }
       }
@@ -92,10 +94,34 @@ class ChatService {
     socket.dispose();
   }
 
-  void sendAttachment({required int messageId, required String filePath}) {
+  /*void sendAttachment({required int messageId, required String filePath}) {
     socket.emit('uploadAttachment', {
       'messageId': messageId,
       'file': filePath
     });
+  }*/
+
+  Future<bool> sendAttachment({
+    required int messageId,
+    required String filePath,
+  }) async {
+    const mutation = r'''
+      mutation UploadAttachment($messageId: Int!, $file: Upload!) {
+        uploadAttachment(messageId: $messageId, file: $file)
+      }
+    ''';
+
+    final variables = {
+        "messageId": messageId,
+    };
+
+    final success = await fileUploadService.uploadSingleFile(
+      mutation: mutation,
+      variables: variables,
+      filePath: filePath,
+      fileVariableName: 'file',
+    );
+
+    return success;
   }
 }

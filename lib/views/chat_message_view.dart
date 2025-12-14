@@ -8,6 +8,7 @@ import '../models/message_model.dart';
 import '../viewmodels/auth_viewmodel.dart';
 import '../viewmodels/chat_view_viewmodel.dart';
 import '../widgets/custom_snackbar.dart';
+import '../widgets/message_attachment.dart';
 import '../widgets/swipe_image_galery.dart';
 
 class ChatMessageView extends ConsumerStatefulWidget {
@@ -55,7 +56,6 @@ class _ChatMessageViewState extends ConsumerState<ChatMessageView> {
 
     final userId = payload.userId;
     final notifier = ref.read(messagesProvider.notifier);
-
     // Üzenet küldése a ChatNotifier-en keresztül
     final messageId = await notifier.sendMessage(widget.flatId, userId, text);
     if (messageId != null) {
@@ -91,56 +91,69 @@ class _ChatMessageViewState extends ConsumerState<ChatMessageView> {
     }
   }
 
-  Widget _buildImagesGrid(List<MessageAttachment>? images) {
-    if (images == null || images.isEmpty) return const SizedBox.shrink();
+  Widget _buildSelectedImagesPreview() {
+    if (_imageFiles.isEmpty) return const SizedBox.shrink();
 
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        crossAxisSpacing: 8,
-        mainAxisSpacing: 8,
-      ),
-      itemCount: images.length,
-      itemBuilder: (context, index) {
-        final image = images[index];
-        final imageUrl = image.url; // itt már URL-t használunk
-
-        return GestureDetector(
-          onTap:
-              () => showSwipeImageGallery(
-                context,
-                children: [NetworkImage(imageUrl)],
-                swipeDismissible: true,
+    return SizedBox(
+      height: 80,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: _imageFiles.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        itemBuilder: (context, index) {
+          final file = _imageFiles[index];
+          return Stack(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.file(
+                  file,
+                  width: 80,
+                  height: 80,
+                  fit: BoxFit.cover,
+                ),
               ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Image.network(
-              imageUrl,
-              fit: BoxFit.cover,
-              loadingBuilder: (context, child, loadingProgress) {
-                if (loadingProgress == null) return child;
-                return const Center(child: CircularProgressIndicator());
-              },
-              errorBuilder: (context, error, stackTrace) {
-                return const Center(child: Icon(Icons.broken_image));
-              },
-            ),
-          ),
-        );
-      },
+              Positioned(
+                top: 0,
+                right: 0,
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _imageFiles.removeAt(index);
+                    });
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black54,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.close,
+                      color: Colors.white,
+                      size: 18,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
     final messages = ref.watch(messagesProvider);
-    messages.sort((a, b) => a.createdAt.compareTo(b.createdAt));
 
-    print(messages);
     ref.listen<List<MessageModel>>(messagesProvider, (previous, next) {
       if (previous?.length != next.length) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _scrollToEnd();
+        });
+      } else {
+        // frissült egy meglévő üzenet (pl. új csatolmány), scroll le a végére
         WidgetsBinding.instance.addPostFrameCallback((_) {
           _scrollToEnd();
         });
@@ -160,10 +173,8 @@ class _ChatMessageViewState extends ConsumerState<ChatMessageView> {
                 final authState = ref.read(authViewModelProvider);
                 final payload = authState.asData?.value.payload;
                 final isMe = message.senderUser.id == payload?.userId;
-
                 final hasText = message.content.trim().isNotEmpty;
                 var hasImages = false;
-
                 final messageAttachments = message.messageAttachments;
                 if (messageAttachments != null) {
                   hasImages = messageAttachments.isNotEmpty;
@@ -192,11 +203,16 @@ class _ChatMessageViewState extends ConsumerState<ChatMessageView> {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      _buildImagesGrid(message.messageAttachments),
-                    ],
+                      MessageImagesStack(
+                        images: message.messageAttachments ?? [],
+                        isMe: message.senderUser.id == payload?.userId,
+                      ),                    ],
                   );
                 } else if (hasImages) {
-                  messageContent = _buildImagesGrid(message.messageAttachments);
+                  messageContent = MessageImagesStack(
+                    images: message.messageAttachments ?? [],
+                    isMe: message.senderUser.id == payload?.userId,
+                  );
                 } else {
                   messageContent = Container(
                     padding: const EdgeInsets.all(12),
@@ -217,6 +233,7 @@ class _ChatMessageViewState extends ConsumerState<ChatMessageView> {
                 return Align(
                   alignment:
                       isMe ? Alignment.centerRight : Alignment.centerLeft,
+                  key: ValueKey(message.id),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 4),
                     child: messageContent,
@@ -225,6 +242,8 @@ class _ChatMessageViewState extends ConsumerState<ChatMessageView> {
               },
             ),
           ),
+          // Preview a kiválasztott képeknek
+          _buildSelectedImagesPreview(),
           const Divider(height: 1),
           SafeArea(
             child: Row(

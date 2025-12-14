@@ -9,14 +9,14 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f7c025f7-f5d1-49bb-9496-3d397e9e2c84" name="Changes" comment="kép küldés üzenetként">
+    <list default="true" id="f7c025f7-f5d1-49bb-9496-3d397e9e2c84" name="Changes" comment="flat fájlföltés">
+      <change afterPath="$PROJECT_DIR$/lib/widgets/message_attachment.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/models/flat_image.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/models/flat_image.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/services/chat_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/services/chat_service.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/services/file_upload_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/services/file_upload_service.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/viewmodels/chat_view_viewmodel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/viewmodels/chat_view_viewmodel.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/viewmodels/flat_selector_viewmodel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/viewmodels/flat_selector_viewmodel.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/views/flat_details_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/flat_details_view.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/views/flat_form_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/flat_form_view.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/views/flat_selector_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/flat_selector_view.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/views/tenant_flat_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/tenant_flat_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/views/chat_message_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/chat_message_view.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -483,7 +483,15 @@
       <option name="project" value="LOCAL" />
       <updated>1763663679088</updated>
     </task>
-    <option name="localTasksCounter" value="48" />
+    <task id="LOCAL-00048" summary="flat fájlföltés">
+      <option name="closed" value="true" />
+      <created>1765744224114</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1765744224114</updated>
+    </task>
+    <option name="localTasksCounter" value="49" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -498,7 +506,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="chat" />
     <MESSAGE value="Lakás adatok oldal javítások" />
     <MESSAGE value="Sötét - világos mód" />
     <MESSAGE value="Chat funkció" />
@@ -523,6 +530,7 @@
     <MESSAGE value="real time üzenet küldés" />
     <MESSAGE value="Üzenet küldés javítás" />
     <MESSAGE value="kép küldés üzenetként" />
-    <option name="LAST_COMMIT_MESSAGE" value="kép küldés üzenetként" />
+    <MESSAGE value="flat fájlföltés" />
+    <option name="LAST_COMMIT_MESSAGE" value="flat fájlföltés" />
   </component>
 </project>

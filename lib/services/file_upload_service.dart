@@ -10,7 +10,7 @@ final fileUploadServiceProvider = Provider<FileUploadService>((ref) {
 });
 
 class FileUploadService {
-  final String _graphqlEndpoint = host;
+  final String _graphqlEndpoint = 'http://$host:3000/graphql';
   final Ref _ref;
 
   FileUploadService(this._ref);
