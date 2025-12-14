@@ -186,7 +186,6 @@ class FlatService {
             id
             url
             filename
-            url
           }
         }
       }

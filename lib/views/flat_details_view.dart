@@ -180,9 +180,14 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView>
   /// Opens a swipeable image gallery with all images.
   void _openGallery(int initialIndex) {
     final allImages = <ImageProvider>[
-      ..._retainedImages.map((e) => NetworkImage(e.url)),
+      // csak azok, amiknek van url
+      ..._retainedImages
+          .where((e) => e.url != null && e.url!.isNotEmpty)
+          .map((e) => NetworkImage(e.url!)),
       ..._newImages.map((file) => FileImage(file)),
     ];
+
+    if (allImages.isEmpty) return; // opcionális: nincs kép, ne nyisson galériát
 
     showSwipeImageGallery(
       context,
@@ -191,6 +196,7 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView>
       swipeDismissible: true,
     );
   }
+
 
   /// Builds the horizontal list of flat images.
   Widget _buildImageList(String flatId) {
@@ -215,7 +221,12 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView>
 
           if (isRetained) {
             final image = _retainedImages[index];
-            imageProvider = NetworkImage(image.url);
+            print(image.filename);
+            if (image.url == null || image.url!.isEmpty) {
+              // Ha nincs URL, ne jelenítsük a képet
+              return const SizedBox.shrink();
+            }
+            imageProvider = NetworkImage(image.url!);
             onDelete = () => _removeRetainedImage(image, flatId);
           } else {
             final file = _newImages[index - _retainedImages.length];

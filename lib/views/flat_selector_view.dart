@@ -29,9 +29,7 @@ class _ApartmentSelectorScreenState
     final flatsState = ref.watch(
       flatSelectorViewModelProvider(payload?.userId),
     );
-
-    print(flatsState.value?.length);
-
+    
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(80 + MediaQuery.of(context).padding.top),

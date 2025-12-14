@@ -9,17 +9,14 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f7c025f7-f5d1-49bb-9496-3d397e9e2c84" name="Changes" comment="Üzenet küldés javítás">
-      <change afterPath="$PROJECT_DIR$/lib/models/message_attachment.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.dart_tool/package_config.json" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/package_config.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.dart_tool/version" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/version" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.flutter-plugins-dependencies" beforeDir="false" afterPath="$PROJECT_DIR$/.flutter-plugins-dependencies" afterDir="false" />
+    <list default="true" id="f7c025f7-f5d1-49bb-9496-3d397e9e2c84" name="Changes" comment="kép küldés üzenetként">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/models/message_model.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/models/message_model.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/services/chat_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/services/chat_service.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/viewmodels/chat_view_viewmodel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/viewmodels/chat_view_viewmodel.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/views/chat_message_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/chat_message_view.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/models/flat_image.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/models/flat_image.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/viewmodels/flat_selector_viewmodel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/viewmodels/flat_selector_viewmodel.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/views/flat_details_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/flat_details_view.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/views/flat_form_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/flat_form_view.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/views/flat_selector_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/flat_selector_view.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/views/tenant_flat_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/tenant_flat_screen.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -478,7 +475,15 @@
       <option name="project" value="LOCAL" />
       <updated>1763634021968</updated>
     </task>
-    <option name="localTasksCounter" value="47" />
+    <task id="LOCAL-00047" summary="kép küldés üzenetként">
+      <option name="closed" value="true" />
+      <created>1763663679088</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1763663679088</updated>
+    </task>
+    <option name="localTasksCounter" value="48" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -493,7 +498,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="javítások" />
     <MESSAGE value="chat" />
     <MESSAGE value="Lakás adatok oldal javítások" />
     <MESSAGE value="Sötét - világos mód" />
@@ -518,6 +522,7 @@
     <MESSAGE value="flat hozzáadás javítások" />
     <MESSAGE value="real time üzenet küldés" />
     <MESSAGE value="Üzenet küldés javítás" />
-    <option name="LAST_COMMIT_MESSAGE" value="Üzenet küldés javítás" />
+    <MESSAGE value="kép küldés üzenetként" />
+    <option name="LAST_COMMIT_MESSAGE" value="kép küldés üzenetként" />
   </component>
 </project>

@@ -39,6 +39,7 @@ class FlatSelectorViewmodel extends StateNotifier<AsyncValue<List<Flat>>> {
     state = const AsyncValue.loading();
     try {
       final flats = await _flatService.getFlatsForLandlord(_userId);
+      print(flats);
       state = AsyncValue.data(flats);
     } catch (e, st) {
       print("GraphQL Error: $e");
@@ -93,7 +94,7 @@ class FlatSelectorViewmodel extends StateNotifier<AsyncValue<List<Flat>>> {
     if (filePaths.isEmpty) return;
 
     // Loading állapot a UI-nak
-    AsyncValue.loading();
+    state = const AsyncValue.loading();
 
     try {
       // Párhuzamos feltöltés minden fájlra

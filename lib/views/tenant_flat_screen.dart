@@ -37,8 +37,10 @@ class TenantFlatScreen extends ConsumerWidget {
 
           final imageProviders =
           flat.images
-              ?.map((img) => NetworkImage(img.url) as ImageProvider)
+              ?.where((img) => img.url != null && img.url!.isNotEmpty) // csak érvényes URL-ek
+              .map((img) => NetworkImage(img.url!) as ImageProvider)
               .toList();
+
 
           return SafeArea(
             bottom: true,
@@ -77,13 +79,17 @@ class TenantFlatScreen extends ConsumerWidget {
                                     swipeDismissible: true,
                                   );
                                 },
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(16),
-                                  child: Image.network(
-                                    img.url,
-                                    width: 300,
-                                    fit: BoxFit.cover,
-                                  ),
+                                child: (img.url != null && img.url!.isNotEmpty)
+                                    ? Image.network(
+                                  img.url!,
+                                  width: 300,
+                                  fit: BoxFit.cover,
+                                )
+                                    : Container( // placeholder, ha nincs kép
+                                  width: 300,
+                                  height: 200,
+                                  color: Colors.grey[300],
+                                  child: const Icon(Icons.image_not_supported),
                                 ),
                               );
                             },
