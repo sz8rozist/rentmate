@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:adaptive_dialog/adaptive_dialog.dart';
-import 'package:floating_action_bubble/floating_action_bubble.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,7 +9,6 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../models/flat_image.dart';
-import '../models/flat_model.dart';
 import '../models/flat_status.dart';
 import '../models/user_model.dart';
 import '../viewmodels/auth_viewmodel.dart';
@@ -488,7 +486,7 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView>
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<FlatStatus>(
-                  value: _selectedFlatStatus,
+                  initialValue: _selectedFlatStatus,
                   decoration: const InputDecoration(labelText: 'Állapot'),
                   items:
                       FlatStatus.values

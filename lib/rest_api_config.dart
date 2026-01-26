@@ -35,7 +35,7 @@ class ApiService {
         }
         return handler.next(options);
       },
-      onError: (DioError e, handler) {
+      onError: (DioException e, handler) {
         return handler.next(e); // tovább dobhatjuk az error-t
       },
     ));

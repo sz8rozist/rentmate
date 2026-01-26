@@ -142,7 +142,7 @@ class _DocumentUploadPageState extends ConsumerState<DocumentUploadPage> {
         child: Column(
           children: [
             DropdownButtonFormField<String>(
-              value: _selectedCategory,
+              initialValue: _selectedCategory,
               items:
                   _categories
                       .map(

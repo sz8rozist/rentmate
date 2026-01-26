@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -100,7 +99,7 @@ class LeaseContractViewModel extends ChangeNotifier {
       );
 
       // Az eredmény egy PDF, amit feltöltünk
-      final originalName = 'berleti_szerzodes_${flatId}.pdf';
+      final originalName = 'berleti_szerzodes_$flatId.pdf';
       final storageKey = await _service.uploadBytes(pdfBytes, originalName);
 
       await _service.saveMetadata(

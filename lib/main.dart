@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
-import 'package:rentmate/rest_api_config.dart';
 import 'package:rentmate/routing/app_router.dart';
 import 'package:rentmate/theme.dart';
 import 'package:rentmate/viewmodels/theme_provider.dart';

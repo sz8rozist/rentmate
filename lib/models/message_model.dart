@@ -1,4 +1,3 @@
-import 'dart:convert';
 
 import 'package:rentmate/models/message_attachment.dart';
 import 'package:rentmate/models/user_model.dart';

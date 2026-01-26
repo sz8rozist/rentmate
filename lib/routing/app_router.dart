@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart'; // kell, ha Riverpodot használsz
 import 'package:go_router/go_router.dart';
-import 'package:rentmate/models/acces_token.dart';
 import 'package:rentmate/models/user_role.dart';
 import 'package:rentmate/routing/router_notifier.dart';
 import 'package:rentmate/viewmodels/flat_selector_viewmodel.dart';
@@ -17,7 +16,6 @@ import 'package:rentmate/views/signin_view.dart';
 import 'package:rentmate/views/signup_view.dart';
 import 'package:rentmate/views/tenant_flat_screen.dart';
 import 'package:rentmate/views/welcome_screen.dart';
-import '../models/user_model.dart';
 import '../viewmodels/auth_viewmodel.dart';
 import '../views/lease_contract_form_page.dart';
 import '../views/splash_screen.dart';

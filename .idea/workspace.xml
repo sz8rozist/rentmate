@@ -9,36 +9,27 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f7c025f7-f5d1-49bb-9496-3d397e9e2c84" name="Changes" comment="Javítások">
-      <change afterPath="$PROJECT_DIR$/assets/images/bg-2.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/viewmodels/file_upload_viewmodel.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/widgets/app_bar.dart" afterDir="false" />
+    <list default="true" id="f7c025f7-f5d1-49bb-9496-3d397e9e2c84" name="Changes" comment="Graphql -&gt; Rest API">
       <change beforePath="$PROJECT_DIR$/.dart_tool/package_config.json" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/package_config.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.flutter-plugins-dependencies" beforeDir="false" afterPath="$PROJECT_DIR$/.flutter-plugins-dependencies" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/GraphQLConfig.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/rest_api_config.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/graphql_error.dart" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/main.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/models/message_model.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/models/message_model.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/rest_api_config.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/rest_api_config.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/routing/app_router.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/routing/app_router.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/services/auth_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/services/auth_service.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/services/chat_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/services/chat_service.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/services/file_upload_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/services/file_upload_service.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/services/flat_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/services/flat_service.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/services/user_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/services/user_service.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/viewmodels/auth_viewmodel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/viewmodels/auth_viewmodel.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/viewmodels/chat_view_viewmodel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/viewmodels/chat_view_viewmodel.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/viewmodels/flat_list_provider.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/viewmodels/flat_list_provider.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/routing/router_notifier.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/routing/router_notifier.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/theme.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/theme.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/viewmodels/flat_selector_viewmodel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/viewmodels/flat_selector_viewmodel.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/viewmodels/lease_contract_viewmodel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/viewmodels/lease_contract_viewmodel.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/viewmodels/tenant_flat_viewmodel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/viewmodels/tenant_flat_viewmodel.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/viewmodels/user_viewmodel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/viewmodels/user_viewmodel.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/views/chat_message_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/chat_message_view.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/views/document_upload_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/document_upload_page.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/views/flat_details_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/flat_details_view.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/views/flat_form_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/flat_form_view.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/views/flat_selector_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/flat_selector_view.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/views/landlord_home_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/landlord_home_view.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/views/signin_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/signin_view.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/views/signup_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/signup_view.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/widgets/shell_scaffold.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/widgets/shell_scaffold.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/widgets/PDFViewPage.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/widgets/PDFViewPage.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/widgets/swipe_image_galery.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/widgets/swipe_image_galery.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/macos/Flutter/GeneratedPluginRegistrant.swift" beforeDir="false" afterPath="$PROJECT_DIR$/macos/Flutter/GeneratedPluginRegistrant.swift" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.yaml" afterDir="false" />
     </list>
@@ -131,14 +122,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1748194801732</updated>
-    </task>
-    <task id="LOCAL-00002" summary="riverpod state management telepítés">
-      <option name="closed" value="true" />
-      <created>1748201632762</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1748201632762</updated>
     </task>
     <task id="LOCAL-00003" summary="Firebase csere supabasere">
       <option name="closed" value="true" />
@@ -524,7 +507,15 @@
       <option name="project" value="LOCAL" />
       <updated>1765755324251</updated>
     </task>
-    <option name="localTasksCounter" value="51" />
+    <task id="LOCAL-00051" summary="Graphql -&gt; Rest API">
+      <option name="closed" value="true" />
+      <created>1769435477067</created>
+      <option name="number" value="00051" />
+      <option name="presentableId" value="LOCAL-00051" />
+      <option name="project" value="LOCAL" />
+      <updated>1769435477067</updated>
+    </task>
+    <option name="localTasksCounter" value="52" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -539,7 +530,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Sötét - világos mód" />
     <MESSAGE value="Chat funkció" />
     <MESSAGE value="chat javítások" />
     <MESSAGE value="Számlázás menüpont" />
@@ -564,6 +554,7 @@
     <MESSAGE value="flat fájlföltés" />
     <MESSAGE value="Üzenet küldés képekkel" />
     <MESSAGE value="Javítások" />
-    <option name="LAST_COMMIT_MESSAGE" value="Javítások" />
+    <MESSAGE value="Graphql -&gt; Rest API" />
+    <option name="LAST_COMMIT_MESSAGE" value="Graphql -&gt; Rest API" />
   </component>
 </project>

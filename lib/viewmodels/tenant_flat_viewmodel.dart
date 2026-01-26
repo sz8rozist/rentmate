@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rentmate/viewmodels/file_upload_viewmodel.dart';
 import '../rest_api_config.dart';
 import '../models/flat_model.dart';
-import '../services/file_upload_service.dart';
 import '../services/flat_service.dart';
 
 class TenantFlatViewModel extends StateNotifier<AsyncValue<Flat?>> {

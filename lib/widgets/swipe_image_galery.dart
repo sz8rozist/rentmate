@@ -36,7 +36,6 @@ class _SwipeImageGalleryPage extends StatefulWidget {
   final bool swipeDismissible;
 
   const _SwipeImageGalleryPage({
-    super.key,
     required this.images,
     required this.initialIndex,
     required this.swipeDismissible,

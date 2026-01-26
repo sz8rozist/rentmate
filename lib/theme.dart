@@ -94,9 +94,9 @@ final ThemeData realEstateTheme = ThemeData(
 
   dropdownMenuTheme: DropdownMenuThemeData(
     menuStyle: MenuStyle(
-      backgroundColor: MaterialStatePropertyAll(Colors.white),
-      surfaceTintColor: MaterialStatePropertyAll(Colors.white),
-      shape: MaterialStatePropertyAll(
+      backgroundColor: WidgetStatePropertyAll(Colors.white),
+      surfaceTintColor: WidgetStatePropertyAll(Colors.white),
+      shape: WidgetStatePropertyAll(
         RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
@@ -231,9 +231,9 @@ final ThemeData realEstateDarkTheme = ThemeData(
 
   dropdownMenuTheme: DropdownMenuThemeData(
     menuStyle: MenuStyle(
-      backgroundColor: MaterialStatePropertyAll(Colors.grey.shade800),
-      surfaceTintColor: MaterialStatePropertyAll(Colors.grey.shade800),
-      shape: MaterialStatePropertyAll(
+      backgroundColor: WidgetStatePropertyAll(Colors.grey.shade800),
+      surfaceTintColor: WidgetStatePropertyAll(Colors.grey.shade800),
+      shape: WidgetStatePropertyAll(
         RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),

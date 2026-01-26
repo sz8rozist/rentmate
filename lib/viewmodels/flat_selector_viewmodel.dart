@@ -4,7 +4,6 @@ import 'package:rentmate/services/flat_service.dart';
 
 import '../rest_api_config.dart';
 import '../models/flat_model.dart';
-import '../services/file_upload_service.dart';
 import 'file_upload_viewmodel.dart';
 
 final flatSelectorViewModelProvider = StateNotifierProvider.family<

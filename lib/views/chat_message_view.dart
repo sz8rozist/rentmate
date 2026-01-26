@@ -1,15 +1,12 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:rentmate/models/message_attachment.dart';
 import '../models/message_model.dart';
 import '../viewmodels/auth_viewmodel.dart';
 import '../viewmodels/chat_view_viewmodel.dart';
 import '../widgets/custom_snackbar.dart';
 import '../widgets/message_attachment.dart';
-import '../widgets/swipe_image_galery.dart';
 
 class ChatMessageView extends ConsumerStatefulWidget {
   final int flatId;
@@ -83,7 +80,7 @@ class _ChatMessageViewState extends ConsumerState<ChatMessageView> {
 
   Future<void> _pickImage() async {
     final pickedFiles = await _picker.pickMultiImage();
-    if (pickedFiles != null && pickedFiles.isNotEmpty) {
+    if (pickedFiles.isNotEmpty) {
       setState(() {
         _imageFiles.addAll(pickedFiles.map((x) => File(x.path)));
       });

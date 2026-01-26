@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:go_router/go_router.dart';
-import 'package:rentmate/models/flat_status.dart';
-import 'package:rentmate/models/user_model.dart';
 import 'package:rentmate/viewmodels/auth_viewmodel.dart';
 import 'package:rentmate/viewmodels/flat_list_provider.dart';
 import 'package:rentmate/viewmodels/flat_selector_viewmodel.dart';
@@ -14,7 +12,6 @@ import 'package:rentmate/widgets/custom_snackbar.dart';
 import 'package:rentmate/widgets/loading_overlay.dart';
 import '../models/flat_model.dart';
 import '../routing/app_router.dart';
-import '../viewmodels/theme_provider.dart';
 import '../widgets/custom_text_form_field.dart';
 
 class FlatFormView extends ConsumerStatefulWidget {
