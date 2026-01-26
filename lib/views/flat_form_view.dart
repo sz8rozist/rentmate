@@ -9,6 +9,7 @@ import 'package:rentmate/models/user_model.dart';
 import 'package:rentmate/viewmodels/auth_viewmodel.dart';
 import 'package:rentmate/viewmodels/flat_list_provider.dart';
 import 'package:rentmate/viewmodels/flat_selector_viewmodel.dart';
+import 'package:rentmate/widgets/app_bar.dart';
 import 'package:rentmate/widgets/custom_snackbar.dart';
 import 'package:rentmate/widgets/loading_overlay.dart';
 import '../models/flat_model.dart';
@@ -48,65 +49,8 @@ class _FlatFormViewState extends ConsumerState<FlatFormView> {
     final flatVM = ref.read(flatViewModelProvider.notifier);
 
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(80 + MediaQuery.of(context).padding.top),
-        child: SizedBox(
-          height: 80 + MediaQuery.of(context).padding.top,
-          width: double.infinity,
-          // A háttér lefedi a státusz sávot is
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              Image.asset('assets/images/header-image.png', fit: BoxFit.cover),
-              Container(
-                color:
-                    ref.watch(themeModeProvider) == ThemeMode.dark
-                        ? Colors.black.withOpacity(0.5)
-                        : Colors.black.withOpacity(0.2),
-              ),
-              // A tartalmat beljebb húzzuk, hogy ne lógjon be a status bar területére
-              Padding(
-                padding: EdgeInsets.fromLTRB(
-                  60,
-                  MediaQuery.of(context).padding.top,
-                  16,
-                  0,
-                ),
-                child: Align(
-                  alignment: Alignment.center,
-                  child: Text(
-                    'Lakás hozzáadása',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      shadows: [
-                        Shadow(
-                          color: Colors.black54,
-                          offset: Offset(1, 1),
-                          blurRadius: 3,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 0,
-                top: MediaQuery.of(context).padding.top,
-                bottom: 0,
-                child: IconButton(
-                  icon: const Icon(Icons.arrow_back, color: Colors.white),
-                  onPressed: () => {
-                    context.goNamed(AppRoute.flatSelect.name),
-                  },
-                  padding: const EdgeInsets.all(16),
-                  constraints: const BoxConstraints(),
-                ),
-              ),
-            ],
-          ),
-        ),
+      appBar: AppBarWidget(
+        onBack: () => context.goNamed(AppRoute.home.name),
       ),
       body: LoadingOverlay(
         isLoading: flatState.isLoading,
@@ -280,27 +224,37 @@ class _FlatFormViewState extends ConsumerState<FlatFormView> {
                       final authState = ref.read(authViewModelProvider);
                       final payload = authState.asData?.value.payload;
 
-                      final addedFlat = await ref.read(flatSelectorViewModelProvider(payload?.userId).notifier).addFlat(
-                        _addressController.text.trim(),
-                        int.parse(_priceController.text.trim()),
-                        payload?.userId,
-                      );
+                      final addedFlat = await ref
+                          .read(
+                            flatSelectorViewModelProvider(
+                              payload?.userId,
+                            ).notifier,
+                          )
+                          .addFlat(
+                            _addressController.text.trim(),
+                            int.parse(_priceController.text.trim()),
+                            payload?.userId,
+                          );
 
                       print(addedFlat);
                       if (addedFlat != null) {
                         final flatId = addedFlat.id;
-                        await ref.read(flatSelectorViewModelProvider(payload?.userId).notifier).uploadImages(
-                          flatId as int,
-                          selectedImages.map((file) => file.path).toList(),
-                        );
+                        await ref
+                            .read(
+                              flatSelectorViewModelProvider(
+                                payload?.userId,
+                              ).notifier,
+                            )
+                            .uploadImages(
+                              flatId as int,
+                              selectedImages.map((file) => file.path).toList(),
+                            );
                       } else {
                         CustomSnackBar.error(
                           context,
                           "Hiba történt a lakás hozzáadásakor.",
                         );
                       }
-
-
 
                       // Visszairányítás
                       context.goNamed(AppRoute.flatSelect.name);

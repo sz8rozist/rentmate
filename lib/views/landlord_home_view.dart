@@ -13,7 +13,6 @@ class LandlordHomeView extends ConsumerStatefulWidget {
 
 class _LandlordHomeViewState extends ConsumerState<LandlordHomeView> {
   late final List<MenuItem> standaloneMenus;
-  late final Map<String, List<MenuItem>> menuGroups;
 
   @override
   Widget build(BuildContext context) {
@@ -28,78 +27,58 @@ class _LandlordHomeViewState extends ConsumerState<LandlordHomeView> {
     standaloneMenus = [
       MenuItem('Lakás kiválasztása', Icons.home, AppRoute.flatSelect),
       MenuItem('Lakás hozzáadása', Icons.add_home, AppRoute.createFlat),
+      MenuItem(
+        'Szerződés készítés',
+        Icons.description,
+        AppRoute.createBerletiSzerzodes,
+      ),
+      MenuItem(
+        'Dokumentum feltöltés',
+        Icons.upload_file,
+        AppRoute.uploadDocument,
+      ),
+      MenuItem(
+        'Dokumentumok megtekintése',
+        Icons.folder_open,
+        AppRoute.documents,
+        paramName: 'flatId',
+        paramValue: selectedFlat.id.toString(),
+      ),
+      MenuItem('Tranzakciók', Icons.receipt_long, AppRoute.invoices),
+      MenuItem('Kaució kezelése', Icons.receipt_long, AppRoute.invoices),
+      MenuItem(
+        'Javítási/Karbantartási költségek kezelése',
+        Icons.receipt_long,
+        AppRoute.invoices,
+      ),
     ];
 
-    menuGroups = {
-      'Dokumentumok': [
-        MenuItem(
-          'Szerződés készítés',
-          Icons.description,
-          AppRoute.createBerletiSzerzodes,
-        ),
-        MenuItem(
-          'Dokumentum feltöltés',
-          Icons.upload_file,
-          AppRoute.uploadDocument,
-        ),
-        MenuItem(
-          'Dokumentumok megtekintése',
-          Icons.folder_open,
-          AppRoute.documents,
-          paramName: 'flatId',
-          paramValue: selectedFlat.id.toString(),
-        ),
-      ],
-      'Pénzügyek': [
-        MenuItem(
-          'Tranzakciók',
-          Icons.receipt_long,
-          AppRoute.invoices,
-        ),
-        MenuItem(
-          'Kaució kezelése',
-          Icons.receipt_long,
-          AppRoute.invoices,
-        ),
-        MenuItem(
-          'Javítási/Karbantartási költségek kezelése',
-          Icons.receipt_long,
-          AppRoute.invoices,
-        ),
-      ],
-    };
-
-    return Scaffold(
-      body: ListView(
+    return SafeArea(
+      child: Padding(
         padding: const EdgeInsets.all(16),
-        children: [
-          // Különálló menük
-          ...standaloneMenus.map((item) => MenuCard(item: item)),
-          const SizedBox(height: 24),
-
-          // Csoportosított menük
-          ...menuGroups.entries.map((entry) {
-            final groupName = entry.key;
-            final menuItems = entry.value;
-
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  groupName,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blueGrey[700],
-                  ),
-                ),
-                const SizedBox(height: 8),
-                ...menuItems.map((item) => MenuCard(item: item)),
-                const SizedBox(height: 24),
-              ],
-            );
-          }),
-        ],
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Menü',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            Expanded(
+              child: GridView.count(
+                crossAxisCount: 2,
+                mainAxisSpacing: 12,
+                // kisebb távolság
+                crossAxisSpacing: 12,
+                childAspectRatio: 1.8,
+                // kisebb kártya, majdnem négyzet
+                children: [
+                  ...standaloneMenus.map((item) => MenuCard(item: item)),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -113,12 +92,12 @@ class MenuItem {
   final String? paramValue;
 
   MenuItem(
-      this.title,
-      this.icon,
-      this.routeName, {
-        this.paramName,
-        this.paramValue,
-      });
+    this.title,
+    this.icon,
+    this.routeName, {
+    this.paramName,
+    this.paramValue,
+  });
 }
 
 class MenuCard extends StatelessWidget {
@@ -128,24 +107,51 @@ class MenuCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 6),
-      elevation: 3,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      child: ListTile(
-        leading: Icon(item.icon, color: Theme.of(context).colorScheme.primary),
-        title: Text(item.title),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-        onTap: () {
-          if (item.paramName != null && item.paramValue != null) {
-            context.goNamed(
-              item.routeName.name,
-              pathParameters: {item.paramName!: item.paramValue!},
-            );
-          } else {
-            context.goNamed(item.routeName.name);
-          }
-        },
+    return GestureDetector(
+      onTap: () {
+        if (item.paramName != null && item.paramValue != null) {
+          context.goNamed(
+            item.routeName.name,
+            pathParameters: {item.paramName!: item.paramValue!},
+          );
+        } else {
+          context.goNamed(item.routeName.name);
+        }
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12), // kicsit kisebb lekerekítés
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(12), // kicsit kevesebb padding
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Icon(
+                item.icon,
+                size: 30, // kisebb ikon
+                color: Colors.grey[800], // sötétszürke ikon
+              ),
+              Text(
+                item.title,
+                style: const TextStyle(
+                  fontSize: 14, // kisebb szöveg
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87, // enyhén szürke szöveg
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

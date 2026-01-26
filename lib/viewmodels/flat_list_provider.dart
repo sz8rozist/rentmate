@@ -2,11 +2,12 @@ import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:rentmate/services/file_upload_service.dart';
+import 'package:rentmate/models/user_model.dart';
 import 'package:rentmate/services/flat_service.dart';
 
-import '../GraphQLConfig.dart';
+import '../rest_api_config.dart';
 import '../models/flat_model.dart';
+import 'file_upload_viewmodel.dart';
 
 /// -----------------
 /// Egy lakás ViewModel
@@ -65,32 +66,55 @@ class FlatViewModel extends StateNotifier<AsyncValue<Flat?>> {
   }
 
   /// Tenant hozzáadás
-  Future<void> addTenant(int flatId, int tenantId) async {
-    state = AsyncValue.loading();
+  Future<void> addTenant(int flatId, int tenantId, UserModel tenant) async {
+    final currentFlat = state.value;
+    if (currentFlat == null) return;
+
+    state = const AsyncValue.loading();
+
     try {
-      final addFlat = await _service.addTenantToFlat(flatId, tenantId);
-      if (addFlat) {
-        Flat? flat = await _service.getFlatById(flatId);
-        state = AsyncValue.data(flat);
+      final success = await _service.addTenantToFlat(flatId, tenantId);
+
+      if (success) {
+        final List<UserModel> updatedTenants = [
+          ...(currentFlat.tenants ?? <UserModel>[]),
+          tenant,
+        ];
+
+        state = AsyncValue.data(
+          currentFlat.copyWith(tenants: updatedTenants),
+        );
       }
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
   }
 
+
   /// Tenant törlés
-  Future<void> removeTenant(int flatId, int tenantId) async {
-    state = AsyncValue.loading();
+  Future<void> removeTenant(int tenantId) async {
+    final currentFlat = state.value;
+    if (currentFlat == null) return;
+
+    state = const AsyncValue.loading();
+
     try {
-      final updatedFlat = await _service.removeTenantFromFlat(tenantId);
-      if (updatedFlat) {
-        Flat? flat = await _service.getFlatById(flatId);
-        state = AsyncValue.data(flat);
+      final success = await _service.removeTenantFromFlat(tenantId);
+
+      if (success) {
+        final updatedTenants = currentFlat.tenants
+            ?.where((t) => t.id != tenantId)
+            .toList();
+
+        state = AsyncValue.data(
+          currentFlat.copyWith(tenants: updatedTenants),
+        );
       }
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
   }
+
 
   void clear() => state = AsyncValue.data(null);
 }
@@ -99,17 +123,15 @@ class FlatViewModel extends StateNotifier<AsyncValue<Flat?>> {
 /// Service Provider
 /// -----------------
 final flatServiceProvider = Provider<FlatService>((ref) {
-  final client = ref.watch(graphQLClientProvider);
   final fileUploadService = ref.watch(fileUploadServiceProvider);
-  return FlatService(client.value, fileUploadService);
+  final apiService = ref.watch(apiServiceProvider);
+  return FlatService(apiService: apiService, fileUploadService: fileUploadService);
 });
 
 /// -----------------
 /// ViewModel Providerek
 /// -----------------
-final flatViewModelProvider = StateNotifierProvider<FlatViewModel, AsyncValue<Flat?>>((
-  ref,
-) {
-  return FlatViewModel(ref.watch(flatServiceProvider));
-});
-
+final flatViewModelProvider =
+    StateNotifierProvider<FlatViewModel, AsyncValue<Flat?>>((ref) {
+      return FlatViewModel(ref.watch(flatServiceProvider));
+    });

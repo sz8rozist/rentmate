@@ -1,13 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../GraphQLConfig.dart';
+import '../rest_api_config.dart';
 import '../services/user_service.dart';
 import '../models/user_model.dart';
 
-final userServiceProvider = Provider<UserService>((ref) {
-  final client = ref.watch(graphQLClientProvider);
-  return UserService(client.value);
-});
 
+final userServiceProvider = Provider<UserService>((ref) {
+  final apiService = ref.watch(apiServiceProvider);
+  return UserService(apiService);
+});
 final tenantListProvider =
     StateNotifierProvider<TenantListNotifier, AsyncValue<List<UserModel>>>((
       ref,

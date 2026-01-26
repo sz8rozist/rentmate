@@ -1,9 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:rentmate/models/flat_status.dart';
 import 'package:rentmate/services/flat_service.dart';
 
-import '../GraphQLConfig.dart';
+import '../rest_api_config.dart';
 import '../models/flat_model.dart';
 import '../services/file_upload_service.dart';
+import 'file_upload_viewmodel.dart';
 
 final flatSelectorViewModelProvider = StateNotifierProvider.family<
   FlatSelectorViewmodel,
@@ -15,9 +17,9 @@ final flatSelectorViewModelProvider = StateNotifierProvider.family<
   return viewModel;
 });
 final flatServiceProvider = Provider<FlatService>((ref) {
-  final client = ref.watch(graphQLClientProvider);
+  final apiService = ref.watch(apiServiceProvider);
   final fileUploadService = ref.watch(fileUploadServiceProvider);
-  return FlatService(client.value, fileUploadService);
+  return FlatService(apiService: apiService, fileUploadService: fileUploadService);
 });
 
 final selectedFlatProvider = StateProvider<Flat?>((ref) => null);
@@ -41,7 +43,6 @@ class FlatSelectorViewmodel extends StateNotifier<AsyncValue<List<Flat>>> {
     state = const AsyncValue.loading();
     try {
       final flats = await _flatService.getFlatsForLandlord(_userId);
-      print(flats);
       state = AsyncValue.data(flats);
     } catch (e, st) {
       print("GraphQL Error: $e");
@@ -52,7 +53,7 @@ class FlatSelectorViewmodel extends StateNotifier<AsyncValue<List<Flat>>> {
   // Új flat hozzáadása a listához
   Future<Flat?> addFlat(String address, int price, int? userId) async {
     try {
-      final flat = await _flatService.addFlat(address, price, userId);
+      final flat = await _flatService.addFlat(address, price, userId as int);
 
       final previous = state.value ?? [];
       state = AsyncValue.data([...previous, flat]);
@@ -65,16 +66,18 @@ class FlatSelectorViewmodel extends StateNotifier<AsyncValue<List<Flat>>> {
   }
 
   // Flat frissítése a listában
-  Future<void> updateFlat(int id, Flat flat) async {
+  Future<Flat> updateFlat(int id, String address, int price, FlatStatus status) async {
     try {
-      final updatedFlat = await _flatService.updateFlat(id, flat);
-
+      final updatedFlat = await _flatService.updateFlat(id, address: address, price: price, status: status);
       final previous = state.value ?? [];
       final updatedList =
           previous.map((f) => f.id == id ? updatedFlat : f).toList();
       state = AsyncValue.data(updatedList);
+
+      return updatedFlat;
     } catch (e, st) {
       state = AsyncValue.error(e, st);
+      rethrow;
     }
   }
 

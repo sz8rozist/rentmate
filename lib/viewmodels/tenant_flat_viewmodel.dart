@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../GraphQLConfig.dart';
+import 'package:rentmate/viewmodels/file_upload_viewmodel.dart';
+import '../rest_api_config.dart';
 import '../models/flat_model.dart';
 import '../services/file_upload_service.dart';
 import '../services/flat_service.dart';
@@ -24,23 +25,12 @@ class TenantFlatViewModel extends StateNotifier<AsyncValue<Flat?>> {
       state = AsyncValue.error(e, st);
     }
   }
-
-  /*Future<void> sendExitRequest() async {
-    if (state.value == null) return;
-    state = const AsyncValue.loading();
-    try {
-      await _service.sendExitRequest(tenantUserId, state.value!.id!);
-      await _fetchFlat(); // ha szeretnéd frissíteni az adatokat
-    } catch (e, st) {
-      state = AsyncValue.error(e, st);
-    }
-  }*/
 }
 
 final flatServiceProvider = Provider<FlatService>((ref) {
-  final client = ref.watch(graphQLClientProvider);
+  final client = ref.watch(apiServiceProvider);
   final fileUploadService = ref.watch(fileUploadServiceProvider);
-  return FlatService(client.value, fileUploadService);
+  return FlatService(apiService: client, fileUploadService: fileUploadService);
 });
 
 final tenantFlatViewModelProvider =

@@ -128,12 +128,6 @@
       "languageVersion": "3.4"
     },
     {
-      "name": "crystal_navigation_bar",
-      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/crystal_navigation_bar-1.0.4",
-      "packageUri": "lib/",
-      "languageVersion": "3.1"
-    },
-    {
       "name": "cupertino_icons",
       "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/cupertino_icons-1.0.8",
       "packageUri": "lib/",
@@ -1050,12 +1044,6 @@
       "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/shared_preferences_windows-2.4.1",
       "packageUri": "lib/",
       "languageVersion": "3.3"
-    },
-    {
-      "name": "sidebarx",
-      "rootUri": "file:///Users/rozsaistvan/.pub-cache/hosted/pub.dev/sidebarx-0.17.2",
-      "packageUri": "lib/",
-      "languageVersion": "2.15"
     },
     {
       "name": "signature",

@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:go_router/go_router.dart';
-import 'package:rentmate/GraphQLConfig.dart';
+import 'package:rentmate/rest_api_config.dart';
 import 'package:rentmate/models/user_model.dart';
 import 'package:rentmate/models/user_role.dart';
 import 'package:rentmate/routing/app_router.dart';

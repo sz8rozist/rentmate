@@ -1,20 +1,22 @@
 import 'dart:async';
-
-import 'package:graphql/client.dart';
-import 'package:rentmate/services/file_upload_service.dart';
+import 'package:dio/dio.dart';
+import 'package:rentmate/models/message_model.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
-import '../models/message_model.dart';
+import '../rest_api_config.dart';
 
 class ChatService {
   final IO.Socket socket;
-  final _messageController = StreamController<MessageModel>.broadcast();
-  final FileUploadService fileUploadService;
-  final GraphQLClient client;
+  final ApiService apiService;
+  final StreamController<MessageModel> _messageController =
+  StreamController<MessageModel>.broadcast();
 
-  ChatService(String serverUrl, this.fileUploadService, this.client)
-      : socket = IO.io(
-    serverUrl,
+  ChatService({
+    required String socketUrl,
+    required int flatId,
+    required this.apiService,
+  }) : socket = IO.io(
+    socketUrl,
     IO.OptionBuilder()
         .setTransports(['websocket'])
         .disableAutoConnect()
@@ -22,11 +24,12 @@ class ChatService {
   ) {
     _setupListeners();
     socket.connect();
+    joinRoom(flatId);
   }
 
+  /// Realtime listener
   void _setupListeners() {
-    // Új üzenet érkezett
-    socket.on('messageAdded', (data) {
+    socket.on('receive_message', (data) {
       final message = MessageModel.fromJson(data);
       _messageController.add(message);
     });
@@ -34,94 +37,57 @@ class ChatService {
 
   Stream<MessageModel> get messageStream => _messageController.stream;
 
-  // Szoba csatlakozás
+  /// Szobához csatlakozás
   void joinRoom(int flatId) {
     socket.emit('joinRoom', {'flatId': flatId});
   }
 
-  Future<int?> sendMessage({
+  /// Szöveges üzenet küldése Socket.IO-val
+  void sendMessage({
     required int flatId,
     required int senderId,
     required String content,
-  }) async {
-    final completer = Completer<int?>();
-
-    socket.emitWithAck(
-      'sendMessage',
-      {
-        'flatId': flatId,
-        'senderId': senderId,
-        'content': content,
-      },
-      ack: (data) {
-        // data a backend által visszaküldött message objektum id-ja
-        completer.complete(data as int?);
-      },
-    );
-
-    return completer.future;
+  }) {
+    socket.emit('send_message', {
+      'flatId': flatId,
+      'senderId': senderId,
+      'content': content,
+    });
   }
 
-  /// Teljes chat történet lekérése
-  Future<void> fetchInitialMessages(int flatId) async {
-    final completer = Completer<void>();
-    // Egyszeri listener a válaszra
-    void handler(dynamic data) {
-      if (data is List) {
-        final messages = data
-            .map((msgJson) => MessageModel.fromJson(msgJson))
-            .toList();
+  /// Chat előzmények lekérése REST API-val
+  Future<List<MessageModel>> fetchMessages(int flatId) async {
+    final data = await apiService.get('/chat/messages/$flatId');
+    final messages =
+    (data as List).map((json) => MessageModel.fromJson(json)).toList();
+    messages.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+    return messages;
+  }
 
-        // sort createdAt szerint
-        messages.sort((a, b) => a.createdAt.compareTo(b.createdAt));
-
-        for (var msg in messages) {
-          _messageController.add(msg);
-        }
-      }
-      completer.complete();
-      socket.off('messages', handler);
+  /// Fájlok feltöltése egy meglévő üzenethez REST API-val
+  Future<MessageModel> uploadFiles({
+    required int messageId,
+    required List<String> filePaths,
+  }) async {
+    final formData = FormData();
+    for (var path in filePaths) {
+      formData.files.add(MapEntry(
+        'files',
+        await MultipartFile.fromFile(path, filename: path.split('/').last),
+      ));
     }
 
-    socket.on('messages', handler);
-    socket.emit('getMessages', {'flatId': flatId});
+    final data = await apiService.post(
+      '/chat/messages/$messageId/files',
+      formData as Map<String, dynamic>,
+      authRequired: true,
+    );
 
-    return completer.future;
+    return MessageModel.fromJson(data);
   }
 
   void dispose() {
     _messageController.close();
     socket.dispose();
-  }
-
-  /*void sendAttachment({required int messageId, required String filePath}) {
-    socket.emit('uploadAttachment', {
-      'messageId': messageId,
-      'file': filePath
-    });
-  }*/
-
-  Future<bool> sendAttachment({
-    required int messageId,
-    required String filePath,
-  }) async {
-    const mutation = r'''
-      mutation UploadAttachment($messageId: Int!, $file: Upload!) {
-        uploadAttachment(messageId: $messageId, file: $file)
-      }
-    ''';
-
-    final variables = {
-        "messageId": messageId,
-    };
-
-    final success = await fileUploadService.uploadSingleFile(
-      mutation: mutation,
-      variables: variables,
-      filePath: filePath,
-      fileVariableName: 'file',
-    );
-
-    return success;
   }
 }

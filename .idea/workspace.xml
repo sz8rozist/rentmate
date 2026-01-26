@@ -9,12 +9,38 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f7c025f7-f5d1-49bb-9496-3d397e9e2c84" name="Changes" comment="Üzenet küldés képekkel">
+    <list default="true" id="f7c025f7-f5d1-49bb-9496-3d397e9e2c84" name="Changes" comment="Javítások">
+      <change afterPath="$PROJECT_DIR$/assets/images/bg-2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/viewmodels/file_upload_viewmodel.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/widgets/app_bar.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.dart_tool/package_config.json" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/package_config.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.flutter-plugins-dependencies" beforeDir="false" afterPath="$PROJECT_DIR$/.flutter-plugins-dependencies" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/GraphQLConfig.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/rest_api_config.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/graphql_error.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/main.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/routing/app_router.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/routing/app_router.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/services/auth_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/services/auth_service.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/services/chat_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/services/chat_service.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/services/file_upload_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/services/file_upload_service.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/services/flat_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/services/flat_service.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/services/user_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/services/user_service.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/viewmodels/auth_viewmodel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/viewmodels/auth_viewmodel.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/viewmodels/chat_view_viewmodel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/viewmodels/chat_view_viewmodel.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/viewmodels/flat_list_provider.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/viewmodels/flat_list_provider.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/viewmodels/flat_selector_viewmodel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/viewmodels/flat_selector_viewmodel.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/viewmodels/tenant_flat_viewmodel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/viewmodels/tenant_flat_viewmodel.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/viewmodels/user_viewmodel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/viewmodels/user_viewmodel.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/views/chat_message_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/chat_message_view.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/views/flat_details_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/flat_details_view.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/views/flat_form_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/flat_form_view.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/views/flat_selector_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/flat_selector_view.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/views/landlord_home_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/landlord_home_view.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/views/signin_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/signin_view.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/views/signup_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/signup_view.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/widgets/shell_scaffold.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/widgets/shell_scaffold.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -75,17 +101,18 @@
     &quot;com.google.services.firebase.aqiPopupShown&quot;: &quot;true&quot;,
     &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;io.flutter.project.isFirstOpen&quot;: &quot;true&quot;,
     &quot;io.flutter.reload.alreadyRun&quot;: &quot;true&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
     &quot;last_opened_file_path&quot;: &quot;/Users/rozsaistvan/Documents/rentmate&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;AndroidSdkUpdater&quot;,
     &quot;show.migrate.to.gradle.popup&quot;: &quot;false&quot;
   }
 }</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/assets/fonts" />
       <recent name="$PROJECT_DIR$/assets/images" />
+      <recent name="$PROJECT_DIR$/assets/fonts" />
       <recent name="$PROJECT_DIR$/assets" />
       <recent name="$PROJECT_DIR$/android/app" />
     </key>
@@ -104,14 +131,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1748194801732</updated>
-    </task>
-    <task id="LOCAL-00001" summary="Firebase hozzáadás">
-      <option name="closed" value="true" />
-      <created>1748201282212</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1748201282213</updated>
     </task>
     <task id="LOCAL-00002" summary="riverpod state management telepítés">
       <option name="closed" value="true" />
@@ -497,7 +516,15 @@
       <option name="project" value="LOCAL" />
       <updated>1765754761687</updated>
     </task>
-    <option name="localTasksCounter" value="50" />
+    <task id="LOCAL-00050" summary="Üzenet küldés képekkel">
+      <option name="closed" value="true" />
+      <created>1765755324245</created>
+      <option name="number" value="00050" />
+      <option name="presentableId" value="LOCAL-00050" />
+      <option name="project" value="LOCAL" />
+      <updated>1765755324251</updated>
+    </task>
+    <option name="localTasksCounter" value="51" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -527,7 +554,6 @@
     <MESSAGE value="Bérleti szerződés létrehozás stepper" />
     <MESSAGE value="Számla részletek javítás" />
     <MESSAGE value="graphql és nest js backend bevezetés" />
-    <MESSAGE value="Javítások" />
     <MESSAGE value="Chat funkció nest js backendel" />
     <MESSAGE value="tenant flat adatok lekérése nest js ből" />
     <MESSAGE value="bottom navigáció, fájl feltöltés" />
@@ -537,6 +563,7 @@
     <MESSAGE value="kép küldés üzenetként" />
     <MESSAGE value="flat fájlföltés" />
     <MESSAGE value="Üzenet küldés képekkel" />
-    <option name="LAST_COMMIT_MESSAGE" value="Üzenet küldés képekkel" />
+    <MESSAGE value="Javítások" />
+    <option name="LAST_COMMIT_MESSAGE" value="Javítások" />
   </component>
 </project>

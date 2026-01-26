@@ -150,7 +150,7 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView>
   }
 
   /// Handles the save action for flat details.
-  Future<void> _onSave(String flatId) async {
+  Future<void> _onSave(int flatId) async {
     if (!_formKey.currentState!.validate()) {
       CustomSnackBar.error(context, "Kérlek töltsd ki helyesen a mezőket!");
       return;
@@ -159,18 +159,23 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView>
       CustomSnackBar.error(context, "Válassz státuszt!");
       return;
     }
-    Flat flat = Flat(
-      address: _addressController.text,
-      price: _priceController.text as int,
-      status: _selectedFlatStatus!,
-    );
+
     final authState = ref.read(authViewModelProvider);
     final payload = authState.asData?.value.payload;
 
-    await ref
+    var updatedFlat = await ref
         .read(flatSelectorViewModelProvider(payload?.userId).notifier)
-        .updateFlat(flatId as int, flat);
-    // It's generally better to pop after a successful operation is confirmed by the provider.
+        .updateFlat(
+          flatId,
+          _addressController.text,
+          int.parse(_priceController.text),
+          _selectedFlatStatus!,
+        );
+    final selected = ref.read(selectedFlatProvider);
+    if (selected?.id == updatedFlat.id) {
+      ref.read(selectedFlatProvider.notifier).state = updatedFlat;
+    }
+
     if (mounted) {
       context.pop();
       CustomSnackBar.success(context, "Sikeres mentés!");
@@ -196,7 +201,6 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView>
       swipeDismissible: true,
     );
   }
-
 
   /// Builds the horizontal list of flat images.
   Widget _buildImageList(String flatId) {
@@ -303,6 +307,7 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView>
           separatorBuilder: (_, __) => const SizedBox(height: 8),
           itemBuilder: (context, index) {
             final tenant = tenantList[index];
+            print(tenant.name);
             return Dismissible(
               key: ValueKey(tenant.id),
               direction: DismissDirection.endToStart,
@@ -316,12 +321,12 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView>
                 );
 
                 if (result == OkCancelResult.ok) {
-                 /* await ref
+                  await ref
                       .read(flatViewModelProvider.notifier)
-                      .removeTenant(flatId as int, tenant.id);
+                      .removeTenant(tenant.id as int);
                   ref
                       .read(tenantListProvider.notifier)
-                      .includeTenant(tenant.id);*/
+                      .includeTenant(tenant.id as int);
                   return true;
                 }
                 return false;
@@ -446,7 +451,7 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView>
   }
 
   /// Builds the dialog content for editing flat details.
-  Widget _buildEditFlatDialog(BuildContext context, String flatId) {
+  Widget _buildEditFlatDialog(BuildContext context, int flatId) {
     return AlertDialog(
       title: const Text('Lakás szerkesztése'),
       content: ConstrainedBox(
@@ -589,20 +594,22 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView>
                           context: context,
                           isScrollControlled: true,
                           builder:
-                              (context) =>
-                                  _buildAddTenantModal(context, selectedFlat.id.toString()),
+                              (context) => _buildAddTenantModal(
+                                context,
+                                selectedFlat.id.toString(),
+                              ),
                         );
 
                     if (selectedTenant != null) {
                       debugPrint(
                         'Kiválasztott bérlő: ${selectedTenant.name}, email: ${selectedTenant.email}',
                       );
-                      /*ref
+                      ref
                           .read(flatViewModelProvider.notifier)
-                          .addTenant(selectedFlat.id as int, selectedTenant.id);
+                          .addTenant(selectedFlat.id as int, selectedTenant.id as int, selectedTenant);
                       ref
                           .read(tenantListProvider.notifier)
-                          .excludeTenant(selectedTenant.id);*/
+                          .excludeTenant(selectedTenant.id as int);
                     }
                   },
                   icon: const Icon(Icons.person_add),
@@ -617,7 +624,10 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView>
                     await showAdaptiveDialog(
                       context: context,
                       builder:
-                          (context) => _buildEditFlatDialog(context, selectedFlat.id.toString()),
+                          (context) => _buildEditFlatDialog(
+                            context,
+                            selectedFlat.id as int,
+                          ),
                     );
                   },
                   icon: const Icon(Icons.edit),

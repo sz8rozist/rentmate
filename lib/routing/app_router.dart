@@ -47,15 +47,15 @@ enum AppRoute {
   flatSelect,
   notFound;
 
-  String title(UserRole role) {
+  String title() {
     switch (this) {
       case AppRoute.home:
-        return 'Kezdőlap';
+        return 'Továbbiak';
       case AppRoute.chatMessage:
         return 'Chat';
       case AppRoute.flat:
       case AppRoute.myRental:
-        return role == UserRole.landlord ? 'Lakásom' : 'Albérletem';
+        return 'Lakásom';
       case AppRoute.profil:
         return 'Profil';
       case AppRoute.createFlat:

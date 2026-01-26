@@ -113,7 +113,7 @@ class _ApartmentSelectorScreenState
                   trailing: const Icon(Icons.arrow_forward_ios),
                   onTap: () {
                     ref.read(selectedFlatProvider.notifier).state = flat;
-                    context.goNamed(AppRoute.home.name);
+                    context.goNamed(AppRoute.flat.name);
                   },
                 ),
               );

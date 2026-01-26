@@ -1,43 +1,25 @@
-import 'package:graphql_flutter/graphql_flutter.dart';
-import 'package:rentmate/graphql_error.dart';
 import '../models/user_model.dart';
+import '../rest_api_config.dart';
 
 class UserService {
-  final GraphQLClient client;
-
-  UserService(this.client);
+  final ApiService apiService;
+  UserService(this.apiService);
 
   Future<List<UserModel>> getTenant(String name) async {
-    const query = r'''
-      query GetTenants($input: GetTenantsInput) {
-        tenants(input: $input) {
-          id
-          name
-          email
-        }
-      }
-    ''';
+    try {
+      // Ha üres, akkor nem küldünk query param-et
+      final queryParams = name.isEmpty ? null : {'name': name};
 
-    final variables = {
-      'input': name.isEmpty ? null : {'name': name}
-    };
+      final data = await apiService.get('/tenants', queryParameters: queryParams);
 
-    final result = await client.query(
-      QueryOptions(
-        document: gql(query),
-        variables: variables,
-        fetchPolicy: FetchPolicy.networkOnly,
-      ),
-    );
+      final tenants = (data as List<dynamic>)
+          .map((e) => UserModel.fromJson(e as Map<String, dynamic>))
+          .toList();
 
-    if (result.hasException) {
-      print(result.exception);
-      throw parseGraphQLErrors(result.exception);
+      return tenants;
+    } catch (e) {
+      print('Error fetching tenants: $e');
+      rethrow;
     }
-
-    final data = result.data!['tenants'] as List<dynamic>;
-    return data
-        .map((e) => UserModel.fromJson(e as Map<String, dynamic>))
-        .toList();
   }
 }

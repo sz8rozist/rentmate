@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-import '../GraphQLConfig.dart';
+import '../rest_api_config.dart';
 import '../models/acces_token.dart';
 import '../models/auth_state.dart';
 import '../models/user_model.dart';
@@ -88,8 +88,5 @@ class AuthViewModel extends StateNotifier<AsyncValue<AuthState>> {
 }
 
 final authServiceProvider = Provider<AuthService>((ref) {
-  final client = ref.watch(graphQLClientProvider);
-  // Ahol a GraphQLClient van definiálva
-  final storage = FlutterSecureStorage();
-  return AuthService(client: client.value, storage: storage);
+  return AuthService(apiService: ref.watch(apiServiceProvider), storage: FlutterSecureStorage());
 });

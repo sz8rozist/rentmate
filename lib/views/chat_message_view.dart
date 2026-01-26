@@ -56,19 +56,30 @@ class _ChatMessageViewState extends ConsumerState<ChatMessageView> {
 
     final userId = payload.userId;
     final notifier = ref.read(messagesProvider.notifier);
-    // Üzenet küldése a ChatNotifier-en keresztül
-    final messageId = await notifier.sendMessage(widget.flatId, userId, text);
-    if (messageId != null) {
+
+    // Szöveges üzenet küldése
+    if (text.isNotEmpty) {
+      notifier.sendMessage(widget.flatId, userId, text);
+    }
+
+    // Ha vannak csatolt fájlok, várjuk meg az új üzenetet a saját usertől
+    if (_imageFiles.isNotEmpty) {
+      final message = await notifier.chatService.messageStream.firstWhere(
+            (msg) => msg.senderUser.id == userId && msg.content == text,
+      );
+
       for (final file in _imageFiles) {
-        notifier.sendAttachment(messageId, file.path);
+        await notifier.sendAttachment(message.id as int, file.path);
       }
+
+      _imageFiles.clear();
     }
 
     _controller.clear();
-    _imageFiles.clear();
     FocusScope.of(context).unfocus();
     _scrollToEnd();
   }
+
 
   Future<void> _pickImage() async {
     final pickedFiles = await _picker.pickMultiImage();
@@ -160,8 +171,8 @@ class _ChatMessageViewState extends ConsumerState<ChatMessageView> {
       }
     });
 
-    return Scaffold(
-      body: Column(
+    return SafeArea(
+      child: Column(
         children: [
           Expanded(
             child: ListView.builder(

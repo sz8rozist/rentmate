@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
-import 'package:rentmate/GraphQLConfig.dart';
+import 'package:rentmate/rest_api_config.dart';
 import 'package:rentmate/routing/app_router.dart';
 import 'package:rentmate/theme.dart';
 import 'package:rentmate/viewmodels/theme_provider.dart';
@@ -28,17 +28,13 @@ class MyApp extends ConsumerWidget {
     final isDarkMode = ref.watch(
       themeModeProvider,
     ); // Riverpod state provider (lásd lentebb)
-    final graphQLClient = ref.watch(graphQLClientProvider);
-    return GraphQLProvider(
-      client: graphQLClient,
-      child: MaterialApp.router(
-        debugShowCheckedModeBanner: false,
-        title: 'RentMate',
-        theme: realEstateTheme,
-        darkTheme: realEstateDarkTheme,
-        themeMode: isDarkMode,
-        routerConfig: router,
-      ),
+    return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
+      title: 'RentMate',
+      theme: realEstateTheme,
+      darkTheme: realEstateDarkTheme,
+      themeMode: isDarkMode,
+      routerConfig: router,
     );
   }
 }

@@ -46,25 +46,19 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
       }
       final authViewModel = ref.read(authViewModelProvider.notifier);
 
-      await authViewModel.register(
+      var registeredUser = await authViewModel.register(
         _emailController.text.trim(),
         role,
         _passwordController.text.trim(),
         _nameController.text.trim(),
       );
 
-      final state = ref.read(authViewModelProvider);
-      state.when(
-        data: (_) {
-          CustomSnackBar.success(context, "Sikeres regisztráció!");
-          context.goNamed(AppRoute.signin.name);
-        },
-        loading: () {},
-        error: (e, _) {
-          CustomSnackBar.error(context, e.toString());
-          print(e);
-        },
-      );
+      if(registeredUser == null){
+        CustomSnackBar.error(context, "Sikertelen regisztráció!");
+      }
+
+      CustomSnackBar.success(context, "Sikeres regisztráció!");
+      context.goNamed(AppRoute.signin.name);
     } else if (!agreePersonalData) {
       CustomSnackBar.warning(
         context,
