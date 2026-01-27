@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rentmate/viewmodels/auth_viewmodel.dart';
-import 'package:rentmate/viewmodels/flat_list_provider.dart';
+import 'package:rentmate/viewmodels/flat_viewmodel.dart';
 import 'package:rentmate/viewmodels/flat_selector_viewmodel.dart';
 import 'package:rentmate/widgets/app_bar.dart';
 import 'package:rentmate/widgets/custom_snackbar.dart';

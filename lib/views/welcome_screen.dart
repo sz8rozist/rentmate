@@ -42,8 +42,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
       return;
     }
 
-    final authState = ref.read(authViewModelProvider);
-    final payload = authState.asData?.value.payload;
+    final payload = ref.watch(currentUserPayloadProvider);
 
     int attempts = 0;
     const int maxAttempts = 3;

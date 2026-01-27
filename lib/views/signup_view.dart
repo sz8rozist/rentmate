@@ -7,6 +7,7 @@ import 'package:rentmate/widgets/custom_snackbar.dart';
 import 'package:rentmate/widgets/custom_text_form_field.dart';
 import '../models/user_role.dart';
 import '../viewmodels/auth_viewmodel.dart';
+import '../viewmodels/register_viewmodel.dart';
 import '../widgets/custom_scaffold.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 
@@ -20,59 +21,19 @@ class SignUpScreen extends ConsumerStatefulWidget {
 }
 
 class _SignUpScreenState extends ConsumerState<SignUpScreen> {
-  final _formSignupKey = GlobalKey<FormState>();
-
-  final _nameController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _usernameController = TextEditingController();
   bool agreePersonalData = true;
 
   @override
   void dispose() {
-    _nameController.dispose();
-    _emailController.dispose();
-    _passwordController.dispose();
-    _usernameController.dispose();
     super.dispose();
-  }
-
-  Future<void> _submitForm() async {
-    if (_formSignupKey.currentState!.validate() && agreePersonalData) {
-      final role = ref.read(roleProvider);
-      if (role == null) {
-        CustomSnackBar.warning(context, "Kérlek válassz szerepkört!");
-        return;
-      }
-      final authViewModel = ref.read(authViewModelProvider.notifier);
-
-      var registeredUser = await authViewModel.register(
-        _emailController.text.trim(),
-        role,
-        _passwordController.text.trim(),
-        _nameController.text.trim(),
-      );
-
-      if(registeredUser == null){
-        CustomSnackBar.error(context, "Sikertelen regisztráció!");
-      }
-
-      CustomSnackBar.success(context, "Sikeres regisztráció!");
-      context.goNamed(AppRoute.signin.name);
-    } else if (!agreePersonalData) {
-      CustomSnackBar.warning(
-        context,
-        'Kérlet fogadd el az adatkezelési feltételeket.',
-      );
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(authViewModelProvider);
-    final selectedRole = ref.watch(roleProvider);
+    final state = ref.watch(registerViewModelProvider);
+    final vm = ref.read(registerViewModelProvider.notifier);
     return LoadingOverlay(
-      isLoading: state is AsyncLoading,
+      isLoading: state.isLoading,
       child: CustomScaffold(
         child: Column(
           children: [
@@ -89,7 +50,6 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                 ),
                 child: SingleChildScrollView(
                   child: Form(
-                    key: _formSignupKey,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
@@ -103,48 +63,26 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                         const SizedBox(height: 40.0),
                         // Teljes név
                         CustomTextFormField(
-                          controller: _nameController,
-                          validator:
-                              RequiredValidator(
-                                errorText: 'Teljes név megadása kötelező.',
-                              ).call,
                           labelText: "Teljes név",
+                          errorText: state.nameError,
+                          onChanged: vm.onNameChanged,
                         ),
                         const SizedBox(height: 25.0),
                         // Email
                         CustomTextFormField(
-                          controller: _emailController,
-                          validator:
-                              MultiValidator([
-                                RequiredValidator(
-                                  errorText: 'Email cím megadása kötelező.',
-                                ),
-                                EmailValidator(
-                                  errorText: 'Érvényes email címet adjon meg.',
-                                ),
-                              ]).call,
                           labelText: "Email",
+                          errorText: state.emailError,
+                          onChanged: vm.onEmailChanged,
                         ),
                         const SizedBox(height: 25.0),
                         // Jelszó
                         CustomTextFormField(
-                          controller: _passwordController,
-                          obscureText: true,
-                          validator:
-                              MultiValidator([
-                                RequiredValidator(
-                                  errorText: 'Jelszó megadása kötelező.',
-                                ),
-                                MinLengthValidator(
-                                  6,
-                                  errorText:
-                                      'A jelszónak legalább 6 karakter hosszúnak kell lennie.',
-                                ),
-                              ]).call,
                           labelText: "Jelszó",
+                          obscureText: true,
+                          errorText: state.passwordError,
+                          onChanged: vm.onPasswordChanged,
                         ),
-                        const SizedBox(height: 25.0),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 41),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -152,25 +90,24 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                               children: [
                                 Radio<UserRole>(
                                   value: UserRole.landlord,
-                                  groupValue: selectedRole,
-                                  onChanged: (value) {
-                                    ref.read(roleProvider.notifier).state =
-                                        value;
-                                  },
+                                  groupValue: state.role,
+                                  onChanged: vm.onRoleChanged,
                                 ),
                                 Text(UserRole.landlord.label),
                                 const SizedBox(width: 20),
                                 Radio<UserRole>(
                                   value: UserRole.tenant,
-                                  groupValue: selectedRole,
-                                  onChanged: (value) {
-                                    ref.read(roleProvider.notifier).state =
-                                        value;
-                                  },
+                                  groupValue: state.role,
+                                  onChanged: vm.onRoleChanged,
                                 ),
                                 Text(UserRole.tenant.label),
                               ],
                             ),
+                            if (state.roleError != null)
+                              Text(
+                                state.roleError!,
+                                style: const TextStyle(color: Colors.red),
+                              ),
                           ],
                         ),
                         // Checkbox
@@ -208,7 +145,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                           width: double.infinity,
                           child: ElevatedButton(
                             onPressed:
-                                state is AsyncLoading ? null : _submitForm,
+                                state.isLoading ? null : vm.submit,
                             child: const Text('Regisztráció'),
                           ),
                         ),

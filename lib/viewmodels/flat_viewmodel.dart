@@ -7,6 +7,7 @@ import 'package:rentmate/services/flat_service.dart';
 
 import '../rest_api_config.dart';
 import '../models/flat_model.dart';
+import '../services/user_service.dart';
 import 'file_upload_viewmodel.dart';
 
 /// -----------------
@@ -14,17 +15,9 @@ import 'file_upload_viewmodel.dart';
 /// -----------------
 class FlatViewModel extends StateNotifier<AsyncValue<Flat?>> {
   final FlatService _service;
-
-  FlatViewModel(this._service) : super(AsyncData(null));
-
-  /*Future<void> loadFlat(int id) async {
-    try {
-      final flat = await _service.getFlatById(id);
-      state = flat;
-    } catch (_) {
-      state = null;
-    }
-  }*/
+  final UserService _userService;
+  String _searchTerm = '';
+  FlatViewModel(this._service, this._userService) : super(AsyncData(null));
 
   Future<List<File>?> pickImages() async {
     final picked = await ImagePicker().pickMultiImage();
@@ -65,53 +58,51 @@ class FlatViewModel extends StateNotifier<AsyncValue<Flat?>> {
     }
   }
 
+  /// Minden tenant a rendszerből (backend)
+  List<UserModel> _allTenants = [];
+
+  /// Kivétel a már hozzáadott tenantok
+  List<int?> get excludedTenantIds =>
+      state.value?.tenants?.map((t) => t.id).toList() ?? [];
+
+  Future<void> loadAllTenants([String searchTerm = '']) async {
+    _searchTerm = searchTerm;
+    final tenants = await _userService.getTenant(searchTerm);
+    _allTenants = tenants;
+  }
+
+  /// Tenant list a kiválasztáshoz a formban
+  List<UserModel> get availableTenants {
+    return _allTenants
+        .where((t) => !excludedTenantIds.contains(t.id))
+        .toList();
+  }
+
+  // Keresés frissítése
+  Future<void> searchTenants(String term) async {
+    await loadAllTenants(term);
+    // Force UI update
+    state = AsyncValue.data(state.value);
+  }
+
   /// Tenant hozzáadás
-  Future<void> addTenant(int flatId, int tenantId, UserModel tenant) async {
-    final currentFlat = state.value;
-    if (currentFlat == null) return;
-
-    state = const AsyncValue.loading();
-
-    try {
-      final success = await _service.addTenantToFlat(flatId, tenantId);
-
-      if (success) {
-        final List<UserModel> updatedTenants = [
-          ...(currentFlat.tenants ?? <UserModel>[]),
-          tenant,
-        ];
-
-        state = AsyncValue.data(
-          currentFlat.copyWith(tenants: updatedTenants),
-        );
-      }
-    } catch (e, st) {
-      state = AsyncValue.error(e, st);
+  Future<void> addTenant(UserModel tenant) async {
+    final flatId = state.value!.id;
+    final success = await _service.addTenantToFlat(flatId as int, tenant.id as int);
+    if (success) {
+      final updatedTenants = [...state.value!.tenants ?? [], tenant];
+      state = AsyncValue.data(state.value!.copyWith(tenants: updatedTenants));
     }
   }
 
-
-  /// Tenant törlés
+  /// Tenant eltávolítás
   Future<void> removeTenant(int tenantId) async {
-    final currentFlat = state.value;
-    if (currentFlat == null) return;
-
-    state = const AsyncValue.loading();
-
-    try {
-      final success = await _service.removeTenantFromFlat(tenantId);
-
-      if (success) {
-        final updatedTenants = currentFlat.tenants
-            ?.where((t) => t.id != tenantId)
-            .toList();
-
-        state = AsyncValue.data(
-          currentFlat.copyWith(tenants: updatedTenants),
-        );
-      }
-    } catch (e, st) {
-      state = AsyncValue.error(e, st);
+    final flatId = state.value!.id;
+    final success = await _service.removeTenantFromFlat(tenantId);
+    if (success) {
+      final updatedTenants =
+      state.value!.tenants!.where((t) => t.id != tenantId).toList();
+      state = AsyncValue.data(state.value!.copyWith(tenants: updatedTenants));
     }
   }
 
@@ -128,10 +119,17 @@ final flatServiceProvider = Provider<FlatService>((ref) {
   return FlatService(apiService: apiService, fileUploadService: fileUploadService);
 });
 
+final userServiceProvider = Provider<UserService>((ref) {
+  final apiService = ref.watch(apiServiceProvider);
+  return UserService(apiService);
+});
+
 /// -----------------
 /// ViewModel Providerek
 /// -----------------
 final flatViewModelProvider =
-    StateNotifierProvider<FlatViewModel, AsyncValue<Flat?>>((ref) {
-      return FlatViewModel(ref.watch(flatServiceProvider));
-    });
+StateNotifierProvider<FlatViewModel, AsyncValue<Flat?>>((ref) {
+  final flatService = ref.watch(flatServiceProvider);
+  final userService = ref.watch(userServiceProvider);
+  return FlatViewModel(flatService, userService);
+});

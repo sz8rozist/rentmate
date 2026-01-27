@@ -1,8 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:rentmate/viewmodels/file_upload_viewmodel.dart';
-import '../rest_api_config.dart';
 import '../models/flat_model.dart';
 import '../services/flat_service.dart';
+import 'flat_viewmodel.dart';
 
 class TenantFlatViewModel extends StateNotifier<AsyncValue<Flat?>> {
   final FlatService _service;
@@ -25,12 +24,6 @@ class TenantFlatViewModel extends StateNotifier<AsyncValue<Flat?>> {
     }
   }
 }
-
-final flatServiceProvider = Provider<FlatService>((ref) {
-  final client = ref.watch(apiServiceProvider);
-  final fileUploadService = ref.watch(fileUploadServiceProvider);
-  return FlatService(apiService: client, fileUploadService: fileUploadService);
-});
 
 final tenantFlatViewModelProvider =
     StateNotifierProvider.family<TenantFlatViewModel, AsyncValue<Flat?>, int?>((

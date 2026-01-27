@@ -24,10 +24,9 @@ class _ApartmentSelectorScreenState
 
   @override
   Widget build(BuildContext context) {
-    final authState = ref.read(authViewModelProvider);
-    final payload = authState.asData?.value.payload;
+    final userId = ref.watch(currentUserIdProvider);
     final flatsState = ref.watch(
-      flatSelectorViewModelProvider(payload?.userId),
+      flatSelectorViewModelProvider(userId),
     );
     
     return Scaffold(

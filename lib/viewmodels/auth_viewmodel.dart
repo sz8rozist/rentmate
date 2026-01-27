@@ -6,7 +6,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../rest_api_config.dart';
 import '../models/acces_token.dart';
 import '../models/auth_state.dart';
-import '../models/user_model.dart';
 import '../models/user_role.dart';
 import '../services/auth_service.dart';
 
@@ -17,6 +16,17 @@ final authViewModelProvider =
 
 final roleProvider = StateProvider<UserRole?>((ref) => UserRole.tenant);
 final biometricVerifiedProvider = StateProvider<bool>((ref) => false);
+
+final currentUserPayloadProvider = Provider<AccessToken?>((ref) {
+  final authState = ref.watch(authViewModelProvider);
+  return authState.asData?.value.payload;
+});
+
+
+final currentUserIdProvider = Provider<int?>((ref) {
+  final payload = ref.watch(currentUserPayloadProvider);
+  return payload?.userId;
+});
 
 class AuthViewModel extends StateNotifier<AsyncValue<AuthState>> {
   final Ref ref;
@@ -36,39 +46,14 @@ class AuthViewModel extends StateNotifier<AsyncValue<AuthState>> {
     }
   }
 
-  Future<void> login(String email, String password) async {
-    state = const AsyncValue.loading();
-    try {
-      final token = await ref.read(authServiceProvider).login(email, password);
-      ref.read(tokenProvider.notifier).state = token;
-      final payload = await _decodePayload(token);
-      state = AsyncValue.data(AuthState(token: token, payload: payload));
-    } catch (e, st) {
-      state = AsyncValue.error(e, st);
-    }
+  Future<void> setSession(String token) async {
+    final payload = await _decodePayload(token);
+    state = AsyncValue.data(AuthState(token: token, payload: payload));
   }
 
   Future<void> logout() async {
     await ref.read(authServiceProvider).logout();
     state = AsyncValue.data(AuthState(token: null, payload: null));
-  }
-
-  Future<UserModel?> register(
-    String email,
-    UserRole role,
-    String password,
-    String name,
-  ) async {
-    state = const AsyncValue.loading();
-    try {
-      final user = await ref
-          .read(authServiceProvider)
-          .register(email, password, name, role);
-      return user;
-    } catch (e, st) {
-      state = AsyncValue.error(e, st);
-    }
-    return null;
   }
 
   Future<AccessToken?> _decodePayload(String token) async {
@@ -88,5 +73,8 @@ class AuthViewModel extends StateNotifier<AsyncValue<AuthState>> {
 }
 
 final authServiceProvider = Provider<AuthService>((ref) {
-  return AuthService(apiService: ref.watch(apiServiceProvider), storage: FlutterSecureStorage());
+  return AuthService(
+    apiService: ref.watch(apiServiceProvider),
+    storage: FlutterSecureStorage(),
+  );
 });

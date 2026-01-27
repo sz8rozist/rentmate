@@ -12,7 +12,7 @@ import '../models/flat_image.dart';
 import '../models/flat_status.dart';
 import '../models/user_model.dart';
 import '../viewmodels/auth_viewmodel.dart';
-import '../viewmodels/flat_list_provider.dart';
+import '../viewmodels/flat_viewmodel.dart';
 import '../viewmodels/flat_selector_viewmodel.dart';
 import '../viewmodels/user_viewmodel.dart';
 import '../widgets/custom_snackbar.dart';
@@ -387,6 +387,8 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView>
   /// Builds the modal content for adding a tenant.
   Widget _buildAddTenantModal(BuildContext context, String flatId) {
     String searchTerm = '';
+    final flatVm = ref.watch(flatViewModelProvider.notifier);
+
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -396,6 +398,7 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView>
       ),
       child: Consumer(
         builder: (context, ref, _) {
+          final tenants = flatVm.availableTenants;
           return Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -404,42 +407,31 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView>
                   labelText: 'Név szerint keresés',
                   prefixIcon: Icon(Icons.search),
                 ),
-                onChanged: (value) {
+                onChanged: (value) async {
                   searchTerm = value.trim();
-                  ref.read(tenantListProvider.notifier).loadTenants(searchTerm);
+                  await flatVm.searchTenants(searchTerm);
                 },
               ),
               const SizedBox(height: 16),
               SizedBox(
                 height: 300,
-                child: ref
-                    .watch(tenantListProvider)
-                    .when(
-                      data: (tenants) {
-                        if (tenants.isEmpty) {
-                          return const Center(child: Text('Nincs találat'));
-                        }
-                        return ListView.builder(
+                child:
+                    tenants.isEmpty
+                        ? const Center(child: Text('Nincs találat'))
+                        : ListView.builder(
                           itemCount: tenants.length,
                           itemBuilder: (context, index) {
                             final tenant = tenants[index];
                             return ListTile(
                               title: Text(tenant.name),
                               subtitle: Text(tenant.email),
-                              onTap: () => Navigator.of(context).pop(tenant),
+                              onTap: () async {
+                                await flatVm.addTenant(tenant);
+                                Navigator.of(context).pop();
+                              },
                             );
                           },
-                        );
-                      },
-                      loading:
-                          () => Center(
-                            child:
-                                Platform.isIOS
-                                    ? const CupertinoActivityIndicator()
-                                    : const CircularProgressIndicator(),
-                          ),
-                      error: (e, st) => Center(child: Text('Hiba történt: $e')),
-                    ),
+                        ),
               ),
             ],
           );
@@ -523,17 +515,14 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView>
   @override
   Widget build(BuildContext context) {
     final selectedFlat = ref.watch(selectedFlatProvider);
-
     if (selectedFlat == null) {
       return const Scaffold(
         body: Center(child: Text("Nincs kiválasztott lakás")),
       );
     }
 
-    // Use .when or .maybeWhen for better handling of loading/error states from the provider.
     final flatStateValue = ref.watch(flatViewModelProvider);
 
-    // Initialize controllers and selectedFlatStatus once flat data is available
     _addressController.text = selectedFlat.address;
     _priceController.text = selectedFlat.price.toString();
     _selectedFlatStatus = selectedFlat.status;
@@ -597,18 +586,6 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView>
                                 selectedFlat.id.toString(),
                               ),
                         );
-
-                    if (selectedTenant != null) {
-                      debugPrint(
-                        'Kiválasztott bérlő: ${selectedTenant.name}, email: ${selectedTenant.email}',
-                      );
-                      ref
-                          .read(flatViewModelProvider.notifier)
-                          .addTenant(selectedFlat.id as int, selectedTenant.id as int, selectedTenant);
-                      ref
-                          .read(tenantListProvider.notifier)
-                          .excludeTenant(selectedTenant.id as int);
-                    }
                   },
                   icon: const Icon(Icons.person_add),
                   label: const Text('Bérlő hozzáadása'),

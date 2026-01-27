@@ -129,7 +129,6 @@ class FlatSelectorViewmodel extends StateNotifier<AsyncValue<List<Flat>>> {
         print("Nem sikerült minden képet feltölteni.");
       }
     } catch (e, st) {
-      print("GraphQL Error: $e");
       state = AsyncValue.error(e, st);
     }
   }

@@ -10,6 +10,7 @@ import 'package:rentmate/routing/app_router.dart';
 import 'package:rentmate/widgets/custom_snackbar.dart';
 import 'package:rentmate/widgets/custom_text_form_field.dart';
 import '../models/auth_state.dart';
+import '../viewmodels/login_viewmodel.dart';
 import '../viewmodels/navigation_viewmodel.dart';
 import '../widgets/custom_scaffold.dart';
 import '../viewmodels/auth_viewmodel.dart';
@@ -23,9 +24,6 @@ class SignInScreen extends ConsumerStatefulWidget {
 }
 
 class _SignInScreenState extends ConsumerState<SignInScreen> {
-  final _formSignInKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
   bool rememberPassword = true;
 
   @override
@@ -35,7 +33,8 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(authViewModelProvider);
+    final state = ref.watch(loginViewModelProvider);
+    final vm = ref.read(loginViewModelProvider.notifier);
 
     // Figyeld az állapotváltozást, és navigálj vagy mutass hibát
     ref.listen<AsyncValue<AuthState>>(authViewModelProvider, (previous, next) {
@@ -73,7 +72,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     });
 
     return LoadingOverlay(
-      isLoading: authState.isLoading,
+      isLoading: state.isLoading,
       child: CustomScaffold(
         child: Column(
           children: [
@@ -91,7 +90,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                 ),
                 child: SingleChildScrollView(
                   child: Form(
-                    key: _formSignInKey,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
@@ -104,27 +102,16 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                         ),
                         const SizedBox(height: 40.0),
                         CustomTextFormField(
-                          controller: _emailController,
                           labelText: "Email",
-                          validator:
-                              MultiValidator([
-                                RequiredValidator(
-                                  errorText: 'Email megadása kötelező',
-                                ),
-                                EmailValidator(
-                                  errorText: 'Érvénytelen email cím',
-                                ),
-                              ]).call,
+                          onChanged: vm.onEmailChanged,
+                          errorText: state.emailError,
                         ),
                         const SizedBox(height: 25.0),
                         CustomTextFormField(
-                          controller: _passwordController,
                           obscureText: true,
-                          validator:
-                              RequiredValidator(
-                                errorText: 'Jelszó megadása kötelező',
-                              ).call,
                           labelText: "Jelszó",
+                          onChanged: vm.onPasswordChanged,
+                          errorText: state.passwordError,
                         ),
                         const SizedBox(height: 25.0),
                         Row(
@@ -159,21 +146,9 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                           width: double.infinity,
                           child: ElevatedButton(
                             onPressed:
-                                authState.isLoading
+                                state.isLoading
                                     ? null
-                                    : () async {
-                                      if (_formSignInKey.currentState!
-                                          .validate()) {
-                                        await ref
-                                            .read(
-                                              authViewModelProvider.notifier,
-                                            )
-                                            .login(
-                                              _emailController.text,
-                                              _passwordController.text,
-                                            );
-                                      }
-                                    },
+                                    : vm.submit,
                             child: const Text('Bejelentkezés'),
                           ),
                         ),

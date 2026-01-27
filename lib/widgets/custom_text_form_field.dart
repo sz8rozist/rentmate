@@ -12,6 +12,7 @@ class CustomTextFormField extends ConsumerWidget {
   final bool obscureText;
   final String obscuringCharacter;
   final String? initialValue;
+  final String? errorText;
   final ValueChanged<String>? onChanged;
 
   const CustomTextFormField({
@@ -26,6 +27,7 @@ class CustomTextFormField extends ConsumerWidget {
     this.obscureText = false,
     this.obscuringCharacter = "*",
     this.initialValue,
+    this.errorText,
     this.onChanged,
   });
 
@@ -45,7 +47,7 @@ class CustomTextFormField extends ConsumerWidget {
       onChanged: onChanged,
       obscureText: obscureText,
       obscuringCharacter: obscuringCharacter,
-      decoration: baseDecoration.copyWith(labelText: labelText),
+      decoration: baseDecoration.copyWith(labelText: labelText, errorText: errorText),
     );
   }
 }
