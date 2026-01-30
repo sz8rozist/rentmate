@@ -12,4 +12,6 @@ class AuthState {
       payload: payload ?? this.payload,
     );
   }
+
+  factory AuthState.empty() => AuthState(token: null, payload: null);
 }

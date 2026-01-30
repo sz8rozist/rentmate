@@ -17,10 +17,11 @@ class FlatImage {
 
   factory FlatImage.fromJson(Map<String, dynamic> json) {
     return FlatImage(
-      id: int.tryParse(json['id']),
-      flatId: int.tryParse(json['flatId'].toString()),
+      id: json['id'] is int ? json['id'] as int : int.tryParse(json['id'].toString()),
+      flatId: json['flatId'] is int ? json['flatId'] as int : int.tryParse(json['flatId']?.toString() ?? ''),
       filename: json['filename'] as String,
       url: json['url'] as String?,
     );
   }
+
 }

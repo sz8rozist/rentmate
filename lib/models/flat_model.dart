@@ -39,12 +39,14 @@ class Flat {
 
   factory Flat.fromJson(Map<String, dynamic> json) {
     return Flat(
-      id: int.tryParse(json['id']),
+      id: json['id'] is int ? json['id'] as int : int.tryParse(json['id'].toString()),
       address: json['address'] as String,
       images: (json['images'] as List<dynamic>?)
           ?.map((e) => FlatImage.fromJson(e))
           .toList(),
-      price: int.tryParse(json['price'].toString()) ?? 0,
+      price: json['price'] is int
+          ? json['price'] as int
+          : int.tryParse(json['price'].toString()) ?? 0,
       status: FlatStatusExtension.fromValue(json['status']),
       landlord: json['landlord'] != null
           ? UserModel.fromJson(json['landlord'])
@@ -57,6 +59,7 @@ class Flat {
           .toList(),
     );
   }
+
 
   Flat copyWith({
     int? id,

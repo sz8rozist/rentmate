@@ -11,7 +11,7 @@ class FlatService {
 
   /// Add Flat
   Future<Flat> addFlat(String address, int price, int landlordId, {FlatStatus status = FlatStatus.available}) async {
-    final data = await apiService.post('/flat-controller', {
+    final data = await apiService.post('/flat', {
       'address': address,
       'price': price,
       'landlordId': landlordId,
@@ -24,7 +24,7 @@ class FlatService {
   /// Upload Single Image
   Future<bool> uploadSingleImage(int flatId, String filePath) async {
     return await fileUploadService.uploadFile(
-      '/flat-controller/$flatId/images',
+      '/flat/$flatId/images',
       filePath,
       fileFieldName: 'image',
     );
@@ -32,7 +32,7 @@ class FlatService {
 
   /// Delete Flat Image
   Future<bool> deleteFlatImage(int imageId) async {
-    final data = await apiService.delete('/flat-controller/images/$imageId');
+    final data = await apiService.delete('/flat/images/$imageId');
     return data['success'] ?? true; // backend lehet true/false vagy maga az object
   }
 
@@ -43,26 +43,26 @@ class FlatService {
     if (price != null) body['price'] = price;
     if (status != null) body['status'] = status.value;
 
-    final data = await apiService.put('/flat-controller/$flatId', body);
+    final data = await apiService.put('/flat/$flatId', body);
     return Flat.fromJson(data);
   }
 
   /// Delete Flat
   Future<bool> deleteFlat(int flatId) async {
-    final data = await apiService.delete('/flat-controller/$flatId');
+    final data = await apiService.delete('/flat/$flatId');
     return data['success'] ?? true;
   }
 
   /// Get Flat by ID
   Future<Flat> getFlatById(int id) async {
-    final data = await apiService.get('/flat-controller/$id');
+    final data = await apiService.get('/flat/$id');
     return Flat.fromJson(data);
   }
 
   /// Get Flat for Tenant
   Future<Flat?> getFlatForTenant(int tenantId) async {
     try {
-      final data = await apiService.get('/flat-controller/tenant/$tenantId');
+      final data = await apiService.get('/flat/tenant/$tenantId');
       return data != null ? Flat.fromJson(data) : null;
     } catch (_) {
       return null;
@@ -71,14 +71,16 @@ class FlatService {
 
   /// Get Flats for Landlord
   Future<List<Flat>> getFlatsForLandlord(int landlordId) async {
-    final data = await apiService.get('/flat-controller/landlord/$landlordId');
+    final data = await apiService.get('/flat/landlord/$landlordId');
     final list = data as List<dynamic>? ?? [];
+    print(list);
+
     return list.map((e) => Flat.fromJson(e)).toList();
   }
 
   /// Assign Tenant to Flat
   Future<bool> addTenantToFlat(int flatId, int tenantId) async {
-    final data = await apiService.post('/flat-controller/$flatId/tenants', {
+    final data = await apiService.post('/flat/$flatId/tenants', {
       'tenantId': tenantId,
     });
     return data['success'] ?? true;
@@ -86,7 +88,7 @@ class FlatService {
 
   /// Remove Tenant from Flat
   Future<bool> removeTenantFromFlat(int tenantId) async {
-    final data = await apiService.delete('/flat-controller/tenants/$tenantId');
+    final data = await apiService.delete('/flat/tenants/$tenantId');
     return data['success'] ?? true;
   }
 }

@@ -49,8 +49,6 @@ class RegisterViewModel extends StateNotifier<RegisterState> {
         state.role,
       );
 
-      // automatikus beléptetés
-      await ref.read(authViewModelProvider.notifier).setSession(token as String);
     } catch (e) {
       _handleError(e);
     } finally {

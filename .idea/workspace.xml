@@ -9,21 +9,25 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f7c025f7-f5d1-49bb-9496-3d397e9e2c84" name="Changes" comment="Graphql -&gt; Rest API">
-      <change afterPath="$PROJECT_DIR$/lib/viewmodels/login_viewmodel.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/viewmodels/register_viewmodel.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/viewmodels/states/LoginState.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/viewmodels/states/RegisterState.dart" afterDir="false" />
+    <list default="true" id="f7c025f7-f5d1-49bb-9496-3d397e9e2c84" name="Changes" comment="Javítások">
+      <change afterPath="$PROJECT_DIR$/lib/form_error_model.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/handle_backend_form_error.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.flutter-plugins-dependencies" beforeDir="false" afterPath="$PROJECT_DIR$/.flutter-plugins-dependencies" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/models/auth_state.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/models/auth_state.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/models/flat_image.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/models/flat_image.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/models/flat_model.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/models/flat_model.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/rest_api_config.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/rest_api_config.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/services/auth_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/services/auth_service.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/services/flat_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/services/flat_service.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/viewmodels/auth_viewmodel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/viewmodels/auth_viewmodel.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/viewmodels/flat_list_provider.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/viewmodels/flat_viewmodel.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/viewmodels/flat_selector_viewmodel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/viewmodels/flat_selector_viewmodel.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/viewmodels/tenant_flat_viewmodel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/viewmodels/tenant_flat_viewmodel.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/views/flat_details_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/flat_details_view.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/views/flat_form_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/flat_form_view.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/viewmodels/flat_viewmodel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/viewmodels/flat_viewmodel.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/viewmodels/login_viewmodel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/viewmodels/login_viewmodel.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/viewmodels/register_viewmodel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/viewmodels/register_viewmodel.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/viewmodels/states/LoginState.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/viewmodels/states/LoginState.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/views/profil_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/profil_view.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/views/signin_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/signin_view.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/views/signup_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/signup_view.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/widgets/custom_text_form_field.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/widgets/custom_text_form_field.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/views/welcome_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/welcome_screen.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -114,14 +118,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1748194801732</updated>
-    </task>
-    <task id="LOCAL-00004" summary="Auth screens mvvm design pattern">
-      <option name="closed" value="true" />
-      <created>1748264418323</created>
-      <option name="number" value="00004" />
-      <option name="presentableId" value="LOCAL-00004" />
-      <option name="project" value="LOCAL" />
-      <updated>1748264418323</updated>
     </task>
     <task id="LOCAL-00005" summary="splash screen, auth, képek">
       <option name="closed" value="true" />
@@ -507,7 +503,15 @@
       <option name="project" value="LOCAL" />
       <updated>1769452572965</updated>
     </task>
-    <option name="localTasksCounter" value="53" />
+    <task id="LOCAL-00053" summary="Javítások">
+      <option name="closed" value="true" />
+      <created>1769521032262</created>
+      <option name="number" value="00053" />
+      <option name="presentableId" value="LOCAL-00053" />
+      <option name="project" value="LOCAL" />
+      <updated>1769521032263</updated>
+    </task>
+    <option name="localTasksCounter" value="54" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -545,8 +549,8 @@
     <MESSAGE value="kép küldés üzenetként" />
     <MESSAGE value="flat fájlföltés" />
     <MESSAGE value="Üzenet küldés képekkel" />
-    <MESSAGE value="Javítások" />
     <MESSAGE value="Graphql -&gt; Rest API" />
-    <option name="LAST_COMMIT_MESSAGE" value="Graphql -&gt; Rest API" />
+    <MESSAGE value="Javítások" />
+    <option name="LAST_COMMIT_MESSAGE" value="Javítások" />
   </component>
 </project>

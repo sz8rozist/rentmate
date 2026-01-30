@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:form_field_validator/form_field_validator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rentmate/models/user_role.dart';
 import 'package:rentmate/routing/app_router.dart';
@@ -16,60 +15,31 @@ import '../widgets/custom_scaffold.dart';
 import '../viewmodels/auth_viewmodel.dart';
 import '../widgets/loading_overlay.dart';
 
-class SignInScreen extends ConsumerStatefulWidget {
+class SignInScreen extends ConsumerWidget {
   const SignInScreen({super.key});
 
   @override
-  ConsumerState<SignInScreen> createState() => _SignInScreenState();
-}
-
-class _SignInScreenState extends ConsumerState<SignInScreen> {
-  bool rememberPassword = true;
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(loginViewModelProvider);
-    final vm = ref.read(loginViewModelProvider.notifier);
+    final loginVM = ref.read(loginViewModelProvider.notifier);
+    bool rememberPassword = false;
 
-    // Figyeld az állapotváltozást, és navigálj vagy mutass hibát
-    ref.listen<AsyncValue<AuthState>>(authViewModelProvider, (previous, next) {
-      next.when(
-        data: (authState) {
-          print(authState.payload?.role?.value);
-          final payload = authState.payload;
-          if (payload != null) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              ref.read(bottomNavIndexProvider.notifier).state = 0;
-
-              if (payload.role == UserRole.landlord) {
-                context.goNamed(AppRoute.flatSelect.name);
-              } else {
-                context.goNamed(AppRoute.home.name);
-              }
-            });
+    void handleLogin() {
+      loginVM.submit().then((success) {
+        final payload = ref.read(authViewModelProvider).asData?.value.payload;
+        print(payload);
+        if (payload != null) {
+          ref.read(bottomNavIndexProvider.notifier).state = 0;
+          if (payload.role == UserRole.landlord) {
+            context.goNamed(AppRoute.flatSelect.name);
+          } else {
+            context.goNamed(AppRoute.home.name);
           }
-        },
-        loading: () {
-          return Center(
-            child:
-                Platform.isIOS
-                    ? const CupertinoActivityIndicator()
-                    : const CircularProgressIndicator(),
-          );
-        },
-        error: (err, _) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            print(err);
-            CustomSnackBar.error(context, err.toString());
-          });
-        },
-      );
-    });
+        }
+      }).catchError((err) {
+        CustomSnackBar.error(context, err.toString());
+      });
+    }
 
     return LoadingOverlay(
       isLoading: state.isLoading,
@@ -80,52 +50,49 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
             Expanded(
               flex: 7,
               child: Container(
-                padding: const EdgeInsets.fromLTRB(25.0, 50.0, 25.0, 20.0),
+                padding: const EdgeInsets.fromLTRB(25, 50, 25, 20),
                 decoration: const BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(40.0),
-                    topRight: Radius.circular(40.0),
-                  ),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(40)),
                 ),
                 child: SingleChildScrollView(
                   child: Form(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text(
+                        const Text(
                           'Üdv újra',
                           style: TextStyle(
-                            fontSize: 30.0,
+                            fontSize: 30,
                             fontWeight: FontWeight.w900,
                           ),
                         ),
-                        const SizedBox(height: 40.0),
+                        const SizedBox(height: 40),
                         CustomTextFormField(
                           labelText: "Email",
-                          onChanged: vm.onEmailChanged,
-                          errorText: state.emailError,
+                          onChanged: loginVM.onEmailChanged,
+                          errorText: state.errors.errorFor('email'),
                         ),
-                        const SizedBox(height: 25.0),
+                        const SizedBox(height: 25),
                         CustomTextFormField(
                           obscureText: true,
                           labelText: "Jelszó",
-                          onChanged: vm.onPasswordChanged,
-                          errorText: state.passwordError,
+                          onChanged: loginVM.onPasswordChanged,
+                          errorText: state.errors.errorFor('password'),
                         ),
-                        const SizedBox(height: 25.0),
+                        const SizedBox(height: 25),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Row(
                               children: [
-                                Checkbox(
-                                  value: rememberPassword,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      rememberPassword = value!;
-                                    });
-                                  },
+                                StatefulBuilder(
+                                  builder: (context, setState) => Checkbox(
+                                    value: rememberPassword,
+                                    onChanged: (v) => setState(() {
+                                      rememberPassword = v!;
+                                    }),
+                                  ),
                                 ),
                                 const Text(
                                   'Emlékezz rám',
@@ -133,26 +100,21 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                                 ),
                               ],
                             ),
-                            GestureDetector(
-                              child: Text(
-                                'Elfelejtett jelszó?',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
+                            const Text(
+                              'Elfelejtett jelszó?',
+                              style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 25.0),
+                        const SizedBox(height: 25),
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
-                            onPressed:
-                                state.isLoading
-                                    ? null
-                                    : vm.submit,
+                            onPressed: state.isLoading ? null : handleLogin,
                             child: const Text('Bejelentkezés'),
                           ),
                         ),
-                        const SizedBox(height: 25.0),
+                        const SizedBox(height: 25),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -161,17 +123,15 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                               style: TextStyle(color: Colors.black45),
                             ),
                             GestureDetector(
-                              onTap: () {
-                                context.goNamed(AppRoute.signup.name);
-                              },
-                              child: Text(
+                              onTap: () => context.goNamed(AppRoute.signup.name),
+                              child: const Text(
                                 'Regisztrálj',
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 20.0),
+                        const SizedBox(height: 20),
                       ],
                     ),
                   ),
@@ -184,3 +144,4 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     );
   }
 }
+

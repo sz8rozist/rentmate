@@ -13,7 +13,7 @@ class ProfilView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authService = ref.watch(authServiceProvider);
+    final authService = ref.watch(authViewModelProvider.notifier);
     final themeMode = ref.watch(themeModeProvider);
     final List<_ProfileCardData> items = [
       _ProfileCardData(

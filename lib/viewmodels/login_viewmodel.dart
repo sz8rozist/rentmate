@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rentmate/viewmodels/states/LoginState.dart';
 
+import '../form_error_model.dart';
+import '../handle_backend_form_error.dart';
 import 'auth_viewmodel.dart';
 
 final loginViewModelProvider =
@@ -14,45 +16,39 @@ class LoginViewModel extends StateNotifier<LoginState> {
   LoginViewModel(this.ref) : super(const LoginState());
 
   void onEmailChanged(String v) {
-    state = state.copyWith(email: v, emailError: null);
+    state = state.copyWith(
+      email: v,
+      errors: state.errors.remove('email'),
+    );
   }
 
   void onPasswordChanged(String v) {
-    state = state.copyWith(password: v, passwordError: null);
+    state = state.copyWith(
+      password: v,
+      errors: state.errors.remove('password'),
+    );
   }
 
   Future<void> submit() async {
-    if (!_validate()) return;
-
-    state = state.copyWith(isLoading: true);
+    state = state.copyWith(
+      isLoading: true,
+      errors: FormErrors.empty(),
+    );
 
     try {
-      final token = await ref
-          .read(authServiceProvider)
+      await ref
+          .read(authViewModelProvider.notifier)
           .login(state.email, state.password);
-
-      await ref.read(authViewModelProvider.notifier)
-          .setSession(token);
     } catch (e) {
-      //Itt lehet talán a backend errorokat elkapni.
-      print(e);
-      state = state.copyWith(
-        passwordError: 'Hibás email vagy jelszó',
-      );
+      final formErrors = parseBusinessError(e);
+
+      if (formErrors.hasErrors) {
+        state = state.copyWith(errors: formErrors);
+      } else {
+        rethrow;
+      }
     } finally {
       state = state.copyWith(isLoading: false);
     }
-  }
-
-  bool _validate() {
-    if (state.email.isEmpty) {
-      state = state.copyWith(emailError: 'Email kötelező');
-      return false;
-    }
-    if (state.password.isEmpty) {
-      state = state.copyWith(passwordError: 'Jelszó kötelező');
-      return false;
-    }
-    return true;
   }
 }

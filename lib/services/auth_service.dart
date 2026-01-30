@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:rentmate/models/user_model.dart';
 import 'package:rentmate/models/user_role.dart';
@@ -17,15 +18,13 @@ class AuthService {
         {'email': email, 'password': password},
         authRequired: false, // loginhoz még nincs token
       );
-
-      final token = data['token'] as String?;
+      final token = data['accessToken'] as String?;
       if (token == null) throw Exception('Login failed: no token returned');
-
       // Token tárolása
       await storage.write(key: 'access_token', value: token);
       return token;
-    } catch (e) {
-      print('Login error: $e');
+    } on DioException catch (e) {
+      print('ERROR: ${e.response}');
       rethrow;
     }
   }

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:rentmate/routing/app_router.dart';
 import 'package:rentmate/widgets/custom_snackbar.dart';
+import '../models/acces_token.dart';
 import '../models/snackbar_message.dart';
 import '../models/user_role.dart';
 import '../viewmodels/auth_viewmodel.dart';
@@ -18,6 +19,7 @@ class WelcomeScreen extends ConsumerStatefulWidget {
 
 class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
   final LocalAuthentication auth = LocalAuthentication();
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -26,23 +28,40 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
     if (extra != null && extra is SnackBarMessage) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         extra.isError
-            ? CustomSnackBar.error(context,extra.message)
-            : CustomSnackBar.success(context,extra.message);
+            ? CustomSnackBar.error(context, extra.message)
+            : CustomSnackBar.success(context, extra.message);
       });
     }
   }
+
   @override
   void initState() {
     super.initState();
-    _tryBiometricAuthLoop();
+    final payload = ref.read(currentUserPayloadProvider);
+    print("PAYLOAD: ${payload}");
+    if (payload != null) {
+      // Felhasználó be van jelentkezve
+      _handleAuthenticatedUser(payload);
+    } else {
+      // Nincs bejelentkezve, marad a WelcomeScreen
+    }
+  }
+
+  Future<void> _handleAuthenticatedUser(AccessToken payload) async {
+    final hasBiometric = await auth.canCheckBiometrics;
+
+    if (hasBiometric) {
+      // Van biometrics → próbáljuk meg
+      await _tryBiometricAuthLoop();
+    } else {
+      // Nincs biometrics → azonnal routing
+      _routeToHome(payload);
+    }
   }
 
   Future<void> _tryBiometricAuthLoop() async {
-    if (!await auth.canCheckBiometrics) {
-      return;
-    }
-
-    final payload = ref.watch(currentUserPayloadProvider);
+    final payload = ref.read(currentUserPayloadProvider);
+    if (payload == null) return;
 
     int attempts = 0;
     const int maxAttempts = 3;
@@ -58,19 +77,14 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
         );
 
         if (authenticated && mounted) {
-          if(payload?.role == UserRole.landlord){
-            context.goNamed(AppRoute.flatSelect.name);
-          }else{
-            //Albérlő mehet a home ra és itt kéne neki be állítani a selectedFlat et szerintem.
-            context.goNamed(AppRoute.home.name);
-          }
+          _routeToHome(payload);
           return;
         } else {
           attempts++;
         }
       } catch (e) {
         if (!mounted) return;
-        CustomSnackBar.error(context,"Túl sok sikertelen próbálkozás!");
+        CustomSnackBar.error(context, "Túl sok sikertelen próbálkozás!");
         break;
       }
     }
@@ -79,6 +93,17 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Túl sok sikertelen próbálkozás')),
       );
+    }
+  }
+
+  void _routeToHome(AccessToken payload) {
+    if (!mounted) return;
+
+    if (payload.role == UserRole.landlord) {
+      context.goNamed(AppRoute.flatSelect.name);
+    } else {
+      // Albérlő
+      context.goNamed(AppRoute.home.name);
     }
   }
 
@@ -118,7 +143,8 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                           ),
                         ),
                         TextSpan(
-                          text: '\nEnter personal details to your employee account',
+                          text:
+                              '\nEnter personal details to your employee account',
                           style: TextStyle(fontSize: 20, color: Colors.white),
                         ),
                       ],
@@ -143,19 +169,11 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
     );
   }
 
-  Widget _buildButton({
-    required String text,
-    required VoidCallback onPressed,
-  }) {
+  Widget _buildButton({required String text, required VoidCallback onPressed}) {
     return SizedBox(
       width: double.infinity,
       height: 55,
-      child: ElevatedButton(
-        onPressed: onPressed,
-        child: Text(
-          text,
-        ),
-      ),
+      child: ElevatedButton(onPressed: onPressed, child: Text(text)),
     );
   }
 }
