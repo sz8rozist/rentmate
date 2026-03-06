@@ -4,9 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:rentmate/models/user_role.dart';
 import 'package:rentmate/routing/router_notifier.dart';
 import 'package:rentmate/viewmodels/flat_selector_viewmodel.dart';
-import 'package:rentmate/views/chat_message_view.dart';
 import 'package:rentmate/views/document_list_page.dart';
-import 'package:rentmate/views/document_upload_page.dart';
 import 'package:rentmate/views/flat_details_view.dart';
 import 'package:rentmate/views/flat_form_view.dart';
 import 'package:rentmate/views/flat_selector_view.dart';
@@ -17,7 +15,6 @@ import 'package:rentmate/views/signup_view.dart';
 import 'package:rentmate/views/tenant_flat_screen.dart';
 import 'package:rentmate/views/welcome_screen.dart';
 import '../viewmodels/auth_viewmodel.dart';
-import '../views/lease_contract_form_page.dart';
 import '../views/splash_screen.dart';
 import '../widgets/PDFViewPage.dart';
 import '../widgets/shell_scaffold.dart';
@@ -38,10 +35,6 @@ enum AppRoute {
   newInvoice,
   invoiceDetaul,
   editInvoice,
-  pdfview,
-  documents,
-  uploadDocument,
-  createBerletiSzerzodes,
   flatSelect,
   notFound;
 
@@ -70,12 +63,6 @@ enum AppRoute {
         return "Számla szerkesztése";
       case AppRoute.pdfview:
         return "Fájl megtekintés";
-      case AppRoute.documents:
-        return "Dokumentumok";
-      case AppRoute.uploadDocument:
-        return "Dokumentumok feltöltése";
-      case AppRoute.createBerletiSzerzodes:
-        return "Bérleti szerződés generálás";
       case AppRoute.flatSelect:
         return "Lakás kiválasztás";
       case AppRoute.notFound:
@@ -102,39 +89,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     refreshListenable: routerNotifier,
     routes: [
       GoRoute(path: '/', builder: (context, state) => SplashScreen()),
-      GoRoute(
-        path: '/view-pdf',
-        name: AppRoute.pdfview.name,
-        builder: (context, state) {
-          final filePath = state.uri.queryParameters['filePath'];
-          if (filePath == null) {
-            return const Scaffold(body: Center(child: Text("Hiányzó fájl")));
-          }
-          return PDFViewPage(filePath: filePath);
-        },
-      ),
-      GoRoute(
-        path: '/flats/:flatId/documents',
-        name: AppRoute.documents.name,
-        builder: (context, state) {
-          final flatId = state.pathParameters['flatId']!;
-          return DocumentListPage(flatId: flatId);
-        },
-      ),
-      GoRoute(
-        path: '/flats/documents/add',
-        name: AppRoute.uploadDocument.name,
-        builder: (context, state) {
-          return DocumentUploadPage();
-        },
-      ),
-      GoRoute(
-        path: '/flats/lease-contract',
-        name: AppRoute.createBerletiSzerzodes.name,
-        builder: (context, state) {
-          return LeaseContractFormPage();
-        },
-      ),
       GoRoute(
         path: '/welcome',
         name: AppRoute.welcome.name,
