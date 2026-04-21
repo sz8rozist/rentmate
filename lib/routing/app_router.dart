@@ -61,8 +61,6 @@ enum AppRoute {
         return "Számla részletei";
       case AppRoute.editInvoice:
         return "Számla szerkesztése";
-      case AppRoute.pdfview:
-        return "Fájl megtekintés";
       case AppRoute.flatSelect:
         return "Lakás kiválasztás";
       case AppRoute.notFound:
