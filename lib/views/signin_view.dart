@@ -30,11 +30,7 @@ class SignInScreen extends ConsumerWidget {
         print(payload);
         if (payload != null) {
           ref.read(bottomNavIndexProvider.notifier).state = 0;
-          if (payload.role == UserRole.landlord) {
-            context.goNamed(AppRoute.flatSelect.name);
-          } else {
-            context.goNamed(AppRoute.home.name);
-          }
+          context.goNamed(AppRoute.home.name);
         }
       }).catchError((err) {
         CustomSnackBar.error(context, err.toString());

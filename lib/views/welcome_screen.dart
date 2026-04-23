@@ -98,13 +98,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
 
   void _routeToHome(AccessToken payload) {
     if (!mounted) return;
-
-    if (payload.role == UserRole.landlord) {
-      context.goNamed(AppRoute.flatSelect.name);
-    } else {
-      // Albérlő
       context.goNamed(AppRoute.home.name);
-    }
   }
 
   @override
