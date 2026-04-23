@@ -129,7 +129,7 @@ class _ShellScaffoldState extends ConsumerState<ShellScaffold> {
   }
 
   BottomNavigationBar _buildBottomNav(ctx, location, isDarkMode, role) {
-    final tabs = ['/dashboard', '/tenants', '/finances'];
+    final tabs = ['/flat', '/chatMessage', '/profil','/home'];
     final idx = tabs.indexWhere((t) => location.startsWith(t));
 
     return BottomNavigationBar(

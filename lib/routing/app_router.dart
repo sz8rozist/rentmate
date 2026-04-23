@@ -104,19 +104,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       ShellRoute(
         builder: (context, state, child) {
-          // Például a flats (lakasaim) oldalon gomb kell:
-         /* List<Widget>? actions;
-          if (state.matchedLocation == '/flats') {
-            actions = [
-              IconButton(
-                icon: const Icon(Icons.add, color: Colors.white),
-                tooltip: 'Új lakás hozzáadása',
-                onPressed: () {
-                  context.pushNamed(AppRoute.createFlat.name);
-                },
-              ),
-            ];
-          }*/
           return ShellScaffold(child: child);
         },
         routes: [
