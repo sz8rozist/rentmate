@@ -10,32 +10,55 @@ import '../models/flat_model.dart';
 import '../services/user_service.dart';
 import 'file_upload_viewmodel.dart';
 
-/// -----------------
-/// Egy lakás ViewModel
-/// -----------------
-class FlatViewModel extends StateNotifier<AsyncValue<Flat?>> {
-  final FlatService _service;
-  final UserService _userService;
-  FlatViewModel(this._service, this._userService) : super(AsyncData(null));
+// ---------------------------------------------------------------------------
+// State
+// ---------------------------------------------------------------------------
+
+class FlatState {
+  const FlatState({
+    this.flat,
+    this.allTenants = const [],
+  });
+
+  final Flat? flat;
+  final List<UserModel> allTenants;
+
+  List<int> get existingTenantIds =>
+      flat?.tenants?.map((t) => t.id as int).toList() ?? [];
+
+  List<UserModel> get availableTenants =>
+      allTenants.where((t) => !existingTenantIds.contains(t.id)).toList();
+
+  FlatState copyWith({Flat? flat, List<UserModel>? allTenants}) => FlatState(
+    flat: flat ?? this.flat,
+    allTenants: allTenants ?? this.allTenants,
+  );
+}
+
+// ---------------------------------------------------------------------------
+// ViewModel
+// ---------------------------------------------------------------------------
+
+class FlatViewModel extends AsyncNotifier<FlatState> {
+  FlatService get _flatService => ref.read(flatServiceProvider);
+  UserService get _userService => ref.read(userServiceProvider);
+
+  @override
+  Future<FlatState> build() async => const FlatState();
+
+  // --- Képkezelés ---
 
   Future<List<File>?> pickImages() async {
     final picked = await ImagePicker().pickMultiImage();
-
     if (picked.isEmpty) return null;
 
-    final allowedImages =
-        picked.where((x) {
-          final path = x.path.toLowerCase();
-          return path.endsWith('.jpg') ||
-              path.endsWith('.jpeg') ||
-              path.endsWith('.png');
-        }).toList();
+    final allowed = picked
+        .where((x) => x.path.toLowerCase().endsWith(RegExp(r'\.(jpg|jpeg|png)$').pattern))
+        .take(6)
+        .map((x) => File(x.path))
+        .toList();
 
-    if (allowedImages.length > 6) {
-      return allowedImages.sublist(0, 6).map((x) => File(x.path)).toList();
-    }
-
-    return allowedImages.map((x) => File(x.path)).toList();
+    return allowed.isEmpty ? null : allowed;
   }
 
   Future<File?> takePhoto() async {
@@ -43,97 +66,97 @@ class FlatViewModel extends StateNotifier<AsyncValue<Flat?>> {
     return picked != null ? File(picked.path) : null;
   }
 
-  /// Kép törlés
   Future<void> deleteImage(int flatId, int imageId) async {
-    state = AsyncValue.loading();
-    try {
-      final updatedFlat = await _service.deleteFlatImage(imageId);
-      if (updatedFlat) {
-        Flat? flat = await _service.getFlatById(flatId);
-        state = AsyncValue.data(flat);
-      }
-    } catch (e, st) {
-      state = AsyncValue.error(e, st);
-    }
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      final success = await _flatService.deleteFlatImage(imageId);
+      if (!success) throw Exception('Kép törlése sikertelen');
+      final updatedFlat = await _flatService.getFlatById(flatId);
+      return state.requireValue.copyWith(flat: updatedFlat);
+    });
   }
 
-  /// Minden tenant a rendszerből (backend)
-  List<UserModel> _allTenants = [];
+  // --- Tenant kezelés ---
 
-  /// Kivétel a már hozzáadott tenantok
-  List<int?> get excludedTenantIds =>
-      state.value?.tenants?.map((t) => t.id).toList() ?? [];
-
-  Future<void> loadAllTenants([String searchTerm = '']) async {
-    final tenants = await _userService.getTenant(searchTerm);
-    _allTenants = tenants;
-  }
-
-  /// Tenant list a kiválasztáshoz a formban
-  List<UserModel> get availableTenants {
-    return _allTenants.where((t) => !excludedTenantIds.contains(t.id)).toList();
-  }
-
-  // Keresés frissítése
   Future<void> searchTenants(String term) async {
-    await loadAllTenants(term);
-    // Force UI update
-    state = AsyncValue.data(state.value);
+    final tenants = await _userService.getTenant(term);
+    final current = state.requireValue;
+    state = AsyncData(current.copyWith(allTenants: tenants));
   }
 
-  /// Tenant hozzáadás
   Future<void> addTenant(UserModel tenant) async {
-    final flatId = state.value!.id;
-    final success = await _service.addTenantToFlat(
-      flatId as int,
-      tenant.id as int,
+    final current = state.requireValue;
+    final flatId = current.flat?.id;
+    if (flatId == null) return;
+
+    final success = await _flatService.addTenantToFlat(flatId, tenant.id as int);
+    if (!success) return;
+
+    final updatedTenants = [...?current.flat!.tenants, tenant];
+    state = AsyncData(
+      current.copyWith(flat: current.flat!.copyWith(tenants: updatedTenants)),
     );
-    if (success) {
-      final updatedTenants = <UserModel>[
-        ...?state.value!.tenants, // ? biztosítja, hogy null esetén kihagyja
-        tenant,
-      ];
-      state = AsyncValue.data(state.value!.copyWith(tenants: updatedTenants));
-    }
   }
 
-  /// Tenant eltávolítás
   Future<void> removeTenant(int tenantId) async {
-    final flatId = state.value!.id;
-    final success = await _service.removeTenantFromFlat(tenantId);
-    if (success) {
-      final updatedTenants =
-          state.value!.tenants!.where((t) => t.id != tenantId).toList();
-      state = AsyncValue.data(state.value!.copyWith(tenants: updatedTenants));
-    }
+    final current = state.requireValue;
+    final flatId = current.flat?.id;
+    if (flatId == null) return;
+
+    final success = await _flatService.removeTenantFromFlat(tenantId);
+    if (!success) return;
+
+    final updatedTenants =
+    current.flat!.tenants!.where((t) => t.id != tenantId).toList();
+    state = AsyncData(
+      current.copyWith(flat: current.flat!.copyWith(tenants: updatedTenants)),
+    );
   }
 
-  void clear() => state = AsyncValue.data(null);
+  Future<void> uploadImages(int flatId, List<String> filePaths) async {
+    if (filePaths.isEmpty) return;
+
+    final current = state.requireValue;
+
+    state = const AsyncLoading();
+
+    state = await AsyncValue.guard(() async {
+      final results = await Future.wait(
+        filePaths.map(
+              (path) => _flatService.uploadSingleImage(flatId, path).catchError((e) {
+            print("Hiba a kép feltöltésénél: $path -> $e");
+            return false;
+          }),
+        ),
+      );
+
+      final updatedFlat = await _flatService.getFlatById(flatId);
+
+      if (!results.every((r) => r == true)) {
+        print("Nem minden kép töltődött fel");
+      }
+
+      return current.copyWith(flat: updatedFlat);
+    });
+  }
+
+  void clear() => state = const AsyncData(FlatState());
 }
 
-/// -----------------
-/// Service Provider
-/// -----------------
+// ---------------------------------------------------------------------------
+// Providers
+// ---------------------------------------------------------------------------
+
 final flatServiceProvider = Provider<FlatService>((ref) {
-  final fileUploadService = ref.watch(fileUploadServiceProvider);
-  final apiService = ref.watch(apiServiceProvider);
   return FlatService(
-    apiService: apiService,
-    fileUploadService: fileUploadService,
+    apiService: ref.watch(apiServiceProvider),
+    fileUploadService: ref.watch(fileUploadServiceProvider),
   );
 });
 
 final userServiceProvider = Provider<UserService>((ref) {
-  final apiService = ref.watch(apiServiceProvider);
-  return UserService(apiService);
+  return UserService(ref.watch(apiServiceProvider));
 });
 
-/// -----------------
-/// ViewModel Providerek
-/// -----------------
 final flatViewModelProvider =
-    StateNotifierProvider<FlatViewModel, AsyncValue<Flat?>>((ref) {
-      final flatService = ref.watch(flatServiceProvider);
-      final userService = ref.watch(userServiceProvider);
-      return FlatViewModel(flatService, userService);
-    });
+AsyncNotifierProvider<FlatViewModel, FlatState>(FlatViewModel.new);

@@ -3,11 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart'; // kell, ha Riverpodot 
 import 'package:go_router/go_router.dart';
 import 'package:rentmate/models/user_role.dart';
 import 'package:rentmate/routing/router_notifier.dart';
-import 'package:rentmate/viewmodels/flat_selector_viewmodel.dart';
-import 'package:rentmate/views/document_list_page.dart';
+import 'package:rentmate/viewmodels/apartman_provider.dart';
 import 'package:rentmate/views/flat_details_view.dart';
 import 'package:rentmate/views/flat_form_view.dart';
-import 'package:rentmate/views/flat_selector_view.dart';
 import 'package:rentmate/views/landlord_home_view.dart';
 import 'package:rentmate/views/profil_view.dart';
 import 'package:rentmate/views/signin_view.dart';
@@ -15,8 +13,8 @@ import 'package:rentmate/views/signup_view.dart';
 import 'package:rentmate/views/tenant_flat_screen.dart';
 import 'package:rentmate/views/welcome_screen.dart';
 import '../viewmodels/auth_viewmodel.dart';
+import '../views/chat_message_view.dart';
 import '../views/splash_screen.dart';
-import '../widgets/PDFViewPage.dart';
 import '../widgets/shell_scaffold.dart';
 
 // Enum az útvonalakhoz
@@ -35,7 +33,6 @@ enum AppRoute {
   newInvoice,
   invoiceDetaul,
   editInvoice,
-  flatSelect,
   notFound;
 
   String title() {
@@ -61,8 +58,6 @@ enum AppRoute {
         return "Számla részletei";
       case AppRoute.editInvoice:
         return "Számla szerkesztése";
-      case AppRoute.flatSelect:
-        return "Lakás kiválasztás";
       case AppRoute.notFound:
         return "Ismeretlen oldal";
       case AppRoute.welcome:
@@ -96,12 +91,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: '/signin',
         name: AppRoute.signin.name,
         pageBuilder: (context, state) => MaterialPage(child: SignInScreen()),
-      ),
-      GoRoute(
-        path: '/flatSelect',
-        name: AppRoute.flatSelect.name,
-        pageBuilder:
-            (context, state) => MaterialPage(child: ApartmentSelectorScreen()),
       ),
       GoRoute(
         path: '/signup',
@@ -178,13 +167,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             builder: (context, state) {
               return Consumer(
                 builder: (context, ref, _) {
-                  final selectedFlat = ref.watch(selectedFlatProvider);
-                  if (selectedFlat == null) {
+                  final apartmanProvder = ref.watch(apartmentProvider);
+                  if (apartmanProvder.active == null) {
                     return const Scaffold(
                       body: Center(child: Text('Nincs kiválasztott lakás.')),
                     );
                   }
-                  return ChatMessageView(flatId: selectedFlat.id as int);
+                  return ChatMessageView(flatId: apartmanProvder.active?.id as int);
                 },
               );
             },

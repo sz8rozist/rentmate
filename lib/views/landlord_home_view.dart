@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rentmate/routing/app_router.dart';
-import 'package:rentmate/viewmodels/flat_selector_viewmodel.dart';
+import 'package:rentmate/viewmodels/apartman_provider.dart';
 
 class LandlordHomeView extends ConsumerStatefulWidget {
   const LandlordHomeView({super.key});
@@ -16,33 +16,32 @@ class _LandlordHomeViewState extends ConsumerState<LandlordHomeView> {
 
   @override
   Widget build(BuildContext context) {
-    final selectedFlat = ref.watch(selectedFlatProvider);
+    final selectedFlat = ref.watch(apartmentProvider);
 
-    if (selectedFlat == null) {
+    if (selectedFlat.active == null) {
       return const Scaffold(
         body: Center(child: Text("Nincs kiválasztott lakás")),
       );
     }
 
     standaloneMenus = [
-      MenuItem('Lakás kiválasztása', Icons.home, AppRoute.flatSelect),
       MenuItem('Lakás hozzáadása', Icons.add_home, AppRoute.createFlat),
       MenuItem(
         'Szerződés készítés',
         Icons.description,
-        AppRoute.createBerletiSzerzodes,
+        AppRoute.invoices,
       ),
       MenuItem(
         'Dokumentum feltöltés',
         Icons.upload_file,
-        AppRoute.uploadDocument,
+        AppRoute.invoices,
       ),
       MenuItem(
         'Dokumentumok megtekintése',
         Icons.folder_open,
-        AppRoute.documents,
+        AppRoute.invoices,
         paramName: 'flatId',
-        paramValue: selectedFlat.id.toString(),
+        paramValue: selectedFlat.active?.id.toString(),
       ),
       MenuItem('Tranzakciók', Icons.receipt_long, AppRoute.invoices),
       MenuItem('Kaució kezelése', Icons.receipt_long, AppRoute.invoices),

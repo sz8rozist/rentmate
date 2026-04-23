@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:go_router/go_router.dart';
+import 'package:rentmate/viewmodels/apartman_provider.dart';
 import 'package:rentmate/viewmodels/auth_viewmodel.dart';
 import 'package:rentmate/viewmodels/flat_viewmodel.dart';
-import 'package:rentmate/viewmodels/flat_selector_viewmodel.dart';
 import 'package:rentmate/widgets/app_bar.dart';
 import 'package:rentmate/widgets/custom_snackbar.dart';
 import 'package:rentmate/widgets/loading_overlay.dart';
@@ -37,10 +37,10 @@ class _FlatFormViewState extends ConsumerState<FlatFormView> {
 
   @override
   Widget build(BuildContext context) {
-    final selectedFlat = ref.read(selectedFlatProvider);
+    final selectedFlat = ref.read(apartmentProvider);
 
     final flatState =
-        selectedFlat != null
+        selectedFlat.active != null
             ? ref.watch(flatViewModelProvider)
             : AsyncValue<Flat?>.data(null);
     final flatVM = ref.read(flatViewModelProvider.notifier);
@@ -221,40 +221,12 @@ class _FlatFormViewState extends ConsumerState<FlatFormView> {
                       final authState = ref.read(authViewModelProvider);
                       final payload = authState.asData?.value.payload;
 
-                      final addedFlat = await ref
-                          .read(
-                            flatSelectorViewModelProvider(
-                              payload?.userId,
-                            ).notifier,
-                          )
-                          .addFlat(
-                            _addressController.text.trim(),
-                            int.parse(_priceController.text.trim()),
-                            payload?.userId,
-                          );
-
-                      print(addedFlat);
-                      if (addedFlat != null) {
-                        final flatId = addedFlat.id;
-                        await ref
-                            .read(
-                              flatSelectorViewModelProvider(
-                                payload?.userId,
-                              ).notifier,
-                            )
-                            .uploadImages(
-                              flatId as int,
-                              selectedImages.map((file) => file.path).toList(),
-                            );
-                      } else {
-                        CustomSnackBar.error(
-                          context,
-                          "Hiba történt a lakás hozzáadásakor.",
-                        );
-                      }
+                      await ref.read(apartmentProvider.notifier).addFlat(_addressController.text.trim(),
+                        int.parse(_priceController.text.trim()),
+                        payload?.userId as int);
 
                       // Visszairányítás
-                      context.goNamed(AppRoute.flatSelect.name);
+                      context.goNamed(AppRoute.home.name);
                     }
                   },
                   child: const Text('Mentés'),

@@ -13,7 +13,6 @@ class ChatService {
 
   ChatService({
     required String socketUrl,
-    required int flatId,
     required this.apiService,
   }) : socket = IO.io(
     socketUrl,
@@ -24,7 +23,6 @@ class ChatService {
   ) {
     _setupListeners();
     socket.connect();
-    joinRoom(flatId);
   }
 
   /// Realtime listener

@@ -7,20 +7,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:rentmate/viewmodels/apartman_provider.dart';
 
 import '../models/flat_image.dart';
+import '../models/flat_model.dart';
 import '../models/flat_status.dart';
-import '../models/user_model.dart';
 import '../viewmodels/auth_viewmodel.dart';
 import '../viewmodels/flat_viewmodel.dart';
-import '../viewmodels/flat_selector_viewmodel.dart';
 import '../viewmodels/user_viewmodel.dart';
 import '../widgets/custom_snackbar.dart';
 import '../widgets/custom_text_form_field.dart';
 import '../widgets/loading_overlay.dart';
 import '../widgets/swipe_image_galery.dart';
 
-/// A widget to display and manage the details of a specific flat.
 class FlatDetailsView extends ConsumerStatefulWidget {
   const FlatDetailsView({super.key});
 
@@ -34,15 +33,16 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView>
   late final TextEditingController _priceController;
   late final AnimationController _animationController;
   late final Animation<double> _animation;
-  FlatStatus? _selectedFlatStatus;
 
+  FlatStatus? _selectedFlatStatus;
   final _formKey = GlobalKey<FormState>();
   final ImagePicker _picker = ImagePicker();
 
-  // Using `_retainedImages` to hold existing images and `_newImages` for newly added ones.
-  // These are updated via state and then passed to the ViewModel for processing.
   List<FlatImage> _retainedImages = [];
   final List<File> _newImages = [];
+
+  // Az initState-ben egyszer töltjük fel a controllereket
+  bool _initialized = false;
 
   @override
   void initState() {
@@ -54,7 +54,6 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView>
     _animation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
-
     _addressController = TextEditingController();
     _priceController = TextEditingController();
   }
@@ -67,130 +66,105 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView>
     super.dispose();
   }
 
-  /// Displays a bottom sheet allowing the user to select an image source.
-  Future<void> _showImageSourceActionSheet(String flatId) async {
+  // ---------------------------------------------------------------------------
+  // Inicializálás (egyszer fut le, amikor a flat először elérhető)
+  // ---------------------------------------------------------------------------
+
+  void _initFromFlat(Flat flat) {
+    if (_initialized) return;
+    _initialized = true;
+    _addressController.text = flat.address;
+    _priceController.text = flat.price.toString();
+    _selectedFlatStatus = flat.status;
+    _retainedImages = List.from(flat.images ?? []);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Képkezelés
+  // ---------------------------------------------------------------------------
+
+  Future<void> _showImageSourceActionSheet(int flatId) async {
     await showModalBottomSheet<void>(
       context: context,
-      builder:
-          (_) => SafeArea(
-            child: Wrap(
-              children: [
-                ListTile(
-                  leading: const Icon(Icons.photo_library),
-                  title: const Text('Galéria'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    _pickImages(flatId);
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.camera_alt),
-                  title: const Text('Kamera'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    _takePhoto(flatId);
-                  },
-                ),
-              ],
+      builder: (_) => SafeArea(
+        child: Wrap(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Galéria'),
+              onTap: () {
+                Navigator.pop(context);
+                _pickImages(flatId);
+              },
             ),
-          ),
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('Kamera'),
+              onTap: () {
+                Navigator.pop(context);
+                _takePhoto(flatId);
+              },
+            ),
+          ],
+        ),
+      ),
     );
   }
 
-  /// Captures a new photo using the device camera.
-  Future<void> _takePhoto(String flatId) async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.camera);
-    if (pickedFile != null) {
-      setState(() => _newImages.add(File(pickedFile.path)));
-      await _updateFlatImages(flatId);
-    }
+  Future<void> _takePhoto(int flatId) async {
+    final picked = await _picker.pickImage(source: ImageSource.camera);
+    if (picked == null) return;
+    setState(() => _newImages.add(File(picked.path)));
+    await _uploadNewImages(flatId);
   }
 
-  /// Picks multiple images from the device gallery.
-  Future<void> _pickImages(String flatId) async {
-    final pickedFiles = await _picker.pickMultiImage();
-    if (pickedFiles.isEmpty) return;
+  Future<void> _pickImages(int flatId) async {
+    final picked = await _picker.pickMultiImage();
+    if (picked.isEmpty) return;
 
-    final allowedImages =
-        pickedFiles.where((file) {
-          final ext = file.path.toLowerCase();
-          return ext.endsWith('.jpg') ||
-              ext.endsWith('.jpeg') ||
-              ext.endsWith('.png');
-        }).toList();
+    final allowed = picked
+        .where((f) {
+      final ext = f.path.toLowerCase();
+      return ext.endsWith('.jpg') ||
+          ext.endsWith('.jpeg') ||
+          ext.endsWith('.png');
+    })
+        .take(6)
+        .map((f) => File(f.path))
+        .toList();
 
-    // Limit to 6 images as per previous logic.
-    final imagesToAdd =
-        allowedImages.take(6).map((file) => File(file.path)).toList();
-
-    setState(() => _newImages.addAll(imagesToAdd));
-    await _updateFlatImages(flatId);
+    if (allowed.isEmpty) return;
+    setState(() => _newImages.addAll(allowed));
+    await _uploadNewImages(flatId);
   }
 
-  /// Updates the flat's images via the ViewModel.
-  Future<void> _updateFlatImages(String flatId) async {
-    /*await ref
-        .read(flatViewModelProvider.notifier)
-        .updateImage(retainedImageUrls: _retainedImages, newImages: _newImages);*/
-    throw UnimplementedError("Nincs implementálva");
+  Future<void> _uploadNewImages(int flatId) async {
+    if (_newImages.isEmpty) return;
+    final paths = _newImages.map((f) => f.path).toList();
+    await ref
+        .read(flatViewModelProvider.notifier).uploadImages(flatId, paths);
+    setState(() => _newImages.clear());
   }
 
-  /// Removes a retained (existing) image from the list.
-  void _removeRetainedImage(FlatImage image, String flatId) {
+  Future<void> _removeRetainedImage(FlatImage image, int flatId) async {
     setState(() => _retainedImages.removeWhere((e) => e.id == image.id));
-    _updateFlatImages(flatId);
+    await ref
+        .read(flatViewModelProvider.notifier)
+        .deleteImage(flatId, image.id as int);
   }
 
-  /// Removes a newly added image from the list.
-  void _removeNewImage(File file, String flatId) {
+  void _removeNewImage(File file) {
     setState(() => _newImages.remove(file));
-    _updateFlatImages(flatId);
   }
 
-  /// Handles the save action for flat details.
-  Future<void> _onSave(int flatId) async {
-    if (!_formKey.currentState!.validate()) {
-      CustomSnackBar.error(context, "Kérlek töltsd ki helyesen a mezőket!");
-      return;
-    }
-    if (_selectedFlatStatus == null) {
-      CustomSnackBar.error(context, "Válassz státuszt!");
-      return;
-    }
-
-    final authState = ref.read(authViewModelProvider);
-    final payload = authState.asData?.value.payload;
-
-    var updatedFlat = await ref
-        .read(flatSelectorViewModelProvider(payload?.userId).notifier)
-        .updateFlat(
-          flatId,
-          _addressController.text,
-          int.parse(_priceController.text),
-          _selectedFlatStatus!,
-        );
-    final selected = ref.read(selectedFlatProvider);
-    if (selected?.id == updatedFlat.id) {
-      ref.read(selectedFlatProvider.notifier).state = updatedFlat;
-    }
-
-    if (mounted) {
-      context.pop();
-      CustomSnackBar.success(context, "Sikeres mentés!");
-    }
-  }
-
-  /// Opens a swipeable image gallery with all images.
   void _openGallery(int initialIndex) {
     final allImages = <ImageProvider>[
-      // csak azok, amiknek van url
       ..._retainedImages
           .where((e) => e.url != null && e.url!.isNotEmpty)
           .map((e) => NetworkImage(e.url!)),
-      ..._newImages.map((file) => FileImage(file)),
+      ..._newImages.map((f) => FileImage(f)),
     ];
-
-    if (allImages.isEmpty) return; // opcionális: nincs kép, ne nyisson galériát
+    if (allImages.isEmpty) return;
 
     showSwipeImageGallery(
       context,
@@ -200,13 +174,46 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView>
     );
   }
 
-  /// Builds the horizontal list of flat images.
-  Widget _buildImageList(String flatId) {
+  // ---------------------------------------------------------------------------
+  // Mentés
+  // ---------------------------------------------------------------------------
+
+  Future<void> _onSave(int flatId) async {
+    if (!_formKey.currentState!.validate()) {
+      CustomSnackBar.error(context, 'Kérlek töltsd ki helyesen a mezőket!');
+      return;
+    }
+    if (_selectedFlatStatus == null) {
+      CustomSnackBar.error(context, 'Válassz státuszt!');
+      return;
+    }
+
+
+    await ref
+        .read(apartmentProvider.notifier)
+        .updateFlat(
+      flatId,
+      _addressController.text,
+      int.parse(_priceController.text),
+      _selectedFlatStatus!,
+    );
+
+    if (mounted) {
+      context.pop();
+      CustomSnackBar.success(context, 'Sikeres mentés!');
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // UI builders
+  // ---------------------------------------------------------------------------
+
+  Widget _buildImageList(int flatId) {
     final totalImages = _retainedImages.length + _newImages.length;
 
     if (totalImages == 0) {
       return const Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16.0),
+        padding: EdgeInsets.symmetric(horizontal: 16),
         child: Text('Nincs feltöltött kép ehhez a lakáshoz.'),
       );
     }
@@ -217,99 +224,59 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView>
         scrollDirection: Axis.horizontal,
         itemCount: totalImages,
         itemBuilder: (context, index) {
-          final bool isRetained = index < _retainedImages.length;
-          final ImageProvider imageProvider;
-          final VoidCallback onDelete;
+          final isRetained = index < _retainedImages.length;
 
           if (isRetained) {
             final image = _retainedImages[index];
-            print(image.filename);
             if (image.url == null || image.url!.isEmpty) {
-              // Ha nincs URL, ne jelenítsük a képet
               return const SizedBox.shrink();
             }
-            imageProvider = NetworkImage(image.url!);
-            onDelete = () => _removeRetainedImage(image, flatId);
+            return _ImageTile(
+              imageProvider: NetworkImage(image.url!),
+              onTap: () => _openGallery(index),
+              onDelete: () => _removeRetainedImage(image, flatId),
+            );
           } else {
             final file = _newImages[index - _retainedImages.length];
-            imageProvider = FileImage(file);
-            onDelete = () => _removeNewImage(file, flatId);
+            return _ImageTile(
+              imageProvider: FileImage(file),
+              onTap: () => _openGallery(index),
+              onDelete: () => _removeNewImage(file),
+            );
           }
-
-          return GestureDetector(
-            onTap: () => _openGallery(index),
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 8),
-                  width: 250,
-                  height: 280,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
-                    color: Colors.grey[300],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: Image(
-                      image: imageProvider,
-                      fit: BoxFit.cover,
-                      width: 200,
-                    ),
-                  ),
-                ),
-                Positioned(
-                  top: 12,
-                  right: 12,
-                  child: _buildDeleteButton(onDelete),
-                ),
-              ],
-            ),
-          );
         },
       ),
     );
   }
 
-  /// Builds a circular delete button for images.
-  Widget _buildDeleteButton(VoidCallback onDelete) {
-    return Material(
-      color: Colors.black38,
-      shape: const CircleBorder(),
-      child: InkWell(
-        onTap: onDelete,
-        borderRadius: BorderRadius.circular(20),
-        child: const Padding(
-          padding: EdgeInsets.all(6),
-          child: Icon(Icons.close, size: 12, color: Colors.white),
-        ),
+  Widget _buildTenantsList(int flatId) {
+    final flatState = ref.watch(flatViewModelProvider);
+
+    return flatState.when(
+      loading: () => Center(
+        child: Platform.isIOS
+            ? const CupertinoActivityIndicator()
+            : const CircularProgressIndicator(),
       ),
-    );
-  }
-
-  /// Builds the list of tenants associated with the flat.
-  Widget _buildTenantsList(String flatId) {
-    final flatListState = ref.watch(flatViewModelProvider);
-    return flatListState.when(
+      error: (e, _) => Center(child: Text('Hiba: $e')),
       data: (flat) {
-        final tenantList = flat?.tenants;
+        final tenants = flat.flat?.tenants ?? [];
 
-        if (tenantList == null || tenantList.isEmpty) {
+        if (tenants.isEmpty) {
           return const Center(child: Text('Nincsenek bérlők hozzáadva.'));
         }
 
         return ListView.separated(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          itemCount: tenantList.length,
+          itemCount: tenants.length,
           separatorBuilder: (_, __) => const SizedBox(height: 8),
           itemBuilder: (context, index) {
-            final tenant = tenantList[index];
-            print(tenant.name);
+            final tenant = tenants[index];
             return Dismissible(
               key: ValueKey(tenant.id),
               direction: DismissDirection.endToStart,
-              confirmDismiss: (direction) async {
+              confirmDismiss: (_) async {
                 final result = await showOkCancelAlertDialog(
                   context: context,
                   title: 'Biztosan törlöd?',
@@ -317,17 +284,15 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView>
                   cancelLabel: 'Mégse',
                   isDestructiveAction: true,
                 );
+                if (result != OkCancelResult.ok) return false;
 
-                if (result == OkCancelResult.ok) {
-                  await ref
-                      .read(flatViewModelProvider.notifier)
-                      .removeTenant(tenant.id as int);
-                  ref
-                      .read(tenantListProvider.notifier)
-                      .includeTenant(tenant.id as int);
-                  return true;
-                }
-                return false;
+                await ref
+                    .read(flatViewModelProvider.notifier)
+                    .removeTenant(tenant.id as int);
+                ref
+                    .read(tenantListProvider.notifier)
+                    .includeTenant(tenant.id as int);
+                return true;
               },
               background: Container(
                 alignment: Alignment.centerRight,
@@ -346,18 +311,131 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView>
           },
         );
       },
-      loading:
-          () => Center(
-            child:
-                Platform.isIOS
-                    ? const CupertinoActivityIndicator()
-                    : const CircularProgressIndicator(),
-          ),
-      error: (error, stack) => Center(child: Text('Hiba: $error')),
     );
   }
 
-  /// Builds a card to display a single piece of flat data.
+  Widget _buildAddTenantModal(BuildContext context, int flatId) {
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+        left: 16,
+        right: 16,
+        top: 16,
+      ),
+      child: Consumer(
+        builder: (context, ref, _) {
+          final tenantState = ref.watch(tenantListProvider);
+          final flatNotifier = ref.read(flatViewModelProvider.notifier);
+
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                decoration: const InputDecoration(
+                  labelText: 'Név szerint keresés',
+                  prefixIcon: Icon(Icons.search),
+                ),
+                onChanged: (value) =>
+                    ref.read(tenantListProvider.notifier).search(value.trim()),
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                height: 300,
+                child: tenantState.when(
+                  loading: () =>
+                  const Center(child: CircularProgressIndicator()),
+                  error: (e, _) => Center(child: Text('Hiba: $e')),
+                  data: (state) {
+                    final tenants = state.visibleTenants;
+                    if (tenants.isEmpty) {
+                      return const Center(child: Text('Nincs találat'));
+                    }
+                    return ListView.builder(
+                      itemCount: tenants.length,
+                      itemBuilder: (context, index) {
+                        final tenant = tenants[index];
+                        return ListTile(
+                          title: Text(tenant.name),
+                          subtitle: Text(tenant.email),
+                          onTap: () async {
+                            await flatNotifier.addTenant(tenant);
+                            if (context.mounted) Navigator.of(context).pop();
+                          },
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildEditFlatDialog(BuildContext context, int flatId) {
+    return AlertDialog(
+      title: const Text('Lakás szerkesztése'),
+      content: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 400, minWidth: 300),
+        child: SingleChildScrollView(
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CustomTextFormField(
+                  labelText: 'Cím',
+                  controller: _addressController,
+                  validator: RequiredValidator(
+                    errorText: 'A cím kitöltése kötelező.',
+                  ).call,
+                ),
+                const SizedBox(height: 12),
+                CustomTextFormField(
+                  labelText: 'Ár',
+                  controller: _priceController,
+                  keyboardType: TextInputType.number,
+                  validator: MultiValidator([
+                    RequiredValidator(errorText: 'Az ár megadása kötelező!'),
+                    PatternValidator(
+                      r'^\d+$',
+                      errorText: 'Az ár csak szám lehet!',
+                    ),
+                  ]).call,
+                ),
+                const SizedBox(height: 12),
+                DropdownButtonFormField<FlatStatus>(
+                  value: _selectedFlatStatus,
+                  decoration: const InputDecoration(labelText: 'Állapot'),
+                  items: FlatStatus.values
+                      .map((s) => DropdownMenuItem(
+                    value: s,
+                    child: Text(s.label),
+                  ))
+                      .toList(),
+                  onChanged: (val) => setState(() => _selectedFlatStatus = val),
+                  validator: (val) => val == null ? 'Válassz állapotot!' : null,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Mégse'),
+        ),
+        ElevatedButton(
+          onPressed: () => _onSave(flatId),
+          child: const Text('Mentés'),
+        ),
+      ],
+    );
+  }
+
   Widget _buildDataCard(String label, String? value) {
     return Card(
       child: Padding(
@@ -374,244 +452,177 @@ class _FlatDetailsViewState extends ConsumerState<FlatDetailsView>
               ),
             ),
             const SizedBox(height: 6),
-            Text(
-              value ?? 'Nincs megadva',
-              style: const TextStyle(fontSize: 16),
-            ),
+            Text(value ?? 'Nincs megadva',
+                style: const TextStyle(fontSize: 16)),
           ],
         ),
       ),
     );
   }
 
-  /// Builds the modal content for adding a tenant.
-  Widget _buildAddTenantModal(BuildContext context, String flatId) {
-    String searchTerm = '';
-    final flatVm = ref.watch(flatViewModelProvider.notifier);
-
-    return Padding(
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-        left: 16,
-        right: 16,
-        top: 16,
-      ),
-      child: Consumer(
-        builder: (context, ref, _) {
-          final tenants = flatVm.availableTenants;
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                decoration: const InputDecoration(
-                  labelText: 'Név szerint keresés',
-                  prefixIcon: Icon(Icons.search),
-                ),
-                onChanged: (value) async {
-                  searchTerm = value.trim();
-                  await flatVm.searchTenants(searchTerm);
-                },
-              ),
-              const SizedBox(height: 16),
-              SizedBox(
-                height: 300,
-                child:
-                    tenants.isEmpty
-                        ? const Center(child: Text('Nincs találat'))
-                        : ListView.builder(
-                          itemCount: tenants.length,
-                          itemBuilder: (context, index) {
-                            final tenant = tenants[index];
-                            return ListTile(
-                              title: Text(tenant.name),
-                              subtitle: Text(tenant.email),
-                              onTap: () async {
-                                await flatVm.addTenant(tenant);
-                                Navigator.of(context).pop();
-                              },
-                            );
-                          },
-                        ),
-              ),
-            ],
-          );
-        },
-      ),
-    );
-  }
-
-  /// Builds the dialog content for editing flat details.
-  Widget _buildEditFlatDialog(BuildContext context, int flatId) {
-    return AlertDialog(
-      title: const Text('Lakás szerkesztése'),
-      content: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 400, minWidth: 300),
-        child: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                CustomTextFormField(
-                  labelText: "Cím",
-                  controller: _addressController,
-                  validator:
-                      RequiredValidator(
-                        errorText: 'A cím kitöltése kötelező.',
-                      ).call,
-                ),
-                const SizedBox(height: 12),
-                CustomTextFormField(
-                  labelText: "Ár",
-                  controller: _priceController,
-                  keyboardType: TextInputType.number,
-                  validator:
-                      MultiValidator([
-                        RequiredValidator(
-                          errorText: 'Az ár megadása kötelező!',
-                        ),
-                        PatternValidator(
-                          r'^\d+$',
-                          errorText: 'Az ár csak szám lehet!',
-                        ),
-                      ]).call,
-                ),
-                const SizedBox(height: 12),
-                DropdownButtonFormField<FlatStatus>(
-                  initialValue: _selectedFlatStatus,
-                  decoration: const InputDecoration(labelText: 'Állapot'),
-                  items:
-                      FlatStatus.values
-                          .map(
-                            (status) => DropdownMenuItem(
-                              value: status,
-                              child: Text(status.label),
-                            ),
-                          )
-                          .toList(),
-                  onChanged: (val) => setState(() => _selectedFlatStatus = val),
-                  validator: (val) => val == null ? 'Válassz állapotot!' : null,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Mégse'),
-        ),
-        ElevatedButton(
-          onPressed: () {
-            _onSave(flatId);
-          },
-          child: const Text('Mentés'),
-        ),
-      ],
-    );
-  }
+  // ---------------------------------------------------------------------------
+  // Build
+  // ---------------------------------------------------------------------------
 
   @override
   Widget build(BuildContext context) {
-    final selectedFlat = ref.watch(selectedFlatProvider);
-    if (selectedFlat == null) {
+    final selectedFlat = ref.watch(apartmentProvider);
+
+    if (selectedFlat.active == null) {
       return const Scaffold(
-        body: Center(child: Text("Nincs kiválasztott lakás")),
+        body: Center(child: Text('Nincs kiválasztott lakás')),
       );
     }
 
-    final flatStateValue = ref.watch(flatViewModelProvider);
+    // Egyszer inicializáljuk a controllereket
+    _initFromFlat(selectedFlat.active as Flat);
 
-    _addressController.text = selectedFlat.address;
-    _priceController.text = selectedFlat.price.toString();
-    _selectedFlatStatus = selectedFlat.status;
-    _retainedImages = selectedFlat.images ?? [];
-
-    final List<Widget> dataCards = [
-      _buildDataCard('Cím', selectedFlat.address),
-      _buildDataCard('Ár (Ft)', selectedFlat.price.toString()),
-      _buildDataCard('Státusz', selectedFlat.status.label),
-    ];
+    final flatState = ref.watch(flatViewModelProvider);
 
     return SafeArea(
       child: LoadingOverlay(
-        isLoading: flatStateValue.isLoading,
+        isLoading: flatState.isLoading,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildImageList(selectedFlat.id.toString()),
+              _buildImageList(selectedFlat.active?.id as int),
               const SizedBox(height: 16),
-              Text(
-                'Lakás adatok:',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
+              Text('Lakás adatok:',
+                  style: Theme.of(context).textTheme.titleMedium),
               const SizedBox(height: 8),
               GridView.count(
                 crossAxisCount: 2,
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
                 childAspectRatio: 3 / 2,
-                children: dataCards,
+                children: [
+                  _buildDataCard('Cím', selectedFlat.active?.address),
+                  _buildDataCard('Ár (Ft)', selectedFlat.active?.price.toString()),
+                  _buildDataCard('Státusz', selectedFlat.active?.status.label),
+                ],
               ),
               const SizedBox(height: 16),
               Text('Bérlők:', style: Theme.of(context).textTheme.titleMedium),
               const SizedBox(height: 8),
-              _buildTenantsList(selectedFlat.id.toString()),
+              _buildTenantsList(selectedFlat.active?.id as int),
               const SizedBox(height: 8),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    _showImageSourceActionSheet(selectedFlat.id.toString());
-                  },
-                  icon: const Icon(Icons.add_a_photo),
-                  label: const Text('Kép hozzáadása'),
-                ),
+              _ActionButton(
+                icon: Icons.add_a_photo,
+                label: 'Kép hozzáadása',
+                onPressed: () =>
+                    _showImageSourceActionSheet(selectedFlat.active?.id as int),
               ),
-              const SizedBox(height: 8), // Távolság a gombok között
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: () async {
-                    final selectedTenant =
-                        await showModalBottomSheet<UserModel>(
-                          context: context,
-                          isScrollControlled: true,
-                          builder:
-                              (context) => _buildAddTenantModal(
-                                context,
-                                selectedFlat.id.toString(),
-                              ),
-                        );
-                  },
-                  icon: const Icon(Icons.person_add),
-                  label: const Text('Bérlő hozzáadása'),
+              const SizedBox(height: 8),
+              _ActionButton(
+                icon: Icons.person_add,
+                label: 'Bérlő hozzáadása',
+                onPressed: () => showModalBottomSheet<void>(
+                  context: context,
+                  isScrollControlled: true,
+                  builder: (ctx) =>
+                      _buildAddTenantModal(ctx, selectedFlat.active?.id as int),
                 ),
               ),
               const SizedBox(height: 8),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: () async {
-                    await showAdaptiveDialog(
-                      context: context,
-                      builder:
-                          (context) => _buildEditFlatDialog(
-                            context,
-                            selectedFlat.id as int,
-                          ),
-                    );
-                  },
-                  icon: const Icon(Icons.edit),
-                  label: const Text('Lakás szerkesztése'),
+              _ActionButton(
+                icon: Icons.edit,
+                label: 'Lakás szerkesztése',
+                onPressed: () => showAdaptiveDialog<void>(
+                  context: context,
+                  builder: (ctx) =>
+                      _buildEditFlatDialog(ctx, selectedFlat.active?.id as int),
                 ),
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Private helper widgetek
+// ---------------------------------------------------------------------------
+
+class _ImageTile extends StatelessWidget {
+  const _ImageTile({
+    required this.imageProvider,
+    required this.onTap,
+    required this.onDelete,
+  });
+
+  final ImageProvider imageProvider;
+  final VoidCallback onTap;
+  final VoidCallback onDelete;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 8),
+            width: 250,
+            height: 280,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              color: Colors.grey[300],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: Image(
+                image: imageProvider,
+                fit: BoxFit.cover,
+                width: 200,
+              ),
+            ),
+          ),
+          Positioned(
+            top: 12,
+            right: 12,
+            child: Material(
+              color: Colors.black38,
+              shape: const CircleBorder(),
+              child: InkWell(
+                onTap: onDelete,
+                borderRadius: BorderRadius.circular(20),
+                child: const Padding(
+                  padding: EdgeInsets.all(6),
+                  child: Icon(Icons.close, size: 12, color: Colors.white),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ActionButton extends StatelessWidget {
+  const _ActionButton({
+    required this.icon,
+    required this.label,
+    required this.onPressed,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton.icon(
+        onPressed: onPressed,
+        icon: Icon(icon),
+        label: Text(label),
       ),
     );
   }

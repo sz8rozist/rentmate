@@ -6,7 +6,6 @@ import 'package:rentmate/viewmodels/theme_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await initHiveForFlutter(); // tároláshoz szükséges
   runApp(ProviderScope(child: MyApp()));
 }
 

@@ -3,56 +3,109 @@ import '../rest_api_config.dart';
 import '../services/user_service.dart';
 import '../models/user_model.dart';
 
+// ---------------------------------------------------------------------------
+// State
+// ---------------------------------------------------------------------------
 
-final userServiceProvider = Provider<UserService>((ref) {
-  final apiService = ref.watch(apiServiceProvider);
-  return UserService(apiService);
-});
-final tenantListProvider =
-    StateNotifierProvider<TenantListNotifier, AsyncValue<List<UserModel>>>((
-      ref,
-    ) {
-      final service = ref.read(userServiceProvider);
-      return TenantListNotifier(service);
-    });
+class TenantListState {
+  const TenantListState({
+    this.allTenants = const [],
+    this.excludedIds = const [],
+    this.searchTerm = '',
+  });
 
-class TenantListNotifier extends StateNotifier<AsyncValue<List<UserModel>>> {
-  final UserService service;
-  List<UserModel> _allTenants = [];
-  List<int> excludedTenantIds = [];
+  final List<UserModel> allTenants;
+  final List<int> excludedIds;
+  final String searchTerm;
 
-  TenantListNotifier(this.service) : super(const AsyncLoading()) {
-    loadTenants();
+  /// A View ezt kapja — szűrt lista
+  List<UserModel> get visibleTenants =>
+      allTenants.where((t) => !excludedIds.contains(t.id)).toList();
+
+  TenantListState copyWith({
+    List<UserModel>? allTenants,
+    List<int>? excludedIds,
+    String? searchTerm,
+  }) =>
+      TenantListState(
+        allTenants: allTenants ?? this.allTenants,
+        excludedIds: excludedIds ?? this.excludedIds,
+        searchTerm: searchTerm ?? this.searchTerm,
+      );
+}
+
+// ---------------------------------------------------------------------------
+// ViewModel
+// ---------------------------------------------------------------------------
+
+class TenantListNotifier extends AsyncNotifier<TenantListState> {
+  UserService get _service => ref.read(userServiceProvider);
+
+  @override
+  Future<TenantListState> build() async {
+    final tenants = await _service.getTenant('');
+    return TenantListState(allTenants: tenants);
   }
 
-  Future<void> loadTenants([String name = '']) async {
-    try {
-      final tenants = await service.getTenant(name);
-      _allTenants = tenants;
-      _filterAndEmit();
-    } catch (e, st) {
-      state = AsyncError(e, st);
-    }
+  // --- Keresés ---
+
+  Future<void> search(String term) async {
+    // Keresés közben a régi lista megmarad, csak frissítjük
+    final current = state.valueOrNull ?? const TenantListState();
+    state = AsyncData(current.copyWith(searchTerm: term));
+
+    final tenants = await _service.getTenant(term);
+    state = AsyncData(
+      (state.valueOrNull ?? const TenantListState()).copyWith(
+        allTenants: tenants,
+        searchTerm: term,
+      ),
+    );
   }
 
-  void _filterAndEmit() {
-    final filtered =
-        _allTenants.where((t) => !excludedTenantIds.contains(t.id)).toList();
-    state = AsyncData(filtered);
+  // --- Szűrés ---
+
+  void excludeTenant(int tenantId) => _updateExcluded(
+        (ids) => [...ids, tenantId],
+  );
+
+  void includeTenant(int tenantId) => _updateExcluded(
+        (ids) => ids.where((id) => id != tenantId).toList(),
+  );
+
+  void setExcludedIds(List<int> ids) {
+    final current = state.valueOrNull ?? const TenantListState();
+    state = AsyncData(current.copyWith(excludedIds: ids));
   }
 
-  void excludeTenant(int tenantId) {
-    excludedTenantIds.add(tenantId);
-    _filterAndEmit();
-  }
-
-  void includeTenant(int tenantId) {
-    excludedTenantIds.remove(tenantId);
-    _filterAndEmit();
-  }
+  // --- Refresh ---
 
   Future<void> refresh() async {
-    state = const AsyncLoading();
-    await loadTenants();
+    final current = state.valueOrNull ?? const TenantListState();
+    state = await AsyncValue.guard(() async {
+      final tenants = await _service.getTenant(current.searchTerm);
+      return current.copyWith(allTenants: tenants);
+    });
+  }
+
+  // --- Helper ---
+
+  void _updateExcluded(List<int> Function(List<int>) updater) {
+    final current = state.valueOrNull;
+    if (current == null) return;
+    state = AsyncData(current.copyWith(excludedIds: updater(current.excludedIds)));
   }
 }
+
+// ---------------------------------------------------------------------------
+// Providers
+// ---------------------------------------------------------------------------
+
+final userServiceProvider = Provider<UserService>((ref) {
+  return UserService(ref.watch(apiServiceProvider));
+});
+
+final tenantListProvider =
+AsyncNotifierProvider<TenantListNotifier, TenantListState>(
+  TenantListNotifier.new,
+);

@@ -1,10 +1,12 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-//String get host => Platform.isAndroid ? '10.0.2.2' : 'localhost';
+String get host => Platform.isAndroid ? '10.0.2.2' : 'localhost';
 /// Ha fizikai deviceon nézzük ezt a host kell
-String get host => '192.168.0.78';
+//String get host => '192.168.0.78';
 
 /// FlutterSecureStorage Provider
 final secureStorageProvider = Provider<FlutterSecureStorage>((ref) {
